@@ -42,9 +42,10 @@ type Product = {
   tag: string;
   description: string;
   amount: number;
-  span: string;
-  accent: string;
+  span?: string;
+  accent?: string;
   slug?: string | null;
+  thumbnail_url?: string | null;
 };
 
 function Index() {
