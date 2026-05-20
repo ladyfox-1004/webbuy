@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SellRouteImport } from './routes/sell'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MeRouteImport } from './routes/me'
@@ -27,6 +28,11 @@ const TermsRoute = TermsRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundRoute = RefundRouteImport.update({
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/payment/result': typeof PaymentResultRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/payment/result': typeof PaymentResultRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/payment/result': typeof PaymentResultRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/me'
     | '/privacy'
     | '/refund'
+    | '/sell'
     | '/signup'
     | '/terms'
     | '/payment/result'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/me'
     | '/privacy'
     | '/refund'
+    | '/sell'
     | '/signup'
     | '/terms'
     | '/payment/result'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/me'
     | '/privacy'
     | '/refund'
+    | '/sell'
     | '/signup'
     | '/terms'
     | '/payment/result'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   MeRoute: typeof MeRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
+  SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
   PaymentResultRoute: typeof PaymentResultRoute
@@ -161,6 +174,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refund': {
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   MeRoute: MeRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
+  SellRoute: SellRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
   PaymentResultRoute: PaymentResultRoute,
@@ -229,3 +250,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
