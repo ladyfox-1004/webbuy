@@ -19,8 +19,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as USlugRouteImport } from './routes/u.$slug'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
+import { Route as AdminReviewRouteImport } from './routes/admin.review'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -72,6 +74,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const USlugRoute = USlugRouteImport.update({
+  id: '/u/$slug',
+  path: '/u/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentResultRoute = PaymentResultRouteImport.update({
   id: '/payment/result',
   path: '/payment/result',
@@ -82,10 +89,15 @@ const PSlugRoute = PSlugRouteImport.update({
   path: '/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminReviewRoute = AdminReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
@@ -94,12 +106,14 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/admin/review': typeof AdminReviewRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/u/$slug': typeof USlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
@@ -108,13 +122,15 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/admin/review': typeof AdminReviewRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/u/$slug': typeof USlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRoute
+  '/admin': typeof AdminRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
@@ -123,8 +139,10 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/admin/review': typeof AdminReviewRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/u/$slug': typeof USlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,8 +157,10 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/terms'
+    | '/admin/review'
     | '/p/$slug'
     | '/payment/result'
+    | '/u/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -153,8 +173,10 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/terms'
+    | '/admin/review'
     | '/p/$slug'
     | '/payment/result'
+    | '/u/$slug'
   id:
     | '__root__'
     | '/'
@@ -167,13 +189,15 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/terms'
+    | '/admin/review'
     | '/p/$slug'
     | '/payment/result'
+    | '/u/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRoute
+  AdminRoute: typeof AdminRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   MeRoute: typeof MeRoute
@@ -184,6 +208,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   PSlugRoute: typeof PSlugRoute
   PaymentResultRoute: typeof PaymentResultRoute
+  USlugRoute: typeof USlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -258,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/u/$slug': {
+      id: '/u/$slug'
+      path: '/u/$slug'
+      fullPath: '/u/$slug'
+      preLoaderRoute: typeof USlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payment/result': {
       id: '/payment/result'
       path: '/payment/result'
@@ -272,12 +304,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/review': {
+      id: '/admin/review'
+      path: '/review'
+      fullPath: '/admin/review'
+      preLoaderRoute: typeof AdminReviewRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminReviewRoute: typeof AdminReviewRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminReviewRoute: AdminReviewRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRoute,
+  AdminRoute: AdminRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   MeRoute: MeRoute,
@@ -288,6 +337,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   PSlugRoute: PSlugRoute,
   PaymentResultRoute: PaymentResultRoute,
+  USlugRoute: USlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

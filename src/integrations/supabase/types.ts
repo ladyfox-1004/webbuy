@@ -113,6 +113,7 @@ export type Database = {
           accent: string
           active: boolean
           amount: number
+          category: string | null
           created_at: string
           currency: string
           delivery_file_path: string | null
@@ -126,6 +127,7 @@ export type Database = {
           span: string
           status: Database["public"]["Enums"]["product_status"]
           tag: string
+          tags: string[]
           thumbnail_url: string | null
           title: string
           updated_at: string
@@ -134,6 +136,7 @@ export type Database = {
           accent?: string
           active?: boolean
           amount: number
+          category?: string | null
           created_at?: string
           currency?: string
           delivery_file_path?: string | null
@@ -147,6 +150,7 @@ export type Database = {
           span?: string
           status?: Database["public"]["Enums"]["product_status"]
           tag: string
+          tags?: string[]
           thumbnail_url?: string | null
           title: string
           updated_at?: string
@@ -155,6 +159,7 @@ export type Database = {
           accent?: string
           active?: boolean
           amount?: number
+          category?: string | null
           created_at?: string
           currency?: string
           delivery_file_path?: string | null
@@ -168,6 +173,7 @@ export type Database = {
           span?: string
           status?: Database["public"]["Enums"]["product_status"]
           tag?: string
+          tags?: string[]
           thumbnail_url?: string | null
           title?: string
           updated_at?: string
@@ -273,6 +279,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       slugify: { Args: { input: string }; Returns: string }
     }
     Enums: {

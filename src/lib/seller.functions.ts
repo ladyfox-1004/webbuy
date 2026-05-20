@@ -58,7 +58,9 @@ const productSchema = z.object({
   product_type: z.enum(["web", "app", "file", "license"]),
   delivery_url: z.string().url().max(500).optional().nullable(),
   delivery_file_path: z.string().max(300).optional().nullable(),
-  status: z.enum(["draft", "live"]).default("draft"),
+  status: z.enum(["draft", "review", "live"]).default("draft"),
+  category: z.string().trim().max(40).optional().nullable(),
+  tags: z.array(z.string().trim().min(1).max(30)).max(10).optional().default([]),
 });
 
 export const listMyProducts = createServerFn({ method: "GET" })
@@ -82,18 +84,25 @@ export const upsertMyProduct = createServerFn({ method: "POST" })
       .from("seller_profiles").select("user_id").eq("user_id", context.userId).maybeSingle();
     if (!profile) throw new Error("먼저 판매자 프로필을 만들어 주세요.");
 
+    // non-admin sellers cannot self-publish: clamp 'live' to 'review'
+    const { data: isAdminRow } = await supabaseAdmin
+      .from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    const isAdmin = !!isAdminRow;
+    const safeStatus = !isAdmin && data.status === "live" ? "review" : data.status;
+    const payload = { ...data, status: safeStatus };
+
     if (data.id) {
       const { error } = await supabaseAdmin
-        .from("products").update({ ...data, seller_id: context.userId })
+        .from("products").update({ ...payload, seller_id: context.userId })
         .eq("id", data.id).eq("seller_id", context.userId);
       if (error) throw new Error(error.message);
     } else {
-      const { id: _ignored, ...insertData } = data;
+      const { id: _ignored, ...insertData } = payload;
       const { error } = await supabaseAdmin
         .from("products").insert({ ...insertData, seller_id: context.userId });
       if (error) throw new Error(error.message);
     }
-    return { ok: true };
+    return { ok: true, status: safeStatus };
   });
 
 export const deleteMyProduct = createServerFn({ method: "POST" })

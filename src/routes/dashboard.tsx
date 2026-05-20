@@ -34,7 +34,9 @@ type ProductForm = {
   product_type: "web" | "app" | "file" | "license";
   delivery_url: string;
   delivery_file_path: string;
-  status: "draft" | "live";
+  status: "draft" | "review" | "live";
+  category: string;
+  tags: string[];
 };
 
 function DashboardPage() {
@@ -162,6 +164,8 @@ function Products() {
           delivery_url: f.delivery_url || null,
           delivery_file_path: f.delivery_file_path || null,
           status: f.status,
+          category: f.category || null,
+          tags: f.tags,
         },
       }),
     onSuccess: () => {
