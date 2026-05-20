@@ -78,7 +78,7 @@ function Nav() {
             {user && (
               <>
                 <Link to="/dashboard" className="transition hover:text-foreground">대시보드</Link>
-                <Link to="/me" className="transition hover:text-foreground">내 결제</Link>
+                <Link to="/me" className="transition hover:text-foreground">보관함</Link>
               </>
             )}
             {isAdmin && (
