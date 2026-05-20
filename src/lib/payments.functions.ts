@@ -178,3 +178,36 @@ export const getProductFileUrl = createServerFn({ method: "POST" })
     if (error || !signed) throw new Error(error?.message ?? "URL 생성 실패");
     return { url: signed.signedUrl };
   });
+
+// Public product detail by slug. Two-step (no FK between products and seller_profiles).
+export const getProductBySlug = createServerFn({ method: "GET" })
+  .inputValidator((input) => z.object({ slug: z.string().min(1).max(200) }).parse(input))
+  .handler(async ({ data }) => {
+    const { data: product, error } = await supabaseAdmin
+      .from("products")
+      .select(
+        "id, slug, title, tag, description, amount, currency, thumbnail_url, product_type, status, active, created_at, seller_id"
+      )
+      .eq("slug", data.slug)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!product || !product.active || product.status !== "live") return null;
+
+    let seller: {
+      user_id: string;
+      business_name: string;
+      slug: string;
+      bio: string | null;
+      avatar_url: string | null;
+      website_url: string | null;
+    } | null = null;
+    if (product.seller_id) {
+      const { data: s } = await supabaseAdmin
+        .from("seller_profiles")
+        .select("user_id, business_name, slug, bio, avatar_url, website_url")
+        .eq("user_id", product.seller_id)
+        .maybeSingle();
+      seller = s ?? null;
+    }
+    return { ...product, seller };
+  });

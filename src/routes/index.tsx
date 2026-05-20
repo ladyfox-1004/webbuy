@@ -43,6 +43,7 @@ type Product = {
   amount: number;
   span: string;
   accent: string;
+  slug?: string | null;
 };
 
 function Index() {
@@ -242,9 +243,17 @@ function ProjectCard({ project }: { project: Product }) {
           <ArrowUpRight className="h-5 w-5 text-muted-foreground transition group-hover:rotate-45 group-hover:text-primary-glow" />
         </div>
         <div>
-          <h3 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
-            {project.title}
-          </h3>
+          {project.slug ? (
+            <Link to="/p/$slug" params={{ slug: project.slug }} className="block group/title">
+              <h3 className="font-display text-2xl font-semibold text-foreground transition group-hover/title:text-primary-glow md:text-3xl">
+                {project.title}
+              </h3>
+            </Link>
+          ) : (
+            <h3 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
+              {project.title}
+            </h3>
+          )}
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
             {project.description}
           </p>
