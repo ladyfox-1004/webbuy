@@ -227,8 +227,8 @@ function Projects() {
           </div>
         ) : (
           <div className="grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-4 md:grid-cols-3">
-            {(products ?? []).map((p: Record<string, unknown>) => (
-              <ProjectCard key={p.id} project={{ ...p, span: "min-h-[260px]", accent: "from-primary/30 to-transparent" } as Product} />
+            {((products ?? []) as Product[]).map((p) => (
+              <ProjectCard key={p.id} project={{ ...p, span: "min-h-[260px]", accent: "from-primary/30 to-transparent" }} />
             ))}
           </div>
         )}
