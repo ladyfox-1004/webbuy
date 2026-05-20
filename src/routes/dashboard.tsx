@@ -34,7 +34,9 @@ type ProductForm = {
   product_type: "web" | "app" | "file" | "license";
   delivery_url: string;
   delivery_file_path: string;
-  status: "draft" | "live";
+  status: "draft" | "review" | "live";
+  category: string;
+  tags: string[];
 };
 
 function DashboardPage() {
