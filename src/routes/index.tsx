@@ -73,7 +73,7 @@ function Nav() {
             <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs">
               ◆
             </span>
-            Studio
+            <span className="text-base">webbuy</span>
           </Link>
           <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
