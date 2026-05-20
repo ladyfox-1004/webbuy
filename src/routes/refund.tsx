@@ -20,7 +20,16 @@ function RefundPage() {
 
         <div className="mt-10 space-y-8 text-muted-foreground">
           <section>
-            <h2 className="font-display text-xl font-semibold text-foreground">1. 청약철회 및 환불 가능 기간</h2>
+            <h2 className="font-display text-xl font-semibold text-foreground">1. 서비스 제공 기간</h2>
+            <p className="mt-2 leading-relaxed">
+              단 건(1회성) 결제 상품의 서비스 제공 기간은 <span className="text-foreground">결제일로부터 최대 3개월</span>입니다.
+              해당 기간 내에 보관함을 통해 상품(웹 접속/파일/라이선스 키)을 이용할 수 있으며, 기간 경과 후에는
+              접근이 제한될 수 있습니다. 구독형 상품의 경우 별도 약관에 따릅니다.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="font-display text-xl font-semibold text-foreground">2. 청약철회 및 환불 가능 기간</h2>
             <p className="mt-2 leading-relaxed">
               이용자는 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 결제일로부터 7일 이내에
               청약철회를 요청할 수 있습니다. 단, 디지털 콘텐츠의 경우 콘텐츠를 다운로드하거나 사용한
