@@ -340,7 +340,7 @@ function Contact() {
               href="mailto:hello@example.com"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-medium text-primary-foreground transition hover:scale-[1.02]"
             >
-              <Mail className="h-4 w-4" /> hello@example.com
+              <Mail className="h-4 w-4" />hello@example.com
             </a>
           </div>
         </div>
