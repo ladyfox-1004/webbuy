@@ -74,9 +74,12 @@ function Nav() {
           </Link>
           <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
-            <a href="#about" className="transition hover:text-foreground">About</a>
+            <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>
             {user && (
-              <Link to="/me" className="transition hover:text-foreground">내 결제</Link>
+              <>
+                <Link to="/dashboard" className="transition hover:text-foreground">대시보드</Link>
+                <Link to="/me" className="transition hover:text-foreground">내 결제</Link>
+              </>
             )}
             {isAdmin && (
               <Link to="/admin" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
