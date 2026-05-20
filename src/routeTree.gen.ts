@@ -20,6 +20,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
+import { Route as PSlugRouteImport } from './routes/p.$slug'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -76,6 +77,11 @@ const PaymentResultRoute = PaymentResultRouteImport.update({
   path: '/payment/result',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PSlugRoute = PSlugRouteImport.update({
+  id: '/p/$slug',
+  path: '/p/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
 }
 export interface FileRoutesById {
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
+  '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/terms'
+    | '/p/$slug'
     | '/payment/result'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/terms'
+    | '/p/$slug'
     | '/payment/result'
   id:
     | '__root__'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/terms'
+    | '/p/$slug'
     | '/payment/result'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
+  PSlugRoute: typeof PSlugRoute
   PaymentResultRoute: typeof PaymentResultRoute
 }
 
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentResultRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/p/$slug': {
+      id: '/p/$slug'
+      path: '/p/$slug'
+      fullPath: '/p/$slug'
+      preLoaderRoute: typeof PSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -266,8 +286,19 @@ const rootRouteChildren: RootRouteChildren = {
   SellRoute: SellRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
+  PSlugRoute: PSlugRoute,
   PaymentResultRoute: PaymentResultRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
