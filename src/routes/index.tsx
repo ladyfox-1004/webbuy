@@ -85,8 +85,8 @@ function Nav() {
               </>
             )}
             {isAdmin && (
-              <Link to="/admin" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
-                <ShieldCheck className="h-3.5 w-3.5" />Admin
+              <Link to="/admin/review" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
+                <ShieldCheck className="h-3.5 w-3.5" />검수
               </Link>
             )}
           </div>
