@@ -194,6 +194,52 @@ function Projects() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const [loading, setLoading] = useState(false);
+  const verify = useServerFn(verifyPayment);
+
+  async function handlePay() {
+    if (!project.amount) return;
+    setLoading(true);
+    try {
+      const PortOne = (await import("@portone/browser-sdk/v2")).default;
+      const paymentId = `pay-${crypto.randomUUID()}`;
+      const result = await PortOne.requestPayment({
+        storeId: PORTONE_CONFIG.storeId,
+        channelKey: PORTONE_CONFIG.channelKey,
+        paymentId,
+        orderName: project.title,
+        totalAmount: project.amount,
+        currency: "CURRENCY_KRW",
+        payMethod: "CARD",
+      });
+
+      if (result?.code !== undefined) {
+        toast.error(result.message ?? "결제가 취소되었습니다.");
+        return;
+      }
+
+      toast.loading("결제 검증 중…", { id: paymentId });
+      const verification = await verify({
+        data: {
+          paymentId,
+          expectedAmount: project.amount,
+          productTitle: project.title,
+        },
+      });
+
+      if (verification.ok) {
+        toast.success(`${project.title} 결제 완료!`, { id: paymentId });
+      } else {
+        toast.error(verification.error ?? "결제 검증 실패", { id: paymentId });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("결제 처리 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
@@ -215,11 +261,25 @@ function ProjectCard({ project }: { project: Project }) {
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
             {project.description}
           </p>
-          {project.price && (
+          {project.amount !== undefined && (
             <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
-              <span className="font-display text-lg font-semibold">{project.price}</span>
-              <button className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
-                <CreditCard className="h-3.5 w-3.5" /> 결제
+              <span className="font-display text-lg font-semibold">
+                ₩{project.amount.toLocaleString("ko-KR")}
+              </span>
+              <button
+                onClick={handlePay}
+                disabled={loading}
+                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />처리중
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-3.5 w-3.5" />결제
+                  </>
+                )}
               </button>
             </div>
           )}
