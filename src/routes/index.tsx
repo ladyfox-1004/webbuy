@@ -146,16 +146,30 @@ function Hero() {
 }
 
 function Projects() {
-  const fetchProducts = useServerFn(listProducts);
+  const fetchSearch = useServerFn(searchProducts);
+  const fetchCategories = useServerFn(listCategories);
+  const [q, setQ] = useState("");
+  const [debouncedQ, setDebouncedQ] = useState("");
+  const [category, setCategory] = useState<string>("");
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQ(q.trim()), 250);
+    return () => clearTimeout(id);
+  }, [q]);
+
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products"],
-    queryFn: () => fetchProducts(),
+    queryKey: ["search-products", debouncedQ, category],
+    queryFn: () => fetchSearch({ data: { q: debouncedQ, category, limit: 36 } }),
+  });
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => fetchCategories(),
   });
 
   return (
     <section id="projects" className="px-4 py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12 flex items-end justify-between">
+        <div className="mb-8 flex items-end justify-between">
           <div>
             <div className="mb-3 text-sm font-medium text-primary-glow">— Projects</div>
             <h2 className="font-display text-4xl font-bold md:text-5xl">컬렉션</h2>
@@ -165,12 +179,55 @@ function Projects() {
           </div>
         </div>
 
+        <div className="mb-6 flex flex-col gap-3">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="제품·태그·설명 검색"
+              className="w-full rounded-full border border-border bg-surface/60 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-primary-glow"
+            />
+          </div>
+          {(categories?.length ?? 0) > 0 && (
+            <div className="-mx-1 flex flex-wrap gap-2">
+              <button
+                onClick={() => setCategory("")}
+                className={`rounded-full border px-3 py-1 text-xs transition ${
+                  category === ""
+                    ? "border-primary-glow bg-gradient-to-br from-primary to-primary-glow text-primary-foreground"
+                    : "border-border bg-surface/40 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                전체
+              </button>
+              {(categories ?? []).map((c) => (
+                <button
+                  key={c}
+                  onClick={() => setCategory(c === category ? "" : c)}
+                  className={`rounded-full border px-3 py-1 text-xs transition ${
+                    category === c
+                      ? "border-primary-glow bg-gradient-to-br from-primary to-primary-glow text-primary-foreground"
+                      : "border-border bg-surface/40 text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {isLoading ? (
           <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        ) : (products ?? []).length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-border bg-surface/30 p-16 text-center text-sm text-muted-foreground">
+            검색 결과가 없어요.
+          </div>
         ) : (
           <div className="grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-4 md:grid-cols-3">
             {(products ?? []).map((p) => (
-              <ProjectCard key={p.id} project={p as Product} />
+              <ProjectCard key={p.id} project={{ ...p, span: "min-h-[260px]", accent: "from-primary/30 to-transparent" } as Product} />
             ))}
           </div>
         )}
