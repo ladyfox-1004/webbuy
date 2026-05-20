@@ -181,13 +181,18 @@ function ProjectCard({ project }: { project: Product }) {
   const navigate = useNavigate();
 
   async function pay(method: "CARD" | "EASY_PAY") {
+    const channelKey = method === "CARD" ? PORTONE_CONFIG.channelKeyCard : PORTONE_CONFIG.channelKeyEasyPay;
+    if (!channelKey) {
+      toast.error("카드 결제 채널이 아직 설정되지 않았습니다. 간편결제를 이용해 주세요.");
+      return;
+    }
     setLoading(true);
     try {
       const PortOne = (await import("@portone/browser-sdk/v2")).default;
       const paymentId = `pay-${crypto.randomUUID()}`;
       const result = await PortOne.requestPayment({
         storeId: PORTONE_CONFIG.storeId,
-        channelKey: PORTONE_CONFIG.channelKey,
+        channelKey,
         paymentId,
         orderName: project.title,
         totalAmount: project.amount,
