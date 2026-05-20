@@ -223,6 +223,7 @@ function Products() {
                     thumbnail_url: p.thumbnail_url ?? "", product_type: (p.product_type as ProductForm["product_type"]) ?? "web",
                     delivery_url: p.delivery_url ?? "", delivery_file_path: p.delivery_file_path ?? "",
                     status: (p.status as "draft" | "live") ?? "draft",
+                    category: (p as any).category ?? "", tags: (p as any).tags ?? [],
                   })}
                   className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-surface"
                 ><Pencil className="h-3.5 w-3.5" /> 수정</button>
@@ -254,6 +255,7 @@ function emptyForm(): ProductForm {
     title: "", tag: "Web", description: "", amount: 9900,
     thumbnail_url: "", product_type: "web",
     delivery_url: "", delivery_file_path: "", status: "draft",
+    category: "", tags: [],
   };
 }
 
