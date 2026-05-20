@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowUpRight,
@@ -15,12 +15,13 @@ import {
   Smartphone,
   LogIn,
   LogOut,
+  Search,
   ShieldCheck,
   User as UserIcon,
 } from "lucide-react";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
 import { verifyPayment } from "@/lib/payments.functions";
-import { listProducts } from "@/lib/products.functions";
+import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
