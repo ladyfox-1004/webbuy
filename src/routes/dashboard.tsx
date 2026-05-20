@@ -164,6 +164,8 @@ function Products() {
           delivery_url: f.delivery_url || null,
           delivery_file_path: f.delivery_file_path || null,
           status: f.status,
+          category: f.category || null,
+          tags: f.tags,
         },
       }),
     onSuccess: () => {
