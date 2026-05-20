@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      entitlements: {
+        Row: {
+          access_token: string
+          customer_email: string | null
+          granted_at: string
+          id: string
+          payment_id: string
+          product_id: string | null
+          seller_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_token?: string
+          customer_email?: string | null
+          granted_at?: string
+          id?: string
+          payment_id: string
+          product_id?: string | null
+          seller_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          customer_email?: string | null
+          granted_at?: string
+          id?: string
+          payment_id?: string
+          product_id?: string | null
+          seller_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
