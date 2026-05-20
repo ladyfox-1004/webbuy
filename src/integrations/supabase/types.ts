@@ -25,6 +25,7 @@ export type Database = {
           product_id: string | null
           product_title: string
           raw: Json | null
+          seller_id: string | null
           status: string
           user_id: string | null
         }
@@ -38,6 +39,7 @@ export type Database = {
           product_id?: string | null
           product_title: string
           raw?: Json | null
+          seller_id?: string | null
           status: string
           user_id?: string | null
         }
@@ -51,6 +53,7 @@ export type Database = {
           product_id?: string | null
           product_title?: string
           raw?: Json | null
+          seller_id?: string | null
           status?: string
           user_id?: string | null
         }
@@ -71,11 +74,18 @@ export type Database = {
           amount: number
           created_at: string
           currency: string
+          delivery_file_path: string | null
+          delivery_url: string | null
           description: string
           id: string
+          product_type: Database["public"]["Enums"]["product_type"]
+          seller_id: string | null
+          slug: string | null
           sort_order: number
           span: string
+          status: Database["public"]["Enums"]["product_status"]
           tag: string
+          thumbnail_url: string | null
           title: string
           updated_at: string
         }
@@ -85,11 +95,18 @@ export type Database = {
           amount: number
           created_at?: string
           currency?: string
+          delivery_file_path?: string | null
+          delivery_url?: string | null
           description: string
           id?: string
+          product_type?: Database["public"]["Enums"]["product_type"]
+          seller_id?: string | null
+          slug?: string | null
           sort_order?: number
           span?: string
+          status?: Database["public"]["Enums"]["product_status"]
           tag: string
+          thumbnail_url?: string | null
           title: string
           updated_at?: string
         }
@@ -99,11 +116,18 @@ export type Database = {
           amount?: number
           created_at?: string
           currency?: string
+          delivery_file_path?: string | null
+          delivery_url?: string | null
           description?: string
           id?: string
+          product_type?: Database["public"]["Enums"]["product_type"]
+          seller_id?: string | null
+          slug?: string | null
           sort_order?: number
           span?: string
+          status?: Database["public"]["Enums"]["product_status"]
           tag?: string
+          thumbnail_url?: string | null
           title?: string
           updated_at?: string
         }
@@ -127,6 +151,51 @@ export type Database = {
           display_name?: string | null
           email?: string | null
           id?: string
+        }
+        Relationships: []
+      }
+      seller_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          business_name: string
+          created_at: string
+          payout_account: string | null
+          payout_bank: string | null
+          payout_holder: string | null
+          slug: string
+          updated_at: string
+          user_id: string
+          verified: boolean
+          website_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_name: string
+          created_at?: string
+          payout_account?: string | null
+          payout_bank?: string | null
+          payout_holder?: string | null
+          slug: string
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+          website_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          business_name?: string
+          created_at?: string
+          payout_account?: string | null
+          payout_bank?: string | null
+          payout_holder?: string | null
+          slug?: string
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -166,6 +235,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      product_status: "draft" | "review" | "live" | "rejected"
+      product_type: "web" | "app" | "file" | "license"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -294,6 +365,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      product_status: ["draft", "review", "live", "rejected"],
+      product_type: ["web", "app", "file", "license"],
     },
   },
 } as const

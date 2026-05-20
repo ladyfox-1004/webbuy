@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as SellRouteImport } from './routes/sell'
 import { Route as RefundRouteImport } from './routes/refund'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
@@ -27,6 +29,11 @@ const TermsRoute = TermsRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RefundRoute = RefundRouteImport.update({
@@ -49,6 +56,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -68,10 +80,12 @@ const PaymentResultRoute = PaymentResultRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/payment/result': typeof PaymentResultRoute
@@ -79,10 +93,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/payment/result': typeof PaymentResultRoute
@@ -91,10 +107,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
   '/privacy': typeof PrivacyRoute
   '/refund': typeof RefundRoute
+  '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/payment/result': typeof PaymentResultRoute
@@ -104,10 +122,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/dashboard'
     | '/login'
     | '/me'
     | '/privacy'
     | '/refund'
+    | '/sell'
     | '/signup'
     | '/terms'
     | '/payment/result'
@@ -115,10 +135,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/dashboard'
     | '/login'
     | '/me'
     | '/privacy'
     | '/refund'
+    | '/sell'
     | '/signup'
     | '/terms'
     | '/payment/result'
@@ -126,10 +148,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/dashboard'
     | '/login'
     | '/me'
     | '/privacy'
     | '/refund'
+    | '/sell'
     | '/signup'
     | '/terms'
     | '/payment/result'
@@ -138,10 +162,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   MeRoute: typeof MeRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundRoute: typeof RefundRoute
+  SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
   PaymentResultRoute: typeof PaymentResultRoute
@@ -161,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refund': {
@@ -191,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -218,10 +258,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   MeRoute: MeRoute,
   PrivacyRoute: PrivacyRoute,
   RefundRoute: RefundRoute,
+  SellRoute: SellRoute,
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
   PaymentResultRoute: PaymentResultRoute,
