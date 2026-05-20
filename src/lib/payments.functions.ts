@@ -67,12 +67,21 @@ export const verifyPayment = createServerFn({ method: "POST" })
     const isPaid = payment.status === "PAID" || payment.status === "VIRTUAL_ACCOUNT_ISSUED";
     const userId = await getOptionalUserId();
 
+    // resolve seller_id from product (if provided)
+    let sellerId: string | null = null;
+    if (data.productId) {
+      const { data: prod } = await supabaseAdmin
+        .from("products").select("seller_id").eq("id", data.productId).maybeSingle();
+      sellerId = prod?.seller_id ?? null;
+    }
+
     const { error: dbError } = await supabaseAdmin.from("payments").upsert(
       {
         payment_id: data.paymentId,
         product_title: data.productTitle,
         product_id: data.productId ?? null,
         user_id: userId,
+        seller_id: sellerId,
         amount: paidAmount,
         currency: payment.currency ?? "KRW",
         status: payment.status,
@@ -85,6 +94,21 @@ export const verifyPayment = createServerFn({ method: "POST" })
     if (dbError) {
       console.error("DB upsert failed", dbError);
       return { ok: false, error: "기록 저장 실패", status: payment.status };
+    }
+
+    // grant entitlement on successful paid
+    if (isPaid && data.productId) {
+      const { error: entErr } = await supabaseAdmin.from("entitlements").upsert(
+        {
+          user_id: userId,
+          product_id: data.productId,
+          seller_id: sellerId,
+          payment_id: data.paymentId,
+          customer_email: payment.customer?.email ?? null,
+        },
+        { onConflict: "payment_id" },
+      );
+      if (entErr) console.error("Entitlement upsert failed", entErr);
     }
 
     return { ok: isPaid, status: payment.status };
