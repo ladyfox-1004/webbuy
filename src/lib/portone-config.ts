@@ -6,5 +6,5 @@ export const PORTONE_CONFIG = {
   // 토스페이(간편결제) 채널
   channelKeyEasyPay: "channel-key-9c8a72f5-981b-4b9a-ae99-b8f841a64410",
   // 카드(일반결제) 채널 — 포트원 콘솔에서 카드 채널 추가 후 채널키 입력
-  channelKeyCard: "" as string,
+  channelKeyCard: "channel-key-a428b2e1-f196-4e65-b23f-e89fb3e918b6" as string,
 } as const;
