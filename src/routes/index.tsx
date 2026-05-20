@@ -1,5 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, ExternalLink, Sparkles, Code2, Zap, Mail, CreditCard } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { toast } from "sonner";
+import { ArrowUpRight, ExternalLink, Sparkles, Code2, Zap, Mail, CreditCard, Loader2 } from "lucide-react";
+import { PORTONE_CONFIG } from "@/lib/portone-config";
+import { verifyPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,9 +22,9 @@ type Project = {
   title: string;
   tag: string;
   description: string;
-  span: string; // tailwind classes for masonry sizing
+  span: string;
   accent: string;
-  price?: string;
+  amount?: number; // KRW
   url?: string;
 };
 
