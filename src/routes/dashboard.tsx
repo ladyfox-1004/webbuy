@@ -263,6 +263,7 @@ function ProductEditor({
   saving: boolean;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   async function handleThumbnail(file: File) {
     setUploading(true);
@@ -280,6 +281,24 @@ function ProductEditor({
       toast.error(e instanceof Error ? e.message : "업로드 실패");
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleDeliveryFile(file: File) {
+    setUploadingFile(true);
+    try {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const safeName = file.name.replace(/[^\w.\-]+/g, "_");
+      const path = `${u.user.id}/${Date.now()}-${safeName}`;
+      const { error } = await supabase.storage.from("product-files").upload(path, file, { upsert: false });
+      if (error) throw error;
+      onChange({ ...value, delivery_file_path: path });
+      toast.success("파일 업로드됨 (비공개)");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "업로드 실패");
+    } finally {
+      setUploadingFile(false);
     }
   }
 
