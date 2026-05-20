@@ -423,6 +423,8 @@ function Footer() {
             <div className="md:col-span-2"><span className="text-foreground/70">주소</span> · 서울특별시 서초구 서초중앙로29길 16-6, 대림빌라 B-303</div>
             <div><span className="text-foreground/70">고객센터</span> · 02-533-1134</div>
             <div><span className="text-foreground/70">이메일</span> · nancoco0705@gmail.com</div>
+            <div className="md:col-span-2"><span className="text-foreground/70">통신판매업신고번호</span> · 신고 예정 (PG 계약 후 신고 진행)</div>
+            <div className="md:col-span-2"><span className="text-foreground/70">서비스 제공 기간</span> · 단건 결제 상품은 결제일로부터 최대 3개월</div>
           </div>
         </div>
 
