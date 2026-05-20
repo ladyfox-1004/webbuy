@@ -354,6 +354,28 @@ function ProductEditor({
             />
           </Row>
 
+          <div className="grid grid-cols-2 gap-3">
+            <Row label="카테고리" hint="홈 필터/검색에 사용">
+              <input
+                maxLength={40}
+                value={value.category} onChange={(e) => onChange({ ...value, category: e.target.value })}
+                className="w-full rounded-xl border border-border bg-background/50 px-3 py-2 text-sm"
+                placeholder="design · dev · marketing"
+              />
+            </Row>
+            <Row label="태그들" hint="쉼표로 구분 (최대 10개)">
+              <input
+                value={value.tags.join(", ")}
+                onChange={(e) => onChange({
+                  ...value,
+                  tags: e.target.value.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 10),
+                })}
+                className="w-full rounded-xl border border-border bg-background/50 px-3 py-2 text-sm"
+                placeholder="react, saas, ai"
+              />
+            </Row>
+          </div>
+
           <Row label="썸네일">
             <div className="flex items-center gap-3">
               {value.thumbnail_url && <img src={value.thumbnail_url} alt="" className="h-14 w-14 rounded-lg object-cover" />}
