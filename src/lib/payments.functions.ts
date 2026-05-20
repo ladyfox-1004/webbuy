@@ -138,3 +138,43 @@ export const listMyPayments = createServerFn({ method: "GET" }).handler(async ()
   if (error) throw new Error(error.message);
   return data ?? [];
 });
+
+export const listMyLibrary = createServerFn({ method: "GET" }).handler(async () => {
+  const userId = await getOptionalUserId();
+  if (!userId) return [];
+  const { data, error } = await supabaseAdmin
+    .from("entitlements")
+    .select(`
+      id, payment_id, access_token, granted_at,
+      products:product_id (
+        id, title, tag, description, thumbnail_url, product_type, delivery_url, delivery_file_path
+      )
+    `)
+    .eq("user_id", userId)
+    .order("granted_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error(error.message);
+  return data ?? [];
+});
+
+// Issues a short-lived signed URL for a private product file the buyer owns.
+export const getProductFileUrl = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ paymentId: z.string().min(1).max(200) }).parse(input))
+  .handler(async ({ data }) => {
+    const userId = await getOptionalUserId();
+    if (!userId) throw new Error("로그인이 필요합니다.");
+    const { data: ent } = await supabaseAdmin
+      .from("entitlements")
+      .select("product_id")
+      .eq("payment_id", data.paymentId)
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (!ent?.product_id) throw new Error("권한이 없습니다.");
+    const { data: prod } = await supabaseAdmin
+      .from("products").select("delivery_file_path").eq("id", ent.product_id).maybeSingle();
+    if (!prod?.delivery_file_path) throw new Error("다운로드 파일이 없습니다.");
+    const { data: signed, error } = await supabaseAdmin
+      .storage.from("product-files").createSignedUrl(prod.delivery_file_path, 300);
+    if (error || !signed) throw new Error(error?.message ?? "URL 생성 실패");
+    return { url: signed.signedUrl };
+  });
