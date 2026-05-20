@@ -57,7 +57,7 @@ export const verifyPayment = createServerFn({ method: "POST" })
         currency: payment.currency ?? "KRW",
         status: payment.status,
         customer_email: payment.customer?.email ?? null,
-        raw: payment as unknown as Record<string, unknown>,
+        raw: payment as never,
       },
       { onConflict: "payment_id" },
     );
@@ -67,5 +67,5 @@ export const verifyPayment = createServerFn({ method: "POST" })
       return { ok: false as const, error: "기록 저장 실패" };
     }
 
-    return { ok: isPaid as const, status: payment.status };
+    return { ok: isPaid, status: payment.status };
   });
