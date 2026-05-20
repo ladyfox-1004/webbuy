@@ -322,10 +322,10 @@ function Contact() {
               협업, 외주, 혹은 그냥 인사. 무엇이든 환영합니다.
             </p>
             <a
-              href="mailto:hello@example.com"
+              href="mailto:nancoco0705@gmail.com"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-medium text-primary-foreground transition hover:scale-[1.02]"
             >
-              <Mail className="h-4 w-4" /><span>hello@example.com</span>
+              <Mail className="h-4 w-4" /><span>nancoco0705@gmail.com</span>
             </a>
           </div>
         </div>
@@ -351,7 +351,7 @@ function Footer() {
             <div><span className="text-foreground/70">사업자등록번호</span> · 215-28-82229</div>
             <div className="md:col-span-2"><span className="text-foreground/70">주소</span> · 서울특별시 서초구 서초중앙로29길 16-6, 대림빌라 B-303</div>
             <div><span className="text-foreground/70">고객센터</span> · 02-533-1134</div>
-            <div><span className="text-foreground/70">이메일</span> · hello@example.com</div>
+            <div><span className="text-foreground/70">이메일</span> · nancoco0705@gmail.com</div>
           </div>
         </div>
 
