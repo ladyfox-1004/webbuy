@@ -43,6 +43,7 @@ type Product = {
   amount: number;
   span: string;
   accent: string;
+  slug?: string | null;
 };
 
 function Index() {
