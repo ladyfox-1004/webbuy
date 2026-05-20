@@ -35,7 +35,7 @@ const projects: Project[] = [
     description: "노션 워크스페이스에 일정·할일·메모를 자동 정리해주는 AI 에이전트.",
     span: "md:col-span-2 md:row-span-2 min-h-[420px]",
     accent: "from-primary/40 to-primary-glow/10",
-    price: "₩9,900 / 월",
+    amount: 9900,
   },
   {
     title: "AI 카피라이터",
@@ -43,7 +43,7 @@ const projects: Project[] = [
     description: "브랜드 톤에 맞춘 인스타·블로그 카피를 한 번에.",
     span: "min-h-[220px]",
     accent: "from-primary-glow/30 to-transparent",
-    price: "₩4,900",
+    amount: 4900,
   },
   {
     title: "포트원 결제 데모",
@@ -51,7 +51,7 @@ const projects: Project[] = [
     description: "실제 결제 흐름을 체험할 수 있는 라이브 데모.",
     span: "min-h-[220px]",
     accent: "from-accent/30 to-transparent",
-    price: "Free",
+    amount: 1000,
   },
   {
     title: "수익 대시보드",
@@ -59,7 +59,7 @@ const projects: Project[] = [
     description: "여러 SaaS의 매출·구독을 한 화면에서.",
     span: "md:col-span-2 min-h-[260px]",
     accent: "from-primary/30 to-primary-glow/20",
-    price: "₩19,000 / 월",
+    amount: 19000,
   },
   {
     title: "PDF 요약기",
@@ -67,7 +67,7 @@ const projects: Project[] = [
     description: "긴 문서를 한 페이지 인사이트로.",
     span: "min-h-[240px]",
     accent: "from-primary-glow/25 to-transparent",
-    price: "₩2,900",
+    amount: 2900,
   },
   {
     title: "이력서 빌더",
@@ -75,7 +75,7 @@ const projects: Project[] = [
     description: "AI가 직무에 맞춰 다듬어주는 이력서 에디터.",
     span: "md:col-span-2 min-h-[240px]",
     accent: "from-primary/35 to-transparent",
-    price: "₩7,900",
+    amount: 7900,
   },
 ];
 
