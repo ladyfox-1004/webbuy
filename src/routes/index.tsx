@@ -1,5 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowUpRight, ExternalLink, Sparkles, Code2, Zap, Mail, CreditCard } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { toast } from "sonner";
+import { ArrowUpRight, ExternalLink, Sparkles, Code2, Zap, Mail, CreditCard, Loader2 } from "lucide-react";
+import { PORTONE_CONFIG } from "@/lib/portone-config";
+import { verifyPayment } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -17,9 +22,9 @@ type Project = {
   title: string;
   tag: string;
   description: string;
-  span: string; // tailwind classes for masonry sizing
+  span: string;
   accent: string;
-  price?: string;
+  amount?: number; // KRW
   url?: string;
 };
 
@@ -30,7 +35,7 @@ const projects: Project[] = [
     description: "노션 워크스페이스에 일정·할일·메모를 자동 정리해주는 AI 에이전트.",
     span: "md:col-span-2 md:row-span-2 min-h-[420px]",
     accent: "from-primary/40 to-primary-glow/10",
-    price: "₩9,900 / 월",
+    amount: 9900,
   },
   {
     title: "AI 카피라이터",
@@ -38,7 +43,7 @@ const projects: Project[] = [
     description: "브랜드 톤에 맞춘 인스타·블로그 카피를 한 번에.",
     span: "min-h-[220px]",
     accent: "from-primary-glow/30 to-transparent",
-    price: "₩4,900",
+    amount: 4900,
   },
   {
     title: "포트원 결제 데모",
@@ -46,7 +51,7 @@ const projects: Project[] = [
     description: "실제 결제 흐름을 체험할 수 있는 라이브 데모.",
     span: "min-h-[220px]",
     accent: "from-accent/30 to-transparent",
-    price: "Free",
+    amount: 1000,
   },
   {
     title: "수익 대시보드",
@@ -54,7 +59,7 @@ const projects: Project[] = [
     description: "여러 SaaS의 매출·구독을 한 화면에서.",
     span: "md:col-span-2 min-h-[260px]",
     accent: "from-primary/30 to-primary-glow/20",
-    price: "₩19,000 / 월",
+    amount: 19000,
   },
   {
     title: "PDF 요약기",
@@ -62,7 +67,7 @@ const projects: Project[] = [
     description: "긴 문서를 한 페이지 인사이트로.",
     span: "min-h-[240px]",
     accent: "from-primary-glow/25 to-transparent",
-    price: "₩2,900",
+    amount: 2900,
   },
   {
     title: "이력서 빌더",
@@ -70,7 +75,7 @@ const projects: Project[] = [
     description: "AI가 직무에 맞춰 다듬어주는 이력서 에디터.",
     span: "md:col-span-2 min-h-[240px]",
     accent: "from-primary/35 to-transparent",
-    price: "₩7,900",
+    amount: 7900,
   },
 ];
 
@@ -189,6 +194,52 @@ function Projects() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const [loading, setLoading] = useState(false);
+  const verify = useServerFn(verifyPayment);
+
+  async function handlePay() {
+    if (!project.amount) return;
+    setLoading(true);
+    try {
+      const PortOne = (await import("@portone/browser-sdk/v2")).default;
+      const paymentId = `pay-${crypto.randomUUID()}`;
+      const result = await PortOne.requestPayment({
+        storeId: PORTONE_CONFIG.storeId,
+        channelKey: PORTONE_CONFIG.channelKey,
+        paymentId,
+        orderName: project.title,
+        totalAmount: project.amount,
+        currency: "CURRENCY_KRW",
+        payMethod: "CARD",
+      });
+
+      if (result?.code !== undefined) {
+        toast.error(result.message ?? "결제가 취소되었습니다.");
+        return;
+      }
+
+      toast.loading("결제 검증 중…", { id: paymentId });
+      const verification = await verify({
+        data: {
+          paymentId,
+          expectedAmount: project.amount,
+          productTitle: project.title,
+        },
+      });
+
+      if (verification.ok) {
+        toast.success(`${project.title} 결제 완료!`, { id: paymentId });
+      } else {
+        toast.error(verification.error ?? "결제 검증 실패", { id: paymentId });
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("결제 처리 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
@@ -210,11 +261,25 @@ function ProjectCard({ project }: { project: Project }) {
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
             {project.description}
           </p>
-          {project.price && (
+          {project.amount !== undefined && (
             <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
-              <span className="font-display text-lg font-semibold">{project.price}</span>
-              <button className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
-                <CreditCard className="h-3.5 w-3.5" /> 결제
+              <span className="font-display text-lg font-semibold">
+                ₩{project.amount.toLocaleString("ko-KR")}
+              </span>
+              <button
+                onClick={handlePay}
+                disabled={loading}
+                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />처리중
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="h-3.5 w-3.5" />결제
+                  </>
+                )}
               </button>
             </div>
           )}
