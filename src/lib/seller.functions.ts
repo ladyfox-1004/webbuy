@@ -58,7 +58,9 @@ const productSchema = z.object({
   product_type: z.enum(["web", "app", "file", "license"]),
   delivery_url: z.string().url().max(500).optional().nullable(),
   delivery_file_path: z.string().max(300).optional().nullable(),
-  status: z.enum(["draft", "live"]).default("draft"),
+  status: z.enum(["draft", "review", "live"]).default("draft"),
+  category: z.string().trim().max(40).optional().nullable(),
+  tags: z.array(z.string().trim().min(1).max(30)).max(10).optional().default([]),
 });
 
 export const listMyProducts = createServerFn({ method: "GET" })
