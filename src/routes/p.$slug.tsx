@@ -149,9 +149,11 @@ function Detail({ product }: { product: Product }) {
                   간편결제
                 </button>
               </div>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                결제 후 보관함(/me)에서 즉시 접속/다운로드 가능합니다.
-              </p>
+              <ul className="space-y-1 text-[11px] leading-relaxed text-muted-foreground">
+                <li>· 결제 후 보관함(/me)에서 즉시 접속/다운로드 가능합니다.</li>
+                <li>· <span className="text-foreground/80">서비스 제공 기간</span>: 결제일로부터 최대 3개월</li>
+                <li>· 환불은 <Link to="/refund" className="underline hover:text-foreground">환불 정책</Link>에 따릅니다.</li>
+              </ul>
 
               {product.seller && (
                 <div className="mt-2 rounded-2xl border border-border bg-background/40 p-4">
