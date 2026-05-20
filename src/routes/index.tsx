@@ -202,7 +202,7 @@ function Projects() {
               >
                 전체
               </button>
-              {(categories ?? []).map((c) => (
+              {(categories ?? []).map((c: string) => (
                 <button
                   key={c}
                   onClick={() => setCategory(c === category ? "" : c)}
