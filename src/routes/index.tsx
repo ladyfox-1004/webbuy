@@ -336,14 +336,34 @@ function Contact() {
 
 function Footer() {
   return (
-    <footer className="border-t border-border/40 px-4 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-        <div>© Studio. All rights reserved.</div>
-        <div className="flex items-center gap-2">
-          Powered by <span className="text-foreground">PortOne</span>
-          <ExternalLink className="h-3.5 w-3.5" />
+    <footer className="border-t border-border/40 px-4 py-12">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+          <Link to="/terms" className="text-muted-foreground transition hover:text-foreground">이용약관</Link>
+          <Link to="/privacy" className="font-medium text-foreground transition hover:text-primary-glow">개인정보처리방침</Link>
+          <Link to="/refund" className="text-muted-foreground transition hover:text-foreground">환불 정책</Link>
+        </div>
+
+        <div className="rounded-2xl border border-border/60 bg-surface/40 p-5 text-xs leading-relaxed text-muted-foreground md:text-sm">
+          <div className="mb-2 font-display text-sm font-semibold text-foreground md:text-base">핑크폭스 (PINKFOX)</div>
+          <div className="grid gap-x-6 gap-y-1 md:grid-cols-2">
+            <div><span className="text-foreground/70">대표</span> · 이서연</div>
+            <div><span className="text-foreground/70">사업자등록번호</span> · 215-28-82229</div>
+            <div className="md:col-span-2"><span className="text-foreground/70">주소</span> · 서울특별시 서초구 서초중앙로29길 16-6, 대림빌라 B-303</div>
+            <div><span className="text-foreground/70">고객센터</span> · 02-533-1134</div>
+            <div><span className="text-foreground/70">이메일</span> · hello@example.com</div>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground md:flex-row">
+          <div>© {new Date().getFullYear()} PINKFOX. All rights reserved.</div>
+          <div className="flex items-center gap-2">
+            Powered by <span className="text-foreground">PortOne</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </div>
         </div>
       </div>
     </footer>
   );
 }
+
