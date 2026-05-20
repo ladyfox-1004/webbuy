@@ -84,18 +84,25 @@ export const upsertMyProduct = createServerFn({ method: "POST" })
       .from("seller_profiles").select("user_id").eq("user_id", context.userId).maybeSingle();
     if (!profile) throw new Error("먼저 판매자 프로필을 만들어 주세요.");
 
+    // non-admin sellers cannot self-publish: clamp 'live' to 'review'
+    const { data: isAdminRow } = await supabaseAdmin
+      .from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    const isAdmin = !!isAdminRow;
+    const safeStatus = !isAdmin && data.status === "live" ? "review" : data.status;
+    const payload = { ...data, status: safeStatus };
+
     if (data.id) {
       const { error } = await supabaseAdmin
-        .from("products").update({ ...data, seller_id: context.userId })
+        .from("products").update({ ...payload, seller_id: context.userId })
         .eq("id", data.id).eq("seller_id", context.userId);
       if (error) throw new Error(error.message);
     } else {
-      const { id: _ignored, ...insertData } = data;
+      const { id: _ignored, ...insertData } = payload;
       const { error } = await supabaseAdmin
         .from("products").insert({ ...insertData, seller_id: context.userId });
       if (error) throw new Error(error.message);
     }
-    return { ok: true };
+    return { ok: true, status: safeStatus };
   });
 
 export const deleteMyProduct = createServerFn({ method: "POST" })
