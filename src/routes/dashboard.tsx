@@ -255,6 +255,7 @@ function emptyForm(): ProductForm {
     title: "", tag: "Web", description: "", amount: 9900,
     thumbnail_url: "", product_type: "web",
     delivery_url: "", delivery_file_path: "", status: "draft",
+    category: "", tags: [],
   };
 }
 
