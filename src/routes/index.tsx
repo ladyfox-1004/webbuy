@@ -1,83 +1,49 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ArrowUpRight, ExternalLink, Sparkles, Code2, Zap, Mail, CreditCard, Loader2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  ExternalLink,
+  Sparkles,
+  Code2,
+  Zap,
+  Mail,
+  CreditCard,
+  Loader2,
+  Smartphone,
+  LogIn,
+  LogOut,
+  ShieldCheck,
+  User as UserIcon,
+} from "lucide-react";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
 import { verifyPayment } from "@/lib/payments.functions";
+import { listProducts } from "@/lib/products.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 export const Route = createFileRoute("/")({
+  component: Index,
   head: () => ({
     meta: [
-      { title: "Studio — 만든 웹앱을 한자리에" },
-      { name: "description", content: "내가 만든 웹앱들을 한자리에서 보고, 포트원 결제로 바로 이용할 수 있는 스튜디오." },
-      { property: "og:title", content: "Studio — 만든 웹앱을 한자리에" },
-      { property: "og:description", content: "포트원 결제를 통해 바로 이용 가능한 웹앱 컬렉션." },
+      { title: "Studio — 내가 만든 웹앱들" },
+      { name: "description", content: "내가 만든 사이드 프로젝트와 SaaS를 한자리에서. 포트원으로 즉시 결제." },
     ],
   }),
-  component: Index,
 });
 
-type Project = {
+type Product = {
+  id: string;
   title: string;
   tag: string;
   description: string;
+  amount: number;
   span: string;
   accent: string;
-  amount?: number; // KRW
-  url?: string;
 };
-
-const projects: Project[] = [
-  {
-    title: "노션 자동화 봇",
-    tag: "Productivity",
-    description: "노션 워크스페이스에 일정·할일·메모를 자동 정리해주는 AI 에이전트.",
-    span: "md:col-span-2 md:row-span-2 min-h-[420px]",
-    accent: "from-primary/40 to-primary-glow/10",
-    amount: 9900,
-  },
-  {
-    title: "AI 카피라이터",
-    tag: "Marketing",
-    description: "브랜드 톤에 맞춘 인스타·블로그 카피를 한 번에.",
-    span: "min-h-[220px]",
-    accent: "from-primary-glow/30 to-transparent",
-    amount: 4900,
-  },
-  {
-    title: "포트원 결제 데모",
-    tag: "Payments",
-    description: "실제 결제 흐름을 체험할 수 있는 라이브 데모.",
-    span: "min-h-[220px]",
-    accent: "from-accent/30 to-transparent",
-    amount: 1000,
-  },
-  {
-    title: "수익 대시보드",
-    tag: "Analytics",
-    description: "여러 SaaS의 매출·구독을 한 화면에서.",
-    span: "md:col-span-2 min-h-[260px]",
-    accent: "from-primary/30 to-primary-glow/20",
-    amount: 19000,
-  },
-  {
-    title: "PDF 요약기",
-    tag: "AI Tool",
-    description: "긴 문서를 한 페이지 인사이트로.",
-    span: "min-h-[240px]",
-    accent: "from-primary-glow/25 to-transparent",
-    amount: 2900,
-  },
-  {
-    title: "이력서 빌더",
-    tag: "Career",
-    description: "AI가 직무에 맞춰 다듬어주는 이력서 에디터.",
-    span: "md:col-span-2 min-h-[240px]",
-    accent: "from-primary/35 to-transparent",
-    amount: 7900,
-  },
-];
 
 function Index() {
   return (
@@ -93,27 +59,46 @@ function Index() {
 }
 
 function Nav() {
+  const { user } = useAuth();
+  const isAdmin = useIsAdmin();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="mx-auto mt-4 max-w-6xl px-4">
         <nav className="glass flex items-center justify-between rounded-full px-5 py-3">
-          <a href="#top" className="flex items-center gap-2 font-display font-bold tracking-tight">
+          <Link to="/" className="flex items-center gap-2 font-display font-bold tracking-tight">
             <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs">
               ◆
             </span>
             Studio
-          </a>
+          </Link>
           <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
             <a href="#about" className="transition hover:text-foreground">About</a>
-            <a href="#contact" className="transition hover:text-foreground">Contact</a>
+            {user && (
+              <Link to="/me" className="transition hover:text-foreground">내 결제</Link>
+            )}
+            {isAdmin && (
+              <Link to="/admin" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
+                <ShieldCheck className="h-3.5 w-3.5" />Admin
+              </Link>
+            )}
           </div>
-          <a
-            href="#projects"
-            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-          >
-            둘러보기 <ArrowUpRight className="h-4 w-4" />
-          </a>
+          {user ? (
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/40 px-4 py-2 text-sm text-foreground transition hover:bg-surface"
+            >
+              <LogOut className="h-4 w-4" />로그아웃
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            >
+              <LogIn className="h-4 w-4" />로그인
+            </Link>
+          )}
         </nav>
       </div>
     </header>
@@ -151,25 +136,18 @@ function Hero() {
             문의하기
           </a>
         </div>
-
-        <div className="mt-20 grid grid-cols-3 gap-6 border-t border-border/50 pt-10 md:gap-12">
-          {[
-            { n: "12+", l: "출시한 웹앱" },
-            { n: "3.4k", l: "월간 사용자" },
-            { n: "99.9%", l: "결제 성공률" },
-          ].map((s) => (
-            <div key={s.l}>
-              <div className="font-display text-3xl font-bold text-foreground md:text-4xl">{s.n}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{s.l}</div>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );
 }
 
 function Projects() {
+  const fetchProducts = useServerFn(listProducts);
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: () => fetchProducts(),
+  });
+
   return (
     <section id="projects" className="px-4 py-24">
       <div className="mx-auto max-w-6xl">
@@ -183,22 +161,26 @@ function Projects() {
           </div>
         </div>
 
-        <div className="grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-4 md:grid-cols-3">
-          {projects.map((p) => (
-            <ProjectCard key={p.title} project={p} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center py-20"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        ) : (
+          <div className="grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-4 md:grid-cols-3">
+            {(products ?? []).map((p) => (
+              <ProjectCard key={p.id} project={p as Product} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function ProjectCard({ project }: { project: Product }) {
   const [loading, setLoading] = useState(false);
   const verify = useServerFn(verifyPayment);
+  const navigate = useNavigate();
 
-  async function handlePay() {
-    if (!project.amount) return;
+  async function pay(method: "CARD" | "EASY_PAY") {
     setLoading(true);
     try {
       const PortOne = (await import("@portone/browser-sdk/v2")).default;
@@ -210,7 +192,7 @@ function ProjectCard({ project }: { project: Project }) {
         orderName: project.title,
         totalAmount: project.amount,
         currency: "CURRENCY_KRW",
-        payMethod: "CARD",
+        payMethod: method,
       });
 
       if (result?.code !== undefined) {
@@ -224,14 +206,11 @@ function ProjectCard({ project }: { project: Project }) {
           paymentId,
           expectedAmount: project.amount,
           productTitle: project.title,
+          productId: project.id,
         },
       });
-
-      if (verification.ok) {
-        toast.success(`${project.title} 결제 완료!`, { id: paymentId });
-      } else {
-        toast.error(verification.error ?? "결제 검증 실패", { id: paymentId });
-      }
+      toast.dismiss(paymentId);
+      navigate({ to: "/payment/result", search: { paymentId, ok: verification.ok ? 1 : 0 } });
     } catch (err) {
       console.error(err);
       toast.error("결제 처리 중 오류가 발생했습니다.");
@@ -261,28 +240,29 @@ function ProjectCard({ project }: { project: Project }) {
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
             {project.description}
           </p>
-          {project.amount !== undefined && (
-            <div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4">
-              <span className="font-display text-lg font-semibold">
-                ₩{project.amount.toLocaleString("ko-KR")}
-              </span>
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
+            <span className="font-display text-lg font-semibold whitespace-nowrap">
+              ₩{project.amount.toLocaleString("ko-KR")}
+            </span>
+            <div className="flex items-center gap-2">
               <button
-                onClick={handlePay}
+                onClick={() => pay("CARD")}
                 disabled={loading}
                 className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
               >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />처리중
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="h-3.5 w-3.5" />결제
-                  </>
-                )}
+                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CreditCard className="h-3.5 w-3.5" />}
+                카드
+              </button>
+              <button
+                onClick={() => pay("EASY_PAY")}
+                disabled={loading}
+                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
+              >
+                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Smartphone className="h-3.5 w-3.5" />}
+                간편결제
               </button>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </article>
@@ -309,7 +289,7 @@ function About() {
               { i: Code2, t: "Full-stack" },
               { i: Zap, t: "Ship Fast" },
               { i: CreditCard, t: "PortOne" },
-              { i: Sparkles, t: "AI Native" },
+              { i: UserIcon, t: "AI Native" },
             ].map(({ i: Icon, t }) => (
               <div key={t} className="flex items-center gap-3 rounded-2xl border border-border bg-surface/40 px-4 py-3">
                 <Icon className="h-4 w-4 text-primary-glow" />
@@ -353,7 +333,7 @@ function Footer() {
   return (
     <footer className="border-t border-border/40 px-4 py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 text-sm text-muted-foreground md:flex-row">
-        <div>© {new Date().getFullYear()} Studio. All rights reserved.</div>
+        <div>© Studio. All rights reserved.</div>
         <div className="flex items-center gap-2">
           Powered by <span className="text-foreground">PortOne</span>
           <ExternalLink className="h-3.5 w-3.5" />
