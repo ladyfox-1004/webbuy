@@ -73,7 +73,7 @@ function Nav() {
             <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs">
               ◆
             </span>
-            Studio
+            <span className="text-base">webbuy</span>
           </Link>
           <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
@@ -85,8 +85,8 @@ function Nav() {
               </>
             )}
             {isAdmin && (
-              <Link to="/admin" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
-                <ShieldCheck className="h-3.5 w-3.5" />Admin
+              <Link to="/admin/review" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
+                <ShieldCheck className="h-3.5 w-3.5" />검수
               </Link>
             )}
           </div>

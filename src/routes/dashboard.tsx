@@ -211,18 +211,37 @@ function Products() {
                 <div className="flex items-center gap-2">
                   <div className="truncate font-medium">{p.title}</div>
                   <span className={`rounded-full px-2 py-0.5 text-[10px] ${
-                    p.status === "live" ? "bg-emerald-500/15 text-emerald-300" : "bg-foreground/10 text-muted-foreground"
-                  }`}>{p.status}</span>
+                    p.status === "live"
+                      ? "bg-emerald-500/15 text-emerald-300"
+                      : p.status === "review"
+                      ? "bg-amber-500/15 text-amber-300"
+                      : "bg-foreground/10 text-muted-foreground"
+                  }`}>{p.status === "review" ? "검수중" : p.status === "live" ? "판매중" : "초안"}</span>
                 </div>
                 <div className="truncate text-xs text-muted-foreground">{p.tag} · ₩{p.amount.toLocaleString("ko-KR")}</div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
+                {p.status === "draft" && (
+                  <button
+                    onClick={() => {
+                      if (!confirm("이 제품을 검수 요청할까요? 관리자 승인 후 공개됩니다.")) return;
+                      saveMut.mutate({
+                        id: p.id, title: p.title, tag: p.tag, description: p.description, amount: p.amount,
+                        thumbnail_url: p.thumbnail_url ?? "", product_type: (p.product_type as ProductForm["product_type"]) ?? "web",
+                        delivery_url: p.delivery_url ?? "", delivery_file_path: p.delivery_file_path ?? "",
+                        status: "review",
+                        category: (p as any).category ?? "", tags: (p as any).tags ?? [],
+                      });
+                    }}
+                    className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-300 hover:bg-amber-500/20"
+                  >검수 요청</button>
+                )}
                 <button
                   onClick={() => setEditing({
                     id: p.id, title: p.title, tag: p.tag, description: p.description, amount: p.amount,
                     thumbnail_url: p.thumbnail_url ?? "", product_type: (p.product_type as ProductForm["product_type"]) ?? "web",
                     delivery_url: p.delivery_url ?? "", delivery_file_path: p.delivery_file_path ?? "",
-                    status: (p.status as "draft" | "live") ?? "draft",
+                    status: (p.status === "live" ? "live" : "draft"),
                     category: (p as any).category ?? "", tags: (p as any).tags ?? [],
                   })}
                   className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-surface"
