@@ -17,6 +17,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MeRouteImport } from './routes/me'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AppDevRouteImport } from './routes/app-dev'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as USlugRouteImport } from './routes/u.$slug'
@@ -64,6 +65,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppDevRoute = AppDevRouteImport.update({
+  id: '/app-dev',
+  path: '/app-dev',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -98,6 +104,7 @@ const AdminReviewRoute = AdminReviewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/app-dev': typeof AppDevRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/app-dev': typeof AppDevRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
@@ -131,6 +139,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/app-dev': typeof AppDevRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
   '/me': typeof MeRoute
@@ -149,6 +158,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/app-dev'
     | '/dashboard'
     | '/login'
     | '/me'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/app-dev'
     | '/dashboard'
     | '/login'
     | '/me'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/app-dev'
     | '/dashboard'
     | '/login'
     | '/me'
@@ -198,6 +210,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
+  AppDevRoute: typeof AppDevRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
   MeRoute: typeof MeRoute
@@ -269,6 +282,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app-dev': {
+      id: '/app-dev'
+      path: '/app-dev'
+      fullPath: '/app-dev'
+      preLoaderRoute: typeof AppDevRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -327,6 +347,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
+  AppDevRoute: AppDevRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   MeRoute: MeRoute,
