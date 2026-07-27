@@ -53,12 +53,111 @@ function Index() {
     <div className="min-h-screen text-foreground">
       <Nav />
       <Hero />
+      <Portfolio />
       <Projects />
       <Pricing />
       <About />
       <Contact />
       <Footer />
     </div>
+  );
+}
+
+const portfolioSites = [
+  { title: "브랜드 랜딩 · Radiant", tag: "Landing", url: "https://radiant-marzipan-765729.netlify.app/" },
+  { title: "온라인 신청 폼 · 지원하기", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
+  { title: "펀카 렌터카 예약", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
+  { title: "VAN POS · 법률 특화", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
+  { title: "PSM VIP 마케팅", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
+  { title: "Lambent 랜딩", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
+  { title: "Thunderous 프로덕트", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
+  { title: "Preeminent 프로모션", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
+  { title: "Stellular 서비스", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
+  { title: "Sparkly 브랜드", tag: "Brand", url: "https://sparkly-smakager-4041fe.netlify.app/" },
+  { title: "Storied 콘텐츠", tag: "Content", url: "https://storied-licorice-8bf649.netlify.app/" },
+  { title: "Celadon 스튜디오", tag: "Studio", url: "https://celadon-puppy-3aca7f.netlify.app/" },
+  { title: "Timely 예약", tag: "Booking", url: "https://timely-cascaron-a8447e.netlify.app/" },
+  { title: "Vocal 커뮤니티", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
+  { title: "Tangerine 커머스", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
+];
+
+function shot(url: string) {
+  return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800`;
+}
+
+function Portfolio() {
+  return (
+    <section id="portfolio" className="px-4 py-20">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <div>
+            <div className="mb-3 text-sm font-medium text-primary-glow">— Portfolio</div>
+            <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
+              실제로 만든 <span className="text-gradient">라이브 사이트</span>
+            </h2>
+            <p className="mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
+              데모가 아닙니다. 실제 배포된 사이트들이에요. 카드를 눌러 실물을 확인하고, 마음에 들면 아래 컬렉션에서 유사 스타일을 바로 구매하세요.
+            </p>
+          </div>
+          <a
+            href="#projects"
+            className="hidden shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground md:inline-flex"
+          >
+            컬렉션 보기 <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {portfolioSites.map((s) => (
+            <a
+              key={s.url}
+              href={s.url}
+              target="_blank"
+              rel="noreferrer"
+              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60"
+            >
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-background/40">
+                <img
+                  src={shot(s.url)}
+                  alt={s.title}
+                  loading="lazy"
+                  className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.display = "none";
+                  }}
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+                <span className="absolute left-3 top-3 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
+                  {s.tag}
+                </span>
+                <span className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-background/70 text-foreground/80 backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-3 p-4">
+                <h3 className="min-w-0 truncate font-display text-base font-semibold">{s.title}</h3>
+                <span className="shrink-0 text-[11px] text-muted-foreground">라이브 보기</span>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface/40 p-8 text-center md:flex-row md:justify-between md:text-left">
+          <div>
+            <div className="font-display text-lg font-semibold">이런 스타일로 내 사이트가 필요하신가요?</div>
+            <div className="text-sm text-muted-foreground">아래 컬렉션에서 즉시 결제하거나, 맞춤 제작을 문의하세요.</div>
+          </div>
+          <div className="flex gap-2">
+            <a href="#projects" className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-2.5 text-sm font-medium text-primary-foreground">
+              컬렉션 보기 <ArrowUpRight className="h-4 w-4" />
+            </a>
+            <a href="#contact" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/40 px-5 py-2.5 text-sm">
+              맞춤 문의
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
