@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
-  head: () => ({ meta: [{ title: "로그인 — Studio" }] }),
+  head: () => ({ meta: [{ title: "로그인 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
 const schema = z.object({
@@ -70,7 +70,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
   return (
     <div className="min-h-screen px-4 py-20">
       <div className="mx-auto mt-16 max-w-md">
-        <Link to="/" className="mb-8 inline-block text-sm text-muted-foreground hover:text-foreground">← Studio</Link>
+        <Link to="/" className="mb-8 inline-block text-sm text-muted-foreground hover:text-foreground">← AISOLITION</Link>
         <div className="glass rounded-3xl p-8 md:p-10">
           <h1 className="font-display text-3xl font-bold">{title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{subtitle}</p>

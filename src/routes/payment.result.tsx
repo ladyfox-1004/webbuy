@@ -13,7 +13,7 @@ const searchSchema = z.object({
 export const Route = createFileRoute("/payment/result")({
   validateSearch: (s) => searchSchema.parse(s),
   component: ResultPage,
-  head: () => ({ meta: [{ title: "결제 결과 — Studio" }] }),
+  head: () => ({ meta: [{ title: "결제 결과 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
 const STATUS_LABEL: Record<string, { label: string; tone: "ok" | "warn" | "err" }> = {

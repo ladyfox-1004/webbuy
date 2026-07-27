@@ -18,7 +18,7 @@ export const Route = createFileRoute("/admin")({
     if (!role) throw redirect({ to: "/" });
   },
   component: AdminPage,
-  head: () => ({ meta: [{ title: "관리자 — Studio" }] }),
+  head: () => ({ meta: [{ title: "관리자 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
 type Tab = "stats" | "payments" | "products" | "users";
