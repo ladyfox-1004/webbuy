@@ -18,6 +18,12 @@ import {
   Search,
   ShieldCheck,
   User as UserIcon,
+  Building2,
+  Gavel,
+  Bitcoin,
+  Link2,
+  MapPinned,
+  ShoppingBag,
 } from "lucide-react";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
 import { verifyPayment } from "@/lib/payments.functions";
