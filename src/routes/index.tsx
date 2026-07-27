@@ -570,7 +570,7 @@ function Footer() {
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-surface/40 p-5 text-xs leading-relaxed text-muted-foreground md:text-sm">
-          <div className="mb-2 font-display text-sm font-semibold text-foreground md:text-base">에이아이솔루션 (AISOLITION)</div>
+          <div className="mb-2 font-display text-sm font-semibold text-foreground md:text-base">에이아이솔루션 (AISOLUTION)</div>
           <div className="grid gap-x-6 gap-y-1 md:grid-cols-2">
             <div><span className="text-foreground/70">대표</span> · 이서연</div>
             <div><span className="text-foreground/70">사업자등록번호</span> · 215-28-82229</div>
@@ -583,7 +583,7 @@ function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground md:flex-row">
-          <div>© {new Date().getFullYear()} AISOLITION. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} AISOLUTION. All rights reserved.</div>
           <div className="flex items-center gap-2">
             Powered by <span className="text-foreground">PortOne</span>
             <ExternalLink className="h-3.5 w-3.5" />
