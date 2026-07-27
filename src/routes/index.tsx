@@ -93,11 +93,8 @@ function Portfolio() {
           <div>
             <div className="mb-3 text-sm font-medium text-primary-glow">— Portfolio</div>
             <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
-              실제로 만든 <span className="text-gradient">라이브 사이트</span>
+              포트폴리오
             </h2>
-            <p className="mt-3 max-w-xl text-sm text-muted-foreground md:text-base">
-              데모가 아닙니다. 실제 배포된 사이트들이에요. 카드를 눌러 실물을 확인하고, 마음에 들면 아래 컬렉션에서 유사 스타일을 바로 구매하세요.
-            </p>
           </div>
           <a
             href="#projects"
