@@ -20,7 +20,7 @@ export const Route = createFileRoute("/dashboard")({
     if (!data.user) throw redirect({ to: "/login" });
   },
   component: DashboardPage,
-  head: () => ({ meta: [{ title: "판매자 대시보드 — Studio" }] }),
+  head: () => ({ meta: [{ title: "판매자 대시보드 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
 type Tab = "overview" | "products" | "sales";

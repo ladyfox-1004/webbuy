@@ -14,7 +14,7 @@ export const Route = createFileRoute("/me")({
     if (!data.user) throw redirect({ to: "/login" });
   },
   component: MePage,
-  head: () => ({ meta: [{ title: "내 보관함 — Studio" }] }),
+  head: () => ({ meta: [{ title: "내 보관함 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
 type Tab = "library" | "payments";

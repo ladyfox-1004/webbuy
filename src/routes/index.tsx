@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "Studio — 내가 만든 웹앱들" },
+      { title: "에이아이솔루션(AISOLITION) — 내가 만든 웹앱들" },
       { name: "description", content: "내가 만든 사이드 프로젝트와 SaaS를 한자리에서. 포트원으로 즉시 결제." },
     ],
   }),
@@ -231,7 +231,7 @@ function Nav() {
             <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs">
               ◆
             </span>
-            <span className="text-base">webbuy</span>
+            <span className="text-base">AISOLITION</span>
           </Link>
           <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
@@ -576,7 +576,7 @@ function Footer() {
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-surface/40 p-5 text-xs leading-relaxed text-muted-foreground md:text-sm">
-          <div className="mb-2 font-display text-sm font-semibold text-foreground md:text-base">핑크폭스 (PINKFOX)</div>
+          <div className="mb-2 font-display text-sm font-semibold text-foreground md:text-base">에이아이솔루션 (AISOLITION)</div>
           <div className="grid gap-x-6 gap-y-1 md:grid-cols-2">
             <div><span className="text-foreground/70">대표</span> · 이서연</div>
             <div><span className="text-foreground/70">사업자등록번호</span> · 215-28-82229</div>
@@ -589,7 +589,7 @@ function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-3 text-xs text-muted-foreground md:flex-row">
-          <div>© {new Date().getFullYear()} PINKFOX. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} AISOLITION. All rights reserved.</div>
           <div className="flex items-center gap-2">
             Powered by <span className="text-foreground">PortOne</span>
             <ExternalLink className="h-3.5 w-3.5" />

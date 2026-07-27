@@ -4,8 +4,8 @@ export const Route = createFileRoute("/refund")({
   component: RefundPage,
   head: () => ({
     meta: [
-      { title: "환불 정책 — 핑크폭스" },
-      { name: "description", content: "핑크폭스(PINKFOX) 환불 및 청약철회 정책" },
+      { title: "환불 정책 — 에이아이솔루션(AISOLITION)" },
+      { name: "description", content: "에이아이솔루션(AISOLITION) 환불 및 청약철회 정책" },
     ],
   }),
 });

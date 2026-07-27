@@ -15,7 +15,7 @@ export const Route = createFileRoute("/sell")({
   component: SellPage,
   head: () => ({
     meta: [
-      { title: "판매자 시작하기 — Studio" },
+      { title: "판매자 시작하기 — 에이아이솔루션(AISOLITION)" },
       { name: "description", content: "내 웹/앱을 등록하고 바로 판매하세요." },
     ],
   }),
@@ -135,11 +135,11 @@ function SellPage() {
                 value={form.business_name}
                 onChange={(e) => setForm({ ...form, business_name: e.target.value })}
                 className="w-full rounded-xl border border-border bg-background/50 px-4 py-2.5 text-sm outline-none focus:border-primary"
-                placeholder="예: 핑크폭스 스튜디오"
+                placeholder="예: 에이아이솔루션 스튜디오"
               />
             </Field>
 
-            <Field label="스토어 주소 *" hint="webbuy.lovable.app/u/{이값} — 영문 소문자·숫자·하이픈, 2~40자">
+            <Field label="스토어 주소 *" hint="lovable.app/u/{이값} — 영문 소문자·숫자·하이픈, 2~40자">
               <input
                 required maxLength={40}
                 value={form.slug}

@@ -8,7 +8,7 @@ import { AuthShell, Field } from "./login";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
-  head: () => ({ meta: [{ title: "회원가입 — Studio" }] }),
+  head: () => ({ meta: [{ title: "회원가입 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
 const schema = z.object({
