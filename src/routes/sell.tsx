@@ -139,7 +139,7 @@ function SellPage() {
               />
             </Field>
 
-            <Field label="스토어 주소 *" hint="webbuy.lovable.app/u/{이값} — 영문 소문자·숫자·하이픈, 2~40자">
+            <Field label="스토어 주소 *" hint="lovable.app/u/{이값} — 영문 소문자·숫자·하이픈, 2~40자">
               <input
                 required maxLength={40}
                 value={form.slug}
