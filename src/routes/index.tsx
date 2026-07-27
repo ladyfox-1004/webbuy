@@ -235,9 +235,11 @@ function Develop() {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {developItems.map((item) => (
-            <div
+            <Link
               key={item.title}
-              className="glass glow-hover flex flex-col rounded-2xl border border-border bg-surface/60 p-6"
+              to="/p/$slug"
+              params={{ slug: item.slug }}
+              className="glass glow-hover flex flex-col rounded-2xl border border-border bg-surface/60 p-6 transition hover:border-primary/40"
             >
               <div className="mb-4 flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
@@ -251,7 +253,15 @@ function Develop() {
               <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
                 {item.desc}
               </p>
-            </div>
+              <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
+                <span className="font-display text-lg font-bold">
+                  ₩{item.price.toLocaleString("ko-KR")}
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-glow">
+                  구매하기 <ArrowUpRight className="h-3.5 w-3.5" />
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
 
