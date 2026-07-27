@@ -30,8 +30,8 @@ export const Route = createFileRoute("/")({
   component: Index,
   head: () => ({
     meta: [
-      { title: "에이아이솔루션(AISOLITION) — 내가 만든 웹앱들" },
-      { name: "description", content: "내가 만든 사이드 프로젝트와 SaaS를 한자리에서. 포트원으로 즉시 결제." },
+      { title: "AISOLUTION" },
+      { name: "description", content: "AI자동화와 함께 빠르게 결과물을 받아보세요." },
     ],
   }),
 });
@@ -228,7 +228,7 @@ function Nav() {
             <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs">
               ◆
             </span>
-            <span className="text-base">AISOLITION</span>
+            <span className="text-base">AISOLUTION</span>
           </Link>
           <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
@@ -274,16 +274,13 @@ function Hero() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface/40 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur">
           <Sparkles className="h-3.5 w-3.5 text-primary-glow" />
-          포트원 결제 연동 · 라이브
+          AI 자동화 · 라이브
         </div>
-        <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight md:text-7xl lg:text-8xl">
-          내가 만든 웹앱들,
-          <br />
-          <span className="text-gradient">한자리에서.</span>
+        <h1 className="font-display text-5xl font-bold leading-[1.08] md:text-7xl lg:text-8xl">
+          AISOLUTION
         </h1>
         <p className="mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-          작업한 사이드 프로젝트와 SaaS를 모아 보여주고, 포트원으로 즉시 결제까지.
-          하나의 스튜디오, 무한한 실험.
+          AI자동화와 함께 빠르게 결과물을 받아보세요.
         </p>
         <div className="mt-10 flex flex-wrap gap-3">
           <a
