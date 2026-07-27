@@ -60,6 +60,7 @@ function Index() {
       <Nav />
       <Hero />
       <Portfolio />
+      <Develop />
       <Projects />
       <Pricing />
       <About />
