@@ -24,6 +24,7 @@ import { Route as USlugRouteImport } from './routes/u.$slug'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as AdminReviewRouteImport } from './routes/admin.review'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -100,6 +101,12 @@ const AdminReviewRoute = AdminReviewRouteImport.update({
   path: '/review',
   getParentRoute: () => AdminRoute,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
   '/u/$slug': typeof USlugRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
   '/u/$slug': typeof USlugRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
   '/u/$slug': typeof USlugRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/payment/result'
     | '/u/$slug'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/payment/result'
     | '/u/$slug'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -205,6 +217,7 @@ export interface FileRouteTypes {
     | '/p/$slug'
     | '/payment/result'
     | '/u/$slug'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -222,6 +235,7 @@ export interface RootRouteChildren {
   PSlugRoute: typeof PSlugRoute
   PaymentResultRoute: typeof PaymentResultRoute
   USlugRoute: typeof USlugRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -331,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReviewRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -359,17 +380,8 @@ const rootRouteChildren: RootRouteChildren = {
   PSlugRoute: PSlugRoute,
   PaymentResultRoute: PaymentResultRoute,
   USlugRoute: USlugRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
