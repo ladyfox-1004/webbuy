@@ -649,12 +649,23 @@ function Contact() {
             <p className="mt-4 max-w-lg text-muted-foreground md:text-lg">
               협업, 외주, 혹은 그냥 인사. 무엇이든 환영합니다.
             </p>
-            <a
-              href="mailto:nancoco0705@gmail.com"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-medium text-primary-foreground transition hover:scale-[1.02]"
-            >
-              <Mail className="h-4 w-4" /><span>nancoco0705@gmail.com</span>
-            </a>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href="mailto:nancoco0705@gmail.com"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-medium text-primary-foreground transition hover:scale-[1.02]"
+              >
+                <Mail className="h-4 w-4" /><span>nancoco0705@gmail.com</span>
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText("pinkfox1015");
+                  toast.success("카톡아이디가 복사되었습니다");
+                }}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 font-medium text-foreground transition hover:bg-surface"
+              >
+                <MessageCircle className="h-4 w-4 text-primary-glow" /><span>카톡: pinkfox1015</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
