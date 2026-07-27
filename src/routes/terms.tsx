@@ -4,8 +4,8 @@ export const Route = createFileRoute("/terms")({
   component: TermsPage,
   head: () => ({
     meta: [
-      { title: "이용약관 — 핑크폭스" },
-      { name: "description", content: "핑크폭스(PINKFOX) 서비스 이용약관" },
+      { title: "이용약관 — 에이아이솔루션(AISOLITION)" },
+      { name: "description", content: "에이아이솔루션(AISOLITION) 서비스 이용약관" },
     ],
   }),
 });
@@ -22,7 +22,7 @@ function TermsPage() {
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">제1조 (목적)</h2>
             <p className="mt-2 leading-relaxed">
-              본 약관은 핑크폭스(PINKFOX, 이하 "회사")가 운영하는 웹사이트(이하 "사이트")에서 제공하는
+              본 약관은 에이아이솔루션(AISOLITION, 이하 "회사")가 운영하는 웹사이트(이하 "사이트")에서 제공하는
               디지털 콘텐츠 및 관련 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자의 권리, 의무,
               책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.
             </p>

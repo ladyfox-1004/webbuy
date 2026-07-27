@@ -29,13 +29,13 @@ import {
 export const Route = createFileRoute("/app-dev")({
   head: () => ({
     meta: [
-      { title: "앱 개발 — webbuy" },
+      { title: "앱 개발 — 에이아이솔루션(AISOLITION)" },
       {
         name: "description",
         content:
           "Flutter 기반 iOS/Android 동시 개발. 견적부터 출시까지 투명한 절차로 함께합니다.",
       },
-      { property: "og:title", content: "앱 개발 — webbuy" },
+      { property: "og:title", content: "앱 개발 — 에이아이솔루션(AISOLITION)" },
       {
         property: "og:description",
         content: "Flutter 기반 크로스 플랫폼 앱 개발 서비스",
@@ -102,7 +102,7 @@ function AppDevPage() {
           <nav className="glass flex items-center justify-between rounded-full px-5 py-3">
             <Link to="/" className="flex items-center gap-2 font-display font-bold tracking-tight">
               <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-to-br from-primary to-primary-glow text-primary-foreground text-xs">◆</span>
-              <span className="text-base">webbuy</span>
+              <span className="text-base">AISOLITION</span>
             </Link>
             <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
               <Link to="/" className="transition hover:text-foreground">홈</Link>
@@ -182,7 +182,7 @@ function AppDevPage() {
       <section className="px-4 py-24">
         <div className="mx-auto max-w-6xl">
           <div className="text-center">
-            <h2 className="font-display text-4xl font-bold md:text-5xl">webbuy의 SI 개발이 특별한 이유</h2>
+            <h2 className="font-display text-4xl font-bold md:text-5xl">AISOLITION의 SI 개발이 특별한 이유</h2>
             <p className="mt-4 text-muted-foreground">개발만이 아닌,<br />고객에게 도달하고 활용되는 제품을 설계합니다.</p>
           </div>
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

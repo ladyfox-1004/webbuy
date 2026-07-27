@@ -4,8 +4,8 @@ export const Route = createFileRoute("/privacy")({
   component: PrivacyPage,
   head: () => ({
     meta: [
-      { title: "개인정보처리방침 — 핑크폭스" },
-      { name: "description", content: "핑크폭스(PINKFOX) 개인정보처리방침" },
+      { title: "개인정보처리방침 — 에이아이솔루션(AISOLITION)" },
+      { name: "description", content: "에이아이솔루션(AISOLITION) 개인정보처리방침" },
     ],
   }),
 });
@@ -21,7 +21,7 @@ function PrivacyPage() {
         <div className="mt-10 space-y-8 text-muted-foreground">
           <section>
             <p className="leading-relaxed">
-              핑크폭스(PINKFOX, 이하 "회사")는 이용자의 개인정보를 중요시하며, 「개인정보 보호법」 등
+              에이아이솔루션(AISOLITION, 이하 "회사")는 이용자의 개인정보를 중요시하며, 「개인정보 보호법」 등
               관련 법령을 준수하기 위하여 노력하고 있습니다. 본 방침은 회사가 운영하는 사이트를 통해
               수집·이용하는 개인정보의 항목과 처리 목적, 보유 기간 등을 안내합니다.
             </p>
