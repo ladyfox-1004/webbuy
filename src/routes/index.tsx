@@ -24,6 +24,7 @@ import {
   Link2,
   MapPinned,
   ShoppingBag,
+  MessageCircle,
 } from "lucide-react";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
 import { verifyPayment } from "@/lib/payments.functions";
