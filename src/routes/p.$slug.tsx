@@ -54,80 +54,7 @@ function ProductDetailPage() {
 type Product = NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>;
 
 function Detail({ product }: { product: Product }) {
-  const [loading, setLoading] = useState(false);
-  const verify = useServerFn(verifyPayment);
-  const navigate = useNavigate();
-
-  async function pay(method: "CARD" | "EASY_PAY") {
-    const channelKey = method === "CARD" ? PORTONE_CONFIG.channelKeyCard : PORTONE_CONFIG.channelKeyEasyPay;
-    if (!channelKey) {
-      toast.error("결제 채널이 설정되지 않았습니다.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const PortOne = (await import("@portone/browser-sdk/v2")).default;
-      const paymentId = `pay-${crypto.randomUUID()}`;
-      const result = await PortOne.requestPayment({
-        storeId: PORTONE_CONFIG.storeId,
-        channelKey,
-        paymentId,
-        orderName: product.title,
-        totalAmount: product.amount,
-        currency: "CURRENCY_KRW",
-        payMethod: method,
-      });
-      if (result?.code !== undefined) {
-        toast.error(result.message ?? "결제가 취소되었습니다.");
-        return;
-      }
-      toast.loading("결제 검증 중…", { id: paymentId });
-      const v = await verify({
-        data: {
-          paymentId,
-          expectedAmount: product.amount,
-          productTitle: product.title,
-          productId: product.id,
-        },
-      });
-      toast.dismiss(paymentId);
-      navigate({ to: "/payment/result", search: { paymentId, ok: v.ok ? 1 : 0 } });
-    } catch (err) {
-      console.error(err);
-      toast.error("결제 처리 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const lsEnabled = !!(product.ls_store_slug && product.ls_variant_id);
-
-  // Load Lemon.js overlay once when LS is enabled
-  useEffect(() => {
-    if (!lsEnabled) return;
-    if (document.querySelector('script[src*="lemon.js"]')) return;
-    const s = document.createElement("script");
-    s.src = "https://assets.lemonsqueezy.com/lemon.js";
-    s.defer = true;
-    document.body.appendChild(s);
-  }, [lsEnabled]);
-
-  async function payWithLemon() {
-    if (!product.ls_store_slug || !product.ls_variant_id) return;
-    const { data } = await supabase.auth.getUser();
-    const params = new URLSearchParams();
-    params.set("embed", "1");
-    params.set("media", "0");
-    params.set("logo", "0");
-    if (data.user?.email) params.set("checkout[email]", data.user.email);
-    params.set("checkout[custom][product_id]", product.id);
-    if (data.user?.id) params.set("checkout[custom][user_id]", data.user.id);
-    const url = `https://${product.ls_store_slug}.lemonsqueezy.com/buy/${product.ls_variant_id}?${params.toString()}`;
-    // If overlay loaded, LemonSqueezy.Url.Open handles it; otherwise fall back.
-    const LS = (window as any).LemonSqueezy;
-    if (LS?.Url?.Open) LS.Url.Open(url);
-    else window.open(url, "_blank", "noopener");
-  }
+  const [inquiryOpen, setInquiryOpen] = useState(false);
 
   return (
     <div className="min-h-screen px-4 py-16">
@@ -159,40 +86,22 @@ function Detail({ product }: { product: Product }) {
               <span className="inline-flex rounded-full border border-border/80 bg-background/40 px-3 py-1 text-xs text-muted-foreground">
                 {product.tag}
               </span>
-              <div className="font-display text-4xl font-bold">
-                ₩{product.amount.toLocaleString("ko-KR")}
+              <div>
+                <div className="text-xs text-muted-foreground">견적·상담 후 진행</div>
+                <div className="mt-1 font-display text-2xl font-semibold">
+                  프로젝트별 맞춤 견적
+                </div>
               </div>
-              <div className="grid gap-2">
-                {lsEnabled && (
-                  <button
-                    onClick={payWithLemon}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 px-5 py-3 text-sm font-semibold text-black hover:brightness-110"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    Lemon Squeezy로 결제 (해외카드)
-                  </button>
-                )}
-                <button
-                  onClick={() => pay("CARD")}
-                  disabled={loading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-60"
-                >
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                  카드로 결제 (국내)
-                </button>
-                <button
-                  onClick={() => pay("EASY_PAY")}
-                  disabled={loading}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-border bg-background/50 px-5 py-3 text-sm font-medium hover:bg-surface disabled:opacity-60"
-                >
-                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Smartphone className="h-4 w-4" />}
-                  간편결제
-                </button>
-              </div>
+              <button
+                onClick={() => setInquiryOpen(true)}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+              >
+                <MessageCircle className="h-4 w-4" /> 문의하기
+              </button>
               <ul className="space-y-1 text-[11px] leading-relaxed text-muted-foreground">
-                <li>· 결제 후 보관함(/me)에서 즉시 접속/다운로드 가능합니다.</li>
-                <li>· <span className="text-foreground/80">서비스 제공 기간</span>: 결제일로부터 최대 3개월</li>
-                <li>· 환불은 <Link to="/refund" className="underline hover:text-foreground">환불 정책</Link>에 따릅니다.</li>
+                <li>· 24시간 이내 답변드립니다.</li>
+                <li>· 요구사항에 맞춰 견적·일정을 안내드립니다.</li>
+                <li>· 계약 및 결제는 상담 후 별도 진행됩니다.</li>
               </ul>
 
               {product.seller && (
@@ -232,6 +141,7 @@ function Detail({ product }: { product: Product }) {
           </aside>
         </div>
       </div>
+      <InquiryModal open={inquiryOpen} onOpenChange={setInquiryOpen} defaultService={product.title} />
     </div>
   );
 }
