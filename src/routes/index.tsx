@@ -678,54 +678,6 @@ function Projects() {
 }
 
 function ProjectCard({ project }: { project: Product }) {
-  const [loading, setLoading] = useState(false);
-  const verify = useServerFn(verifyPayment);
-  const navigate = useNavigate();
-
-  async function pay(method: "CARD" | "EASY_PAY") {
-    const channelKey = method === "CARD" ? PORTONE_CONFIG.channelKeyCard : PORTONE_CONFIG.channelKeyEasyPay;
-    if (!channelKey) {
-      toast.error("카드 결제 채널이 아직 설정되지 않았습니다. 간편결제를 이용해 주세요.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const PortOne = (await import("@portone/browser-sdk/v2")).default;
-      const paymentId = `pay-${crypto.randomUUID()}`;
-      const result = await PortOne.requestPayment({
-        storeId: PORTONE_CONFIG.storeId,
-        channelKey,
-        paymentId,
-        orderName: project.title,
-        totalAmount: project.amount,
-        currency: "CURRENCY_KRW",
-        payMethod: method,
-      });
-
-      if (result?.code !== undefined) {
-        toast.error(result.message ?? "결제가 취소되었습니다.");
-        return;
-      }
-
-      toast.loading("결제 검증 중…", { id: paymentId });
-      const verification = await verify({
-        data: {
-          paymentId,
-          expectedAmount: project.amount,
-          productTitle: project.title,
-          productId: project.id,
-        },
-      });
-      toast.dismiss(paymentId);
-      navigate({ to: "/payment/result", search: { paymentId, ok: verification.ok ? 1 : 0 } });
-    } catch (err) {
-      console.error(err);
-      toast.error("결제 처리 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
@@ -756,27 +708,13 @@ function ProjectCard({ project }: { project: Product }) {
             {project.description}
           </p>
           <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-            <span className="font-display text-lg font-semibold whitespace-nowrap">
-              ₩{project.amount.toLocaleString("ko-KR")}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => pay("CARD")}
-                disabled={loading}
-                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
-              >
-                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CreditCard className="h-3.5 w-3.5" />}
-                카드
-              </button>
-              <button
-                onClick={() => pay("EASY_PAY")}
-                disabled={loading}
-                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
-              >
-                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Smartphone className="h-3.5 w-3.5" />}
-                간편결제
-              </button>
-            </div>
+            <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
+            <button
+              onClick={() => openInquiry(project.title)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
+            >
+              <MessageCircle className="h-3.5 w-3.5" /> 문의하기
+            </button>
           </div>
         </div>
       </div>
