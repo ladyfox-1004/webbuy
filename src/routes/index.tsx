@@ -697,7 +697,7 @@ function Projects() {
 
 function ProjectCard({ project }: { project: Product }) {
   const { openInquiry } = useInquiry();
-  const bgUrl = project.thumbnail_url || (project.category ? categoryBgMap[project.category] : undefined);
+  const bgUrl = project.thumbnail_url || (project.tag ? categoryBgMap[project.tag] : undefined);
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
