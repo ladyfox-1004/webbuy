@@ -234,6 +234,14 @@ const developItems = [
     price: 130000,
   },
   {
+    icon: ShoppingBag,
+    title: "중고거래 플랫폼",
+    tag: "C2C Marketplace",
+    desc: "당근마켓 스타일의 지역 기반 중고거래 플랫폼을 구축합니다. 상품 등록, 채팅, 거래 상태 관리, 신고 기능까지 포함합니다.",
+    slug: "c2c-marketplace",
+    price: 130000,
+  },
+  {
     icon: Sparkles,
     title: "제품 광고 숏폼 생성기",
     tag: "Shorts / AI",
