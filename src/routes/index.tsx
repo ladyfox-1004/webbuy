@@ -350,7 +350,6 @@ function Nav() {
   const isAdmin = useIsAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
-  const userMenuRef = useState<HTMLDivElement | null>(null)[1];
 
   useEffect(() => {
     if (!userOpen) return;
