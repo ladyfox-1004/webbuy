@@ -660,6 +660,7 @@ function Projects() {
 }
 
 function ProjectCard({ project }: { project: Product }) {
+  const { openInquiry } = useInquiry();
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
