@@ -36,6 +36,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
+import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg.asset.json";
+import auctionBg from "@/assets/card-bg/auction-bg.jpg.asset.json";
+import cryptoBg from "@/assets/card-bg/crypto-bg.jpg.asset.json";
+import affiliateBg from "@/assets/card-bg/affiliate-bg.jpg.asset.json";
+import datingBg from "@/assets/card-bg/dating-bg.jpg.asset.json";
+import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg.asset.json";
+import shortsBg from "@/assets/card-bg/shorts-bg.jpg.asset.json";
 
 
 export const Route = createFileRoute("/")({
@@ -54,6 +61,7 @@ type Product = {
   tag: string;
   description: string;
   amount: number;
+  category?: string | null;
   span?: string;
   accent?: string;
   slug?: string | null;
@@ -179,6 +187,7 @@ const developItems = [
     desc: "매물 등록·검색, 지도 연동, 중개사 문의까지 갖춘 부동산 전용 홈페이지를 제작합니다. 반응형 디자인과 빠른 로딩 속도로 방문자 이탈을 줄입니다.",
     slug: "real-estate-site",
     price: 100000,
+    image: realEstateBg.url,
   },
   {
     icon: Gavel,
@@ -187,6 +196,7 @@ const developItems = [
     desc: "경매 물건 정보, 입찰 일정, 결과 조회 기능을 제공하는 경매 특화 플랫폼입니다. 실시간 데이터 갱신과 사용자 알림을 지원합니다.",
     slug: "real-estate-auction",
     price: 120000,
+    image: auctionBg.url,
   },
   {
     icon: Bitcoin,
@@ -195,6 +205,7 @@ const developItems = [
     desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스 개발 경험이 있습니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
     slug: "crypto-dev",
     price: 150000,
+    image: cryptoBg.url,
   },
   {
     icon: Link2,
@@ -203,6 +214,7 @@ const developItems = [
     desc: "수익형 제휴 마케팅 사이트, 추천 링크 추적, 실적 집계 기능을 구현합니다. 광고주와 프로모터 모두가 쓰기 편한 관리자 페이지를 함께 만듭니다.",
     slug: "affiliate-dev",
     price: 100000,
+    image: affiliateBg.url,
   },
   {
     icon: MapPinned,
@@ -211,6 +223,7 @@ const developItems = [
     desc: "위치 기반 매칭, 지도 위 핀 표시, 채팅 기능이 연동된 소개팅 서비스를 개발합니다. 사용자 경험과 프라이버시 보호를 동시에 고려합니다.",
     slug: "dating-map-app",
     price: 130000,
+    image: datingBg.url,
   },
   {
     icon: ShoppingBag,
@@ -219,6 +232,7 @@ const developItems = [
     desc: "당근마켓 스타일의 지역 기반 중고거래 플랫폼을 구축합니다. 상품 등록, 채팅, 거래 상태 관리, 신고 기능까지 포함합니다.",
     slug: "c2c-marketplace",
     price: 130000,
+    image: marketplaceBg.url,
   },
   {
     icon: Sparkles,
@@ -227,8 +241,19 @@ const developItems = [
     desc: "AI로 제품 이미지와 스크립트를 넣으면 즉시 광고용 숏폼을 뽑아주는 생성기를 개발합니다. SNS 마케팅 자동화에 최적화된 파이프라인입니다.",
     slug: "shorts-generator",
     price: 150000,
+    image: shortsBg.url,
   },
 ];
+
+const categoryBgMap: Record<string, string> = {
+  "Real Estate": realEstateBg.url,
+  "Auction": auctionBg.url,
+  "Crypto": cryptoBg.url,
+  "Affiliate": affiliateBg.url,
+  "Social / Dating": datingBg.url,
+  "C2C Marketplace": marketplaceBg.url,
+  "Shorts / AI": shortsBg.url,
+};
 
 function Develop() {
   const { openInquiry } = useInquiry();
@@ -253,23 +278,34 @@ function Develop() {
               key={item.title}
               type="button"
               onClick={() => openInquiry(item.title)}
-              className="glass glow-hover flex flex-col rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
+              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
             >
-              <div className="mb-4 flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
+              {item.image && (
+                <>
+                  <img
+                    src={item.image}
+                    alt=""
+                    loading="lazy"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
+                </>
+              )}
+              <div className="relative mb-4 flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg">
                   <item.icon className="h-5 w-5" />
                 </span>
-                <span className="rounded-full border border-border/70 bg-background/40 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
+                <span className="rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
                   {item.tag}
                 </span>
               </div>
-              <h3 className="font-display text-lg font-semibold">{item.title}</h3>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+              <h3 className="relative font-display text-lg font-semibold">{item.title}</h3>
+              <p className="relative mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
                 {item.desc}
               </p>
-              <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
+              <div className="relative mt-5 flex items-center justify-between border-t border-border/60 pt-4">
                 <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
                   <MessageCircle className="h-3.5 w-3.5" /> 문의하기
                 </span>
               </div>
@@ -661,13 +697,26 @@ function Projects() {
 
 function ProjectCard({ project }: { project: Product }) {
   const { openInquiry } = useInquiry();
+  const bgUrl = project.thumbnail_url || (project.tag ? categoryBgMap[project.tag] : undefined);
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
     >
-      <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${project.accent} opacity-60`}
-      />
+      {bgUrl ? (
+        <>
+          <img
+            src={bgUrl}
+            alt=""
+            loading="lazy"
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
+        </>
+      ) : (
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${project.accent} opacity-60`}
+        />
+      )}
       <div className="relative flex h-full flex-col justify-between gap-8">
         <div className="flex items-start justify-between">
           <span className="rounded-full border border-border/80 bg-background/40 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
