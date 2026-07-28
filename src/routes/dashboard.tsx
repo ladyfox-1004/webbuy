@@ -37,6 +37,8 @@ type ProductForm = {
   status: "draft" | "review" | "live";
   category: string;
   tags: string[];
+  ls_store_slug: string;
+  ls_variant_id: string;
 };
 
 function DashboardPage() {
@@ -166,6 +168,8 @@ function Products() {
           status: f.status,
           category: f.category || null,
           tags: f.tags,
+          ls_store_slug: f.ls_store_slug || null,
+          ls_variant_id: f.ls_variant_id || null,
         },
       }),
     onSuccess: () => {
@@ -231,6 +235,7 @@ function Products() {
                         delivery_url: p.delivery_url ?? "", delivery_file_path: p.delivery_file_path ?? "",
                         status: "review",
                         category: (p as any).category ?? "", tags: (p as any).tags ?? [],
+                        ls_store_slug: (p as any).ls_store_slug ?? "", ls_variant_id: (p as any).ls_variant_id ?? "",
                       });
                     }}
                     className="inline-flex items-center gap-1 rounded-full border border-amber-400/40 bg-amber-500/10 px-3 py-1.5 text-xs text-amber-300 hover:bg-amber-500/20"
@@ -243,6 +248,7 @@ function Products() {
                     delivery_url: p.delivery_url ?? "", delivery_file_path: p.delivery_file_path ?? "",
                     status: (p.status === "live" ? "live" : "draft"),
                     category: (p as any).category ?? "", tags: (p as any).tags ?? [],
+                    ls_store_slug: (p as any).ls_store_slug ?? "", ls_variant_id: (p as any).ls_variant_id ?? "",
                   })}
                   className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs hover:bg-surface"
                 ><Pencil className="h-3.5 w-3.5" /> 수정</button>
@@ -275,6 +281,7 @@ function emptyForm(): ProductForm {
     thumbnail_url: "", product_type: "web",
     delivery_url: "", delivery_file_path: "", status: "draft",
     category: "", tags: [],
+    ls_store_slug: "", ls_variant_id: "",
   };
 }
 
