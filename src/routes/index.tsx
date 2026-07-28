@@ -61,6 +61,7 @@ type Product = {
   tag: string;
   description: string;
   amount: number;
+  category?: string | null;
   span?: string;
   accent?: string;
   slug?: string | null;
