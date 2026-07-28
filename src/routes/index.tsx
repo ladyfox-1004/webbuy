@@ -36,6 +36,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
+import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg.asset.json";
+import auctionBg from "@/assets/card-bg/auction-bg.jpg.asset.json";
+import cryptoBg from "@/assets/card-bg/crypto-bg.jpg.asset.json";
+import affiliateBg from "@/assets/card-bg/affiliate-bg.jpg.asset.json";
+import datingBg from "@/assets/card-bg/dating-bg.jpg.asset.json";
+import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg.asset.json";
+import shortsBg from "@/assets/card-bg/shorts-bg.jpg.asset.json";
 
 
 export const Route = createFileRoute("/")({
