@@ -64,6 +64,19 @@ type Product = {
 };
 
 function Index() {
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [defaultService, setDefaultService] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { service?: string } | undefined;
+      setDefaultService(detail?.service);
+      setInquiryOpen(true);
+    };
+    window.addEventListener("open-inquiry", handler);
+    return () => window.removeEventListener("open-inquiry", handler);
+  }, []);
+
   return (
     <div className="min-h-screen text-foreground">
       <Nav />
@@ -75,6 +88,11 @@ function Index() {
       <About />
       <Contact />
       <Footer />
+      <InquiryModal
+        open={inquiryOpen}
+        onOpenChange={setInquiryOpen}
+        defaultService={defaultService}
+      />
     </div>
   );
 }
