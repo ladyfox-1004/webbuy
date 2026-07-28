@@ -35,11 +35,8 @@ import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
-import { InquiryModal } from "@/components/InquiryModal";
+import { useInquiry } from "@/components/InquiryModal";
 
-function openInquiry(service?: string) {
-  window.dispatchEvent(new CustomEvent("open-inquiry", { detail: { service } }));
-}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -64,19 +61,6 @@ type Product = {
 };
 
 function Index() {
-  const [inquiryOpen, setInquiryOpen] = useState(false);
-  const [defaultService, setDefaultService] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail as { service?: string } | undefined;
-      setDefaultService(detail?.service);
-      setInquiryOpen(true);
-    };
-    window.addEventListener("open-inquiry", handler);
-    return () => window.removeEventListener("open-inquiry", handler);
-  }, []);
-
   return (
     <div className="min-h-screen text-foreground">
       <Nav />
@@ -88,11 +72,6 @@ function Index() {
       <About />
       <Contact />
       <Footer />
-      <InquiryModal
-        open={inquiryOpen}
-        onOpenChange={setInquiryOpen}
-        defaultService={defaultService}
-      />
     </div>
   );
 }
@@ -252,6 +231,7 @@ const developItems = [
 ];
 
 function Develop() {
+  const { openInquiry } = useInquiry();
   return (
     <section id="develop" className="px-4 py-24">
       <div className="mx-auto max-w-6xl">
@@ -330,6 +310,7 @@ const pricingTiers = [
 ];
 
 function Pricing() {
+  const { openInquiry } = useInquiry();
   return (
     <section id="pricing" className="px-4 py-24">
       <div className="mx-auto max-w-6xl">
@@ -756,6 +737,7 @@ function About() {
 }
 
 function Contact() {
+  const { openInquiry } = useInquiry();
   return (
     <section id="contact" className="px-4 py-24">
       <div className="mx-auto max-w-4xl">
@@ -766,7 +748,7 @@ function Contact() {
             <div className="mb-3 text-sm font-medium text-primary-glow">— Contact</div>
             <h2 className="font-display text-4xl font-bold md:text-5xl">함께 만들어요.</h2>
             <p className="mt-4 max-w-lg text-muted-foreground md:text-lg">
-              프로젝트든 아이디어든, 지금 바로 이야기해 보세요.
+              아이디어를 현실로 만드는 첫 단추를 눌러보세요.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <button

@@ -1,9 +1,41 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, createContext, useContext, ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Loader2, Paperclip, Sparkles, X } from "lucide-react";
 import { submitInquiry } from "@/lib/inquiry.functions";
 import { supabase } from "@/integrations/supabase/client";
+
+const InquiryContext = createContext<{
+  open: boolean;
+  defaultService: string | undefined;
+  openInquiry: (service?: string) => void;
+  closeInquiry: () => void;
+} | null>(null);
+
+export function InquiryProvider({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const [defaultService, setDefaultService] = useState<string | undefined>(undefined);
+
+  const openInquiry = (service?: string) => {
+    setDefaultService(service);
+    setOpen(true);
+  };
+
+  const closeInquiry = () => setOpen(false);
+
+  return (
+    <InquiryContext.Provider value={{ open, defaultService, openInquiry, closeInquiry }}>
+      {children}
+      <InquiryModal open={open} onOpenChange={closeInquiry} defaultService={defaultService} />
+    </InquiryContext.Provider>
+  );
+}
+
+export function useInquiry() {
+  const ctx = useContext(InquiryContext);
+  if (!ctx) throw new Error("useInquiry must be used within InquiryProvider");
+  return ctx;
+}
 
 const SERVICE_OPTIONS = [
   "제품광고 숏폼",
