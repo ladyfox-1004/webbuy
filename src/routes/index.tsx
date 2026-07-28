@@ -25,6 +25,8 @@ import {
   MapPinned,
   ShoppingBag,
   MessageCircle,
+  FileText,
+  Share2,
   Menu,
   X,
   LayoutDashboard,
@@ -43,6 +45,8 @@ import affiliateBg from "@/assets/card-bg/affiliate-bg.jpg";
 import datingBg from "@/assets/card-bg/dating-bg.jpg";
 import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg";
 import shortsBg from "@/assets/card-bg/shorts-bg.jpg";
+import blogAutomationBg from "@/assets/card-bg/blog-automation-bg.jpg";
+import snsAutoBg from "@/assets/card-bg/sns-auto-bg.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -243,6 +247,24 @@ const developItems = [
     price: 150000,
     image: shortsBg,
   },
+  {
+    icon: FileText,
+    title: "블로그 자동화 툴",
+    tag: "Blog Automation",
+    desc: "키워드 입력만으로 AI가 기획·초안·이미지까지 준비해주는 블로그 자동화 도구를 개발합니다. 배포와 SEO 메타 태그까지 자동화해 운영 부담을 줄입니다.",
+    slug: "blog-automation",
+    price: 130000,
+    image: blogAutomationBg,
+  },
+  {
+    icon: Share2,
+    title: "SNS 자동업로드 툴",
+    tag: "SNS Auto",
+    desc: "제작된 콘텐츠를 예약 시간에 맞춰 인스타그램, 블로그, 쇼츠 등 여러 채널에 자동 업로드하는 파이프라인을 구축합니다. 해시태그와 썸네일도 자동 생성됩니다.",
+    slug: "sns-auto-upload",
+    price: 130000,
+    image: snsAutoBg,
+  },
 ];
 
 const categoryBgMap: Record<string, string> = {
@@ -253,6 +275,8 @@ const categoryBgMap: Record<string, string> = {
   "Social / Dating": datingBg,
   "C2C Marketplace": marketplaceBg,
   "Shorts / AI": shortsBg,
+  "Blog Automation": blogAutomationBg,
+  "SNS Auto": snsAutoBg,
 };
 
 function Develop() {
