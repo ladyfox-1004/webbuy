@@ -529,15 +529,6 @@ function Nav() {
                   </button>
                 </>
               )}
-              {!user && (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow px-3 py-2.5 text-sm font-medium text-primary-foreground"
-                >
-                  <LogIn className="h-4 w-4" />로그인
-                </Link>
-              )}
             </div>
           </div>
         )}
