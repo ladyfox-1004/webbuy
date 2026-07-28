@@ -770,11 +770,17 @@ function Contact() {
               협업, 외주, 혹은 그냥 인사. 무엇이든 환영합니다.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => openInquiry()}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-semibold text-primary-foreground transition hover:scale-[1.02]"
+              >
+                <MessageCircle className="h-4 w-4" /> 문의하기
+              </button>
               <a
                 href="mailto:nancoco0705@gmail.com"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-medium text-primary-foreground transition hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 font-medium text-foreground transition hover:bg-surface"
               >
-                <Mail className="h-4 w-4" /><span>nancoco0705@gmail.com</span>
+                <Mail className="h-4 w-4 text-primary-glow" /><span>nancoco0705@gmail.com</span>
               </a>
               <button
                 onClick={() => {
