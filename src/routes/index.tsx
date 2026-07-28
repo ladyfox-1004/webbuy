@@ -286,12 +286,12 @@ function Develop() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
-            <div className="mb-3 text-sm font-medium text-primary-glow">— Develop</div>
+            <div className="mb-3 text-sm font-medium text-primary-glow">— Planning / Develop</div>
             <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
-              개발 경험
+              기획/개발
             </h2>
             <p className="mt-4 max-w-xl text-muted-foreground">
-              랜딩페이지 외에도 다양한 웹/앱 서비스를 직접 설계하고 개발해 왔습니다.
+              비즈니스 목표에 맞춰 기획부터 개발까지 완성도 높은 웹/앱 서비스를 만들어갑니다.
             </p>
           </div>
         </div>
@@ -447,7 +447,7 @@ function Nav() {
           {/* Desktop nav */}
           <div className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
-            <a href="#develop" className="transition hover:text-foreground">개발 경험</a>
+            <a href="#develop" className="transition hover:text-foreground">기획/개발</a>
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
             {isAdmin && <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>}
             {isAdmin && <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>}
@@ -543,7 +543,7 @@ function Nav() {
           <div className="mt-2 rounded-3xl border border-border bg-surface/95 p-4 shadow-card backdrop-blur md:hidden">
             <div className="flex flex-col gap-1 text-sm">
               <a href="#portfolio" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">포트폴리오</a>
-              <a href="#develop" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">개발 경험</a>
+              <a href="#develop" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">기획/개발</a>
               <a href="#projects" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">Projects</a>
               {isAdmin && <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>}
               {isAdmin && <Link to="/sell" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">판매하기</Link>}
@@ -659,9 +659,6 @@ function Projects() {
           <div>
             <div className="mb-3 text-sm font-medium text-primary-glow">— Projects</div>
             <h2 className="font-display text-4xl font-bold md:text-5xl">컬렉션</h2>
-          </div>
-          <div className="hidden text-sm text-muted-foreground md:block">
-            클릭해서 바로 결제하고 사용하기
           </div>
         </div>
 
