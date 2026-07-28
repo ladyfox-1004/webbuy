@@ -99,6 +99,35 @@ function Detail({ product }: { product: Product }) {
     }
   }
 
+  const lsEnabled = !!(product.ls_store_slug && product.ls_variant_id);
+
+  // Load Lemon.js overlay once when LS is enabled
+  useEffect(() => {
+    if (!lsEnabled) return;
+    if (document.querySelector('script[src*="lemon.js"]')) return;
+    const s = document.createElement("script");
+    s.src = "https://assets.lemonsqueezy.com/lemon.js";
+    s.defer = true;
+    document.body.appendChild(s);
+  }, [lsEnabled]);
+
+  async function payWithLemon() {
+    if (!product.ls_store_slug || !product.ls_variant_id) return;
+    const { data } = await supabase.auth.getUser();
+    const params = new URLSearchParams();
+    params.set("embed", "1");
+    params.set("media", "0");
+    params.set("logo", "0");
+    if (data.user?.email) params.set("checkout[email]", data.user.email);
+    params.set("checkout[custom][product_id]", product.id);
+    if (data.user?.id) params.set("checkout[custom][user_id]", data.user.id);
+    const url = `https://${product.ls_store_slug}.lemonsqueezy.com/buy/${product.ls_variant_id}?${params.toString()}`;
+    // If overlay loaded, LemonSqueezy.Url.Open handles it; otherwise fall back.
+    const LS = (window as any).LemonSqueezy;
+    if (LS?.Url?.Open) LS.Url.Open(url);
+    else window.open(url, "_blank", "noopener");
+  }
+
   return (
     <div className="min-h-screen px-4 py-16">
       <div className="mx-auto max-w-5xl">
