@@ -84,3 +84,27 @@ export const adminStats = createServerFn({ method: "GET" })
       series: days,
     };
   });
+
+export const adminListWebhookEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data: payments, error } = await supabaseAdmin
+      .from("payments")
+      .select("id, payment_id, product_title, amount, currency, status, customer_email, provider, created_at")
+      .eq("provider", "lemonsqueezy")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+
+    const { data: emails } = await supabaseAdmin
+      .from("email_send_log")
+      .select("message_id, template_name, recipient_email, status, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100);
+
+    return {
+      payments: payments ?? [],
+      emails: emails ?? [],
+    };
+  });

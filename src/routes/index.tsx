@@ -25,6 +25,11 @@ import {
   MapPinned,
   ShoppingBag,
   MessageCircle,
+  Menu,
+  X,
+  LayoutDashboard,
+  Package,
+  Webhook,
 } from "lucide-react";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
 import { verifyPayment } from "@/lib/payments.functions";
@@ -343,6 +348,18 @@ function Pricing() {
 function Nav() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+
+  useEffect(() => {
+    if (!userOpen) return;
+    const handle = (e: MouseEvent) => {
+      const el = document.getElementById("user-menu");
+      if (el && !el.contains(e.target as Node)) setUserOpen(false);
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [userOpen]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
@@ -354,40 +371,156 @@ function Nav() {
             </span>
             <span className="text-base">AISOLUTION</span>
           </Link>
-          <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
+
+          {/* Desktop nav */}
+          <div className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
             <a href="#develop" className="transition hover:text-foreground">개발 경험</a>
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
             <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>
             <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>
-            {user && (
-              <>
-                <Link to="/dashboard" className="transition hover:text-foreground">대시보드</Link>
-                <Link to="/me" className="transition hover:text-foreground">보관함</Link>
-              </>
-            )}
-            {isAdmin && (
-              <Link to="/admin/review" className="inline-flex items-center gap-1 text-primary-glow transition hover:text-foreground">
-                <ShieldCheck className="h-3.5 w-3.5" />검수
+          </div>
+
+          {/* Desktop user actions */}
+          <div className="hidden items-center gap-2 md:flex">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserOpen((v) => !v)}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/40 px-4 py-2 text-sm text-foreground transition hover:bg-surface"
+                >
+                  <UserIcon className="h-4 w-4" />
+                  <span className="max-w-[120px] truncate">{user.email ?? "내 계정"}</span>
+                </button>
+                {userOpen && (
+                  <div id="user-menu" className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-border bg-surface/95 p-2 shadow-card backdrop-blur">
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setUserOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                    >
+                      <LayoutDashboard className="h-4 w-4 text-primary-glow" /> 대시보드
+                    </Link>
+                    <Link
+                      to="/me"
+                      onClick={() => setUserOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                    >
+                      <Package className="h-4 w-4 text-primary-glow" /> 보관함
+                    </Link>
+                    {isAdmin && (
+                      <>
+                        <div className="my-1 h-px bg-border" />
+                        <Link
+                          to="/admin"
+                          onClick={() => setUserOpen(false)}
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                        >
+                          <ShieldCheck className="h-4 w-4 text-primary-glow" /> 관리자
+                        </Link>
+                        <Link
+                          to="/admin/review"
+                          onClick={() => setUserOpen(false)}
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                        >
+                          <ShieldCheck className="h-4 w-4 text-amber-400" /> 검수 대기열
+                        </Link>
+                        <Link
+                          to="/admin/webhooks"
+                          onClick={() => setUserOpen(false)}
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                        >
+                          <Webhook className="h-4 w-4 text-primary-glow" /> 웹훅 로그
+                        </Link>
+                      </>
+                    )}
+                    <div className="my-1 h-px bg-border" />
+                    <button
+                      onClick={() => {
+                        setUserOpen(false);
+                        supabase.auth.signOut();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-foreground transition hover:bg-surface-elevated"
+                    >
+                      <LogOut className="h-4 w-4" /> 로그아웃
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+              >
+                <LogIn className="h-4 w-4" />로그인
               </Link>
             )}
           </div>
-          {user ? (
-            <button
-              onClick={() => supabase.auth.signOut()}
-              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/40 px-4 py-2 text-sm text-foreground transition hover:bg-surface"
-            >
-              <LogOut className="h-4 w-4" />로그아웃
-            </button>
-          ) : (
-            <Link
-              to="/login"
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-            >
-              <LogIn className="h-4 w-4" />로그인
-            </Link>
-          )}
+
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            className="inline-flex items-center justify-center rounded-full p-2 text-foreground md:hidden"
+            aria-label="메뉴 열기"
+          >
+            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </nav>
+
+        {/* Mobile menu */}
+        {mobileOpen && (
+          <div className="mt-2 rounded-3xl border border-border bg-surface/95 p-4 shadow-card backdrop-blur md:hidden">
+            <div className="flex flex-col gap-1 text-sm">
+              <a href="#portfolio" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">포트폴리오</a>
+              <a href="#develop" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">개발 경험</a>
+              <a href="#projects" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">Projects</a>
+              <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>
+              <Link to="/sell" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">판매하기</Link>
+              {user && (
+                <>
+                  <div className="my-1 h-px bg-border" />
+                  <Link to="/dashboard" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated">
+                    <LayoutDashboard className="h-4 w-4 text-primary-glow" /> 대시보드
+                  </Link>
+                  <Link to="/me" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated">
+                    <Package className="h-4 w-4 text-primary-glow" /> 보관함
+                  </Link>
+                  {isAdmin && (
+                    <>
+                      <Link to="/admin" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated">
+                        <ShieldCheck className="h-4 w-4 text-primary-glow" /> 관리자
+                      </Link>
+                      <Link to="/admin/review" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated">
+                        <ShieldCheck className="h-4 w-4 text-amber-400" /> 검수 대기열
+                      </Link>
+                      <Link to="/admin/webhooks" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated">
+                        <Webhook className="h-4 w-4 text-primary-glow" /> 웹훅 로그
+                      </Link>
+                    </>
+                  )}
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      supabase.auth.signOut();
+                    }}
+                    className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-left text-foreground transition hover:bg-surface-elevated"
+                  >
+                    <LogOut className="h-4 w-4" /> 로그아웃
+                  </button>
+                </>
+              )}
+              {!user && (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow px-3 py-2.5 text-sm font-medium text-primary-foreground"
+                >
+                  <LogIn className="h-4 w-4" />로그인
+                </Link>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
@@ -703,6 +836,8 @@ function Footer() {
           <Link to="/terms" className="text-muted-foreground transition hover:text-foreground">이용약관</Link>
           <Link to="/privacy" className="font-medium text-foreground transition hover:text-primary-glow">개인정보처리방침</Link>
           <Link to="/refund" className="text-muted-foreground transition hover:text-foreground">환불 정책</Link>
+          <Link to="/dashboard" className="text-muted-foreground transition hover:text-foreground">판매자 대시보드</Link>
+          <Link to="/admin/webhooks" className="text-muted-foreground transition hover:text-foreground">웹훅 로그</Link>
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-surface/40 p-5 text-xs leading-relaxed text-muted-foreground md:text-sm">

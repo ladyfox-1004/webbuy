@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Plus, Trash2, Pencil, ShieldCheck } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Pencil, ShieldCheck, Webhook } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminListPayments, adminListUsers, adminStats } from "@/lib/admin.functions";
 import { listProducts, upsertProduct, deleteProduct } from "@/lib/products.functions";
@@ -53,6 +53,12 @@ function AdminPage() {
               {label}
             </button>
           ))}
+          <Link
+            to="/admin/webhooks"
+            className="ml-auto mr-2 inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-primary-glow transition hover:bg-surface/60"
+          >
+            <Webhook className="h-3.5 w-3.5" /> 웹훅 로그
+          </Link>
         </div>
 
         {tab === "stats" && <StatsPanel />}

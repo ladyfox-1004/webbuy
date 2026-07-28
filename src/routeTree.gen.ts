@@ -25,6 +25,7 @@ import { Route as USlugRouteImport } from './routes/u.$slug'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminReviewRouteImport } from './routes/admin.review'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -112,6 +113,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminWebhooksRoute = AdminWebhooksRouteImport.update({
+  id: '/webhooks',
+  path: '/webhooks',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReviewRoute = AdminReviewRouteImport.update({
   id: '/review',
   path: '/review',
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/review': typeof AdminReviewRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/review': typeof AdminReviewRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/review': typeof AdminReviewRoute
+  '/admin/webhooks': typeof AdminWebhooksRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin/review'
+    | '/admin/webhooks'
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin/review'
+    | '/admin/webhooks'
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/unsubscribe'
     | '/admin/review'
+    | '/admin/webhooks'
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
@@ -433,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/webhooks': {
+      id: '/admin/webhooks'
+      path: '/webhooks'
+      fullPath: '/admin/webhooks'
+      preLoaderRoute: typeof AdminWebhooksRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/review': {
       id: '/admin/review'
       path: '/review'
@@ -480,10 +499,12 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminReviewRoute: typeof AdminReviewRoute
+  AdminWebhooksRoute: typeof AdminWebhooksRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminReviewRoute: AdminReviewRoute,
+  AdminWebhooksRoute: AdminWebhooksRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
