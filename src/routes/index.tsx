@@ -406,6 +406,12 @@ function Nav() {
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
             {isAdmin && <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>}
             {isAdmin && <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>}
+            <button
+              onClick={() => openInquiry()}
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
+            >
+              문의하기 <MessageCircle className="h-3.5 w-3.5" />
+            </button>
           </div>
 
           {/* Desktop user actions */}
@@ -496,6 +502,15 @@ function Nav() {
               <a href="#projects" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">Projects</a>
               {isAdmin && <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>}
               {isAdmin && <Link to="/sell" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">판매하기</Link>}
+              <button
+                onClick={() => {
+                  setMobileOpen(false);
+                  openInquiry();
+                }}
+                className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow px-3 py-2.5 text-sm font-medium text-primary-foreground"
+              >
+                문의하기 <MessageCircle className="h-4 w-4" />
+              </button>
               {user && (
                 <>
                   <div className="my-1 h-px bg-border" />
