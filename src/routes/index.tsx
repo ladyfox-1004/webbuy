@@ -728,20 +728,20 @@ function About() {
         <div>
           <div className="mb-3 text-sm font-medium text-primary-glow">— About</div>
           <h2 className="font-display text-4xl font-bold leading-tight md:text-5xl">
-            혼자 만드는 작은 스튜디오.
+            개발자의 아이디어가 제품이 되는 곳
           </h2>
         </div>
         <div className="space-y-6 text-muted-foreground">
           <p className="text-lg leading-relaxed">
-            아이디어가 떠오르면 주말에 만들고, 다음 주말에 출시합니다. 빠르게 만들고,
-            진짜 쓰는 사람들에게서 배웁니다.
+            좋은 코드는 혼자 완성되지 않습니다. 기획·개발·배포 전 과정을 함께하며,
+            아이디어를 실제 제품과 비즈니스로 만듭니다.
           </p>
           <div className="grid grid-cols-2 gap-4 pt-4">
             {[
-              { i: Code2, t: "Full-stack" },
-              { i: Zap, t: "Ship Fast" },
-              { i: CreditCard, t: "PortOne" },
-              { i: UserIcon, t: "AI Native" },
+              { i: Sparkles, t: "AI 기획" },
+              { i: Code2, t: "MVP 개발" },
+              { i: Zap, t: "빠른 출시" },
+              { i: Smartphone, t: "운영·배포" },
             ].map(({ i: Icon, t }) => (
               <div key={t} className="flex items-center gap-3 rounded-2xl border border-border bg-surface/40 px-4 py-3">
                 <Icon className="h-4 w-4 text-primary-glow" />
@@ -766,7 +766,7 @@ function Contact() {
             <div className="mb-3 text-sm font-medium text-primary-glow">— Contact</div>
             <h2 className="font-display text-4xl font-bold md:text-5xl">함께 만들어요.</h2>
             <p className="mt-4 max-w-lg text-muted-foreground md:text-lg">
-              협업, 외주, 혹은 그냥 인사. 무엇이든 환영합니다.
+              프로젝트든 아이디어든, 지금 바로 이야기해 보세요.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <button
