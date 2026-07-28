@@ -394,7 +394,7 @@ function Nav() {
                   <span className="max-w-[120px] truncate">{user.email ?? "내 계정"}</span>
                 </button>
                 {userOpen && (
-                  <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-border bg-surface/95 p-2 shadow-card backdrop-blur">
+                  <div id="user-menu" className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-border bg-surface/95 p-2 shadow-card backdrop-blur">
                     <Link
                       to="/dashboard"
                       onClick={() => setUserOpen(false)}
