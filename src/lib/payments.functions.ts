@@ -109,6 +109,46 @@ export const verifyPayment = createServerFn({ method: "POST" })
         { onConflict: "payment_id" },
       );
       if (entErr) console.error("Entitlement upsert failed", entErr);
+
+      // Fire receipt email (best-effort; never block the payment response)
+      const recipient = payment.customer?.email ?? null;
+      if (recipient) {
+        try {
+          const { data: prod } = await supabaseAdmin
+            .from("products")
+            .select("delivery_url, delivery_file_path")
+            .eq("id", data.productId)
+            .maybeSingle();
+
+          let downloadUrl: string | null = null;
+          if (prod?.delivery_file_path) {
+            const { data: signed } = await supabaseAdmin.storage
+              .from("product-files")
+              .createSignedUrl(prod.delivery_file_path, 60 * 60 * 24);
+            downloadUrl = signed?.signedUrl ?? null;
+          }
+
+          const { sendInternalTransactionalEmail } = await import(
+            "@/lib/email/send-internal.server"
+          );
+          await sendInternalTransactionalEmail({
+            templateName: "purchase-receipt",
+            recipientEmail: recipient,
+            idempotencyKey: `receipt-${data.paymentId}`,
+            templateData: {
+              productTitle: data.productTitle,
+              amount: paidAmount,
+              paymentId: data.paymentId,
+              libraryUrl: "https://ai-solution.space/me",
+              deliveryUrl: prod?.delivery_url ?? null,
+              downloadUrl,
+              siteName: "AISOLUTION",
+            },
+          });
+        } catch (mailErr) {
+          console.error("Receipt email failed", mailErr);
+        }
+      }
     }
 
     return { ok: isPaid, status: payment.status };
