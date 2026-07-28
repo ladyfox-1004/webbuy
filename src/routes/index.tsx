@@ -696,14 +696,15 @@ function Projects() {
 
 function ProjectCard({ project }: { project: Product }) {
   const { openInquiry } = useInquiry();
+  const bgUrl = project.thumbnail_url || (project.category ? categoryBgMap[project.category] : undefined);
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
     >
-      {project.thumbnail_url ? (
+      {bgUrl ? (
         <>
           <img
-            src={project.thumbnail_url}
+            src={bgUrl}
             alt=""
             loading="lazy"
             className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
