@@ -31,12 +31,15 @@ import {
   Package,
   Webhook,
 } from "lucide-react";
-import { PORTONE_CONFIG } from "@/lib/portone-config";
-import { verifyPayment } from "@/lib/payments.functions";
 import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { InquiryModal } from "@/components/InquiryModal";
+
+function openInquiry(service?: string) {
+  window.dispatchEvent(new CustomEvent("open-inquiry", { detail: { service } }));
+}
 
 export const Route = createFileRoute("/")({
   component: Index,
