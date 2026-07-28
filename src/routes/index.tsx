@@ -700,7 +700,7 @@ function Projects() {
 
 function ProjectCard({ project }: { project: Product }) {
   const { openInquiry } = useInquiry();
-  const bgUrl = project.thumbnail_url || (project.tag ? categoryBgMap[project.tag] : undefined);
+  const bgUrl = project.thumbnail_url || categoryBgMap[project.tag ?? ""] || shortsBg;
   return (
     <article
       className={`glow-hover group flex flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm transition hover:border-primary/40 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/95 ${project.span}`}
