@@ -404,8 +404,8 @@ function Nav() {
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
             <a href="#develop" className="transition hover:text-foreground">개발 경험</a>
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
-            <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>
-            <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>
+            {isAdmin && <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>}
+            {isAdmin && <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>}
           </div>
 
           {/* Desktop user actions */}
