@@ -260,23 +260,34 @@ function Develop() {
               key={item.title}
               type="button"
               onClick={() => openInquiry(item.title)}
-              className="glass glow-hover flex flex-col rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
+              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
             >
-              <div className="mb-4 flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
+              {item.image && (
+                <>
+                  <img
+                    src={item.image}
+                    alt=""
+                    loading="lazy"
+                    className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
+                </>
+              )}
+              <div className="relative mb-4 flex items-center gap-3">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg">
                   <item.icon className="h-5 w-5" />
                 </span>
-                <span className="rounded-full border border-border/70 bg-background/40 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
+                <span className="rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
                   {item.tag}
                 </span>
               </div>
-              <h3 className="font-display text-lg font-semibold">{item.title}</h3>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
+              <h3 className="relative font-display text-lg font-semibold">{item.title}</h3>
+              <p className="relative mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
                 {item.desc}
               </p>
-              <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
+              <div className="relative mt-5 flex items-center justify-between border-t border-border/60 pt-4">
                 <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground">
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
                   <MessageCircle className="h-3.5 w-3.5" /> 문의하기
                 </span>
               </div>
