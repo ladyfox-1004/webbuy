@@ -61,6 +61,8 @@ const productSchema = z.object({
   status: z.enum(["draft", "review", "live"]).default("draft"),
   category: z.string().trim().max(40).optional().nullable(),
   tags: z.array(z.string().trim().min(1).max(30)).max(10).optional().default([]),
+  ls_store_slug: z.string().trim().max(60).optional().nullable(),
+  ls_variant_id: z.string().trim().max(60).optional().nullable(),
 });
 
 export const listMyProducts = createServerFn({ method: "GET" })

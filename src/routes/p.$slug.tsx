@@ -1,11 +1,12 @@
-import { createFileRoute, Link, useNavigate, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowUpRight, CreditCard, Loader2, Smartphone, Store } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CreditCard, Loader2, Smartphone, Store, ShoppingBag } from "lucide-react";
 import { getProductBySlug, verifyPayment } from "@/lib/payments.functions";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/p/$slug")({
   component: ProductDetailPage,
@@ -98,6 +99,35 @@ function Detail({ product }: { product: Product }) {
     }
   }
 
+  const lsEnabled = !!(product.ls_store_slug && product.ls_variant_id);
+
+  // Load Lemon.js overlay once when LS is enabled
+  useEffect(() => {
+    if (!lsEnabled) return;
+    if (document.querySelector('script[src*="lemon.js"]')) return;
+    const s = document.createElement("script");
+    s.src = "https://assets.lemonsqueezy.com/lemon.js";
+    s.defer = true;
+    document.body.appendChild(s);
+  }, [lsEnabled]);
+
+  async function payWithLemon() {
+    if (!product.ls_store_slug || !product.ls_variant_id) return;
+    const { data } = await supabase.auth.getUser();
+    const params = new URLSearchParams();
+    params.set("embed", "1");
+    params.set("media", "0");
+    params.set("logo", "0");
+    if (data.user?.email) params.set("checkout[email]", data.user.email);
+    params.set("checkout[custom][product_id]", product.id);
+    if (data.user?.id) params.set("checkout[custom][user_id]", data.user.id);
+    const url = `https://${product.ls_store_slug}.lemonsqueezy.com/buy/${product.ls_variant_id}?${params.toString()}`;
+    // If overlay loaded, LemonSqueezy.Url.Open handles it; otherwise fall back.
+    const LS = (window as any).LemonSqueezy;
+    if (LS?.Url?.Open) LS.Url.Open(url);
+    else window.open(url, "_blank", "noopener");
+  }
+
   return (
     <div className="min-h-screen px-4 py-16">
       <div className="mx-auto max-w-5xl">
@@ -132,13 +162,22 @@ function Detail({ product }: { product: Product }) {
                 ₩{product.amount.toLocaleString("ko-KR")}
               </div>
               <div className="grid gap-2">
+                {lsEnabled && (
+                  <button
+                    onClick={payWithLemon}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 px-5 py-3 text-sm font-semibold text-black hover:brightness-110"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Lemon Squeezy로 결제 (해외카드)
+                  </button>
+                )}
                 <button
                   onClick={() => pay("CARD")}
                   disabled={loading}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-60"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                  카드로 결제
+                  카드로 결제 (국내)
                 </button>
                 <button
                   onClick={() => pay("EASY_PAY")}
