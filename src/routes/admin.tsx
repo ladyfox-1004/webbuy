@@ -53,6 +53,12 @@ function AdminPage() {
               {label}
             </button>
           ))}
+          <Link
+            to="/admin/webhooks"
+            className="ml-auto mr-2 inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-primary-glow transition hover:bg-surface/60"
+          >
+            <Webhook className="h-3.5 w-3.5" /> 웹훅 로그
+          </Link>
         </div>
 
         {tab === "stats" && <StatsPanel />}
