@@ -766,7 +766,7 @@ function Contact() {
             <div className="mb-3 text-sm font-medium text-primary-glow">— Contact</div>
             <h2 className="font-display text-4xl font-bold md:text-5xl">함께 만들어요.</h2>
             <p className="mt-4 max-w-lg text-muted-foreground md:text-lg">
-              협업, 외주, 혹은 그냥 인사. 무엇이든 환영합니다.
+              프로젝트든 아이디어든, 지금 바로 이야기해 보세요.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <button
