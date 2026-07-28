@@ -749,7 +749,7 @@ function Contact() {
           <div className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-primary-glow/20 blur-3xl" />
           <div className="relative">
             <div className="mb-3 text-sm font-medium text-primary-glow">— Contact</div>
-            <h2 className="font-display text-4xl font-bold md:text-5xl">함께 만들어요.</h2>
+            <h2 className="font-display text-4xl font-bold md:text-5xl">프로젝트를 시작해요</h2>
             <p className="mt-4 max-w-lg text-muted-foreground md:text-lg">
               아이디어를 현실로 만드는 첫 단추를 눌러보세요.
             </p>
