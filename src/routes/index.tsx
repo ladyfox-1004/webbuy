@@ -703,47 +703,48 @@ function ProjectCard({ project }: { project: Product }) {
   const bgUrl = project.thumbnail_url || (project.tag ? categoryBgMap[project.tag] : undefined);
   return (
     <article
-      className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
+      className={`glow-hover group flex flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm transition hover:border-primary/40 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/95 ${project.span}`}
     >
       {bgUrl ? (
-        <>
+        <div className="relative aspect-[16/7] w-full overflow-hidden">
           <img
             src={bgUrl}
             alt=""
             loading="lazy"
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            width={1280}
+            height={800}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
-        </>
+        </div>
       ) : (
         <div
-          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${project.accent} opacity-60`}
+          className={`aspect-[16/7] w-full bg-gradient-to-br ${project.accent} opacity-60`}
         />
       )}
-      <div className="relative flex h-full flex-col justify-between gap-8">
+      <div className="flex h-full flex-col justify-between gap-6 p-6">
         <div className="flex items-start justify-between">
-          <span className="rounded-full border border-border/80 bg-background/40 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+          <span className="rounded-full border border-slate-200/80 bg-slate-100/80 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300">
             {project.tag}
           </span>
-          <ArrowUpRight className="h-5 w-5 text-muted-foreground transition group-hover:rotate-45 group-hover:text-primary-glow" />
+          <ArrowUpRight className="h-5 w-5 text-slate-400 transition group-hover:rotate-45 group-hover:text-primary-glow dark:text-slate-500" />
         </div>
         <div>
           {project.slug ? (
             <Link to="/p/$slug" params={{ slug: project.slug }} className="block group/title">
-              <h3 className="font-display text-2xl font-semibold text-foreground transition group-hover/title:text-primary-glow md:text-3xl">
+              <h3 className="font-display text-2xl font-semibold text-slate-900 transition group-hover/title:text-primary-glow md:text-3xl dark:text-slate-100">
                 {project.title}
               </h3>
             </Link>
           ) : (
-            <h3 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
+            <h3 className="font-display text-2xl font-semibold text-slate-900 md:text-3xl dark:text-slate-100">
               {project.title}
             </h3>
           )}
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base dark:text-slate-400">
             {project.description}
           </p>
-          <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-            <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
+            <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
             <button
               onClick={() => openInquiry(project.title)}
               className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
