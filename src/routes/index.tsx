@@ -836,6 +836,8 @@ function Footer() {
           <Link to="/terms" className="text-muted-foreground transition hover:text-foreground">이용약관</Link>
           <Link to="/privacy" className="font-medium text-foreground transition hover:text-primary-glow">개인정보처리방침</Link>
           <Link to="/refund" className="text-muted-foreground transition hover:text-foreground">환불 정책</Link>
+          <Link to="/dashboard" className="text-muted-foreground transition hover:text-foreground">판매자 대시보드</Link>
+          <Link to="/admin/webhooks" className="text-muted-foreground transition hover:text-foreground">웹훅 로그</Link>
         </div>
 
         <div className="rounded-2xl border border-border/60 bg-surface/40 p-5 text-xs leading-relaxed text-muted-foreground md:text-sm">
