@@ -109,6 +109,7 @@ export type Database = {
           id: string
           payment_id: string
           product_id: string | null
+          provider: string
           seller_id: string | null
           user_id: string | null
         }
@@ -119,6 +120,7 @@ export type Database = {
           id?: string
           payment_id: string
           product_id?: string | null
+          provider?: string
           seller_id?: string | null
           user_id?: string | null
         }
@@ -129,6 +131,7 @@ export type Database = {
           id?: string
           payment_id?: string
           product_id?: string | null
+          provider?: string
           seller_id?: string | null
           user_id?: string | null
         }
@@ -152,6 +155,7 @@ export type Database = {
           payment_id: string
           product_id: string | null
           product_title: string
+          provider: string
           raw: Json | null
           seller_id: string | null
           status: string
@@ -166,6 +170,7 @@ export type Database = {
           payment_id: string
           product_id?: string | null
           product_title: string
+          provider?: string
           raw?: Json | null
           seller_id?: string | null
           status: string
@@ -180,6 +185,7 @@ export type Database = {
           payment_id?: string
           product_id?: string | null
           product_title?: string
+          provider?: string
           raw?: Json | null
           seller_id?: string | null
           status?: string
@@ -207,6 +213,8 @@ export type Database = {
           delivery_url: string | null
           description: string
           id: string
+          ls_store_slug: string | null
+          ls_variant_id: string | null
           product_type: Database["public"]["Enums"]["product_type"]
           seller_id: string | null
           slug: string | null
@@ -230,6 +238,8 @@ export type Database = {
           delivery_url?: string | null
           description: string
           id?: string
+          ls_store_slug?: string | null
+          ls_variant_id?: string | null
           product_type?: Database["public"]["Enums"]["product_type"]
           seller_id?: string | null
           slug?: string | null
@@ -253,6 +263,8 @@ export type Database = {
           delivery_url?: string | null
           description?: string
           id?: string
+          ls_store_slug?: string | null
+          ls_variant_id?: string | null
           product_type?: Database["public"]["Enums"]["product_type"]
           seller_id?: string | null
           slug?: string | null
