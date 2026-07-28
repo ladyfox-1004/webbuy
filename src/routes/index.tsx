@@ -244,6 +244,16 @@ const developItems = [
   },
 ];
 
+const categoryBgMap: Record<string, string> = {
+  "Real Estate": realEstateBg.url,
+  "Auction": auctionBg.url,
+  "Crypto": cryptoBg.url,
+  "Affiliate": affiliateBg.url,
+  "Social / Dating": datingBg.url,
+  "C2C Marketplace": marketplaceBg.url,
+  "Shorts / AI": shortsBg.url,
+};
+
 function Develop() {
   const { openInquiry } = useInquiry();
   return (
