@@ -25,6 +25,8 @@ import {
   MapPinned,
   ShoppingBag,
   MessageCircle,
+  FileText,
+  Share2,
   Menu,
   X,
   LayoutDashboard,
@@ -43,6 +45,8 @@ import affiliateBg from "@/assets/card-bg/affiliate-bg.jpg";
 import datingBg from "@/assets/card-bg/dating-bg.jpg";
 import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg";
 import shortsBg from "@/assets/card-bg/shorts-bg.jpg";
+import blogAutomationBg from "@/assets/card-bg/blog-automation-bg.jpg";
+import snsAutoBg from "@/assets/card-bg/sns-auto-bg.jpg";
 
 
 export const Route = createFileRoute("/")({
