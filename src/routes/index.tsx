@@ -278,36 +278,39 @@ function Develop() {
               key={item.title}
               type="button"
               onClick={() => openInquiry(item.title)}
-              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
+              className="glow-hover group flex flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white/95 text-left shadow-sm transition hover:border-primary/40 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/95"
             >
               {item.image && (
-                <>
+                <div className="relative aspect-[16/7] w-full overflow-hidden">
                   <img
                     src={item.image}
                     alt=""
                     loading="lazy"
-                    className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    width={1280}
+                    height={800}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
-                </>
+                </div>
               )}
-              <div className="relative mb-4 flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <span className="rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
-                  {item.tag}
-                </span>
-              </div>
-              <h3 className="relative font-display text-lg font-semibold">{item.title}</h3>
-              <p className="relative mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-                {item.desc}
-              </p>
-              <div className="relative mt-5 flex items-center justify-between border-t border-border/60 pt-4">
-                <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
-                  <MessageCircle className="h-3.5 w-3.5" /> 문의하기
-                </span>
+              <div className="flex flex-1 flex-col p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <span className="rounded-full border border-slate-200/80 bg-slate-100/80 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300">
+                    {item.tag}
+                  </span>
+                </div>
+                <h3 className="font-display text-lg font-semibold text-slate-900 dark:text-slate-100">{item.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                  {item.desc}
+                </p>
+                <div className="mt-5 flex items-center justify-between border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
+                    <MessageCircle className="h-3.5 w-3.5" /> 문의하기
+                  </span>
+                </div>
               </div>
             </button>
           ))}
