@@ -354,6 +354,7 @@ function Pricing() {
 
 
 function Nav() {
+  const { openInquiry } = useInquiry();
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -567,6 +568,7 @@ function Hero() {
 }
 
 function Projects() {
+  const { openInquiry } = useInquiry();
   const fetchSearch = useServerFn(searchProducts);
   const fetchCategories = useServerFn(listCategories);
   const [q, setQ] = useState("");
