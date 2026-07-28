@@ -141,7 +141,7 @@ export function InquiryModal({
             "0 30px 80px -20px rgba(76, 29, 149, 0.35), 0 10px 30px -10px rgba(2, 6, 23, 0.4)",
         }}
       >
-        <div className="relative max-h-[90vh] overflow-y-auto rounded-[26px] bg-gradient-to-br from-white via-white to-violet-50/60 p-7 sm:p-8">
+        <div className="relative max-h-[90vh] overflow-y-auto rounded-[26px] bg-gradient-to-br from-white via-white to-violet-50/60 p-7 sm:p-8 inquiry-scroll">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
