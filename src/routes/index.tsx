@@ -36,13 +36,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
-import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg.asset.json";
-import auctionBg from "@/assets/card-bg/auction-bg.jpg.asset.json";
-import cryptoBg from "@/assets/card-bg/crypto-bg.jpg.asset.json";
-import affiliateBg from "@/assets/card-bg/affiliate-bg.jpg.asset.json";
-import datingBg from "@/assets/card-bg/dating-bg.jpg.asset.json";
-import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg.asset.json";
-import shortsBg from "@/assets/card-bg/shorts-bg.jpg.asset.json";
+import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg";
+import auctionBg from "@/assets/card-bg/auction-bg.jpg";
+import cryptoBg from "@/assets/card-bg/crypto-bg.jpg";
+import affiliateBg from "@/assets/card-bg/affiliate-bg.jpg";
+import datingBg from "@/assets/card-bg/dating-bg.jpg";
+import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg";
+import shortsBg from "@/assets/card-bg/shorts-bg.jpg";
 
 
 export const Route = createFileRoute("/")({
@@ -187,7 +187,7 @@ const developItems = [
     desc: "매물 등록·검색, 지도 연동, 중개사 문의까지 갖춘 부동산 전용 홈페이지를 제작합니다. 반응형 디자인과 빠른 로딩 속도로 방문자 이탈을 줄입니다.",
     slug: "real-estate-site",
     price: 100000,
-    image: realEstateBg.url,
+    image: realEstateBg,
   },
   {
     icon: Gavel,
@@ -196,7 +196,7 @@ const developItems = [
     desc: "경매 물건 정보, 입찰 일정, 결과 조회 기능을 제공하는 경매 특화 플랫폼입니다. 실시간 데이터 갱신과 사용자 알림을 지원합니다.",
     slug: "real-estate-auction",
     price: 120000,
-    image: auctionBg.url,
+    image: auctionBg,
   },
   {
     icon: Bitcoin,
@@ -205,7 +205,7 @@ const developItems = [
     desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스 개발 경험이 있습니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
     slug: "crypto-dev",
     price: 150000,
-    image: cryptoBg.url,
+    image: cryptoBg,
   },
   {
     icon: Link2,
@@ -214,7 +214,7 @@ const developItems = [
     desc: "수익형 제휴 마케팅 사이트, 추천 링크 추적, 실적 집계 기능을 구현합니다. 광고주와 프로모터 모두가 쓰기 편한 관리자 페이지를 함께 만듭니다.",
     slug: "affiliate-dev",
     price: 100000,
-    image: affiliateBg.url,
+    image: affiliateBg,
   },
   {
     icon: MapPinned,
@@ -223,7 +223,7 @@ const developItems = [
     desc: "위치 기반 매칭, 지도 위 핀 표시, 채팅 기능이 연동된 소개팅 서비스를 개발합니다. 사용자 경험과 프라이버시 보호를 동시에 고려합니다.",
     slug: "dating-map-app",
     price: 130000,
-    image: datingBg.url,
+    image: datingBg,
   },
   {
     icon: ShoppingBag,
@@ -232,7 +232,7 @@ const developItems = [
     desc: "당근마켓 스타일의 지역 기반 중고거래 플랫폼을 구축합니다. 상품 등록, 채팅, 거래 상태 관리, 신고 기능까지 포함합니다.",
     slug: "c2c-marketplace",
     price: 130000,
-    image: marketplaceBg.url,
+    image: marketplaceBg,
   },
   {
     icon: Sparkles,
@@ -241,18 +241,18 @@ const developItems = [
     desc: "AI로 제품 이미지와 스크립트를 넣으면 즉시 광고용 숏폼을 뽑아주는 생성기를 개발합니다. SNS 마케팅 자동화에 최적화된 파이프라인입니다.",
     slug: "shorts-generator",
     price: 150000,
-    image: shortsBg.url,
+    image: shortsBg,
   },
 ];
 
 const categoryBgMap: Record<string, string> = {
-  "Real Estate": realEstateBg.url,
-  "Auction": auctionBg.url,
-  "Crypto": cryptoBg.url,
-  "Affiliate": affiliateBg.url,
-  "Social / Dating": datingBg.url,
-  "C2C Marketplace": marketplaceBg.url,
-  "Shorts / AI": shortsBg.url,
+  "Real Estate": realEstateBg,
+  "Auction": auctionBg,
+  "Crypto": cryptoBg,
+  "Affiliate": affiliateBg,
+  "Social / Dating": datingBg,
+  "C2C Marketplace": marketplaceBg,
+  "Shorts / AI": shortsBg,
 };
 
 function Develop() {
@@ -278,36 +278,39 @@ function Develop() {
               key={item.title}
               type="button"
               onClick={() => openInquiry(item.title)}
-              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
+              className="glow-hover group flex flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white/95 text-left shadow-sm transition hover:border-primary/40 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/95"
             >
               {item.image && (
-                <>
+                <div className="relative aspect-[16/7] w-full overflow-hidden">
                   <img
                     src={item.image}
                     alt=""
                     loading="lazy"
-                    className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                    width={1280}
+                    height={800}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
-                </>
+                </div>
               )}
-              <div className="relative mb-4 flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <span className="rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
-                  {item.tag}
-                </span>
-              </div>
-              <h3 className="relative font-display text-lg font-semibold">{item.title}</h3>
-              <p className="relative mt-3 flex-1 text-sm leading-relaxed text-muted-foreground">
-                {item.desc}
-              </p>
-              <div className="relative mt-5 flex items-center justify-between border-t border-border/60 pt-4">
-                <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
-                  <MessageCircle className="h-3.5 w-3.5" /> 문의하기
-                </span>
+              <div className="flex flex-1 flex-col p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow-lg">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <span className="rounded-full border border-slate-200/80 bg-slate-100/80 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300">
+                    {item.tag}
+                  </span>
+                </div>
+                <h3 className="font-display text-lg font-semibold text-slate-900 dark:text-slate-100">{item.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                  {item.desc}
+                </p>
+                <div className="mt-5 flex items-center justify-between border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
+                    <MessageCircle className="h-3.5 w-3.5" /> 문의하기
+                  </span>
+                </div>
               </div>
             </button>
           ))}
@@ -697,50 +700,51 @@ function Projects() {
 
 function ProjectCard({ project }: { project: Product }) {
   const { openInquiry } = useInquiry();
-  const bgUrl = project.thumbnail_url || (project.tag ? categoryBgMap[project.tag] : undefined);
+  const bgUrl = project.thumbnail_url || categoryBgMap[project.tag ?? ""] || shortsBg;
   return (
     <article
-      className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
+      className={`glow-hover group flex flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm transition hover:border-primary/40 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/95 ${project.span}`}
     >
       {bgUrl ? (
-        <>
+        <div className="relative aspect-[16/7] w-full overflow-hidden">
           <img
             src={bgUrl}
             alt=""
             loading="lazy"
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            width={1280}
+            height={800}
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
-        </>
+        </div>
       ) : (
         <div
-          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${project.accent} opacity-60`}
+          className={`aspect-[16/7] w-full bg-gradient-to-br ${project.accent} opacity-60`}
         />
       )}
-      <div className="relative flex h-full flex-col justify-between gap-8">
+      <div className="flex h-full flex-col justify-between gap-6 p-6">
         <div className="flex items-start justify-between">
-          <span className="rounded-full border border-border/80 bg-background/40 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
+          <span className="rounded-full border border-slate-200/80 bg-slate-100/80 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300">
             {project.tag}
           </span>
-          <ArrowUpRight className="h-5 w-5 text-muted-foreground transition group-hover:rotate-45 group-hover:text-primary-glow" />
+          <ArrowUpRight className="h-5 w-5 text-slate-400 transition group-hover:rotate-45 group-hover:text-primary-glow dark:text-slate-500" />
         </div>
         <div>
           {project.slug ? (
             <Link to="/p/$slug" params={{ slug: project.slug }} className="block group/title">
-              <h3 className="font-display text-2xl font-semibold text-foreground transition group-hover/title:text-primary-glow md:text-3xl">
+              <h3 className="font-display text-2xl font-semibold text-slate-900 transition group-hover/title:text-primary-glow md:text-3xl dark:text-slate-100">
                 {project.title}
               </h3>
             </Link>
           ) : (
-            <h3 className="font-display text-2xl font-semibold text-foreground md:text-3xl">
+            <h3 className="font-display text-2xl font-semibold text-slate-900 md:text-3xl dark:text-slate-100">
               {project.title}
             </h3>
           )}
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+          <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base dark:text-slate-400">
             {project.description}
           </p>
-          <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-            <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
+            <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
             <button
               onClick={() => openInquiry(project.title)}
               className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
