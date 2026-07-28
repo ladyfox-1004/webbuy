@@ -474,14 +474,7 @@ function Nav() {
                   </div>
                 )}
               </div>
-            ) : (
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-              >
-                <LogIn className="h-4 w-4" />로그인
-              </Link>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile menu toggle */}
