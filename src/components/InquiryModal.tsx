@@ -141,7 +141,7 @@ export function InquiryModal({
             "0 30px 80px -20px rgba(76, 29, 149, 0.35), 0 10px 30px -10px rgba(2, 6, 23, 0.4)",
         }}
       >
-        <div className="relative max-h-[90vh] overflow-y-auto rounded-[26px] bg-gradient-to-br from-white via-white to-violet-50/60 p-7 sm:p-8">
+        <div className="relative max-h-[90vh] overflow-y-auto rounded-[26px] bg-gradient-to-br from-white via-white to-violet-50/60 p-7 sm:p-8 inquiry-scroll">
           <button
             type="button"
             onClick={() => onOpenChange(false)}
@@ -276,12 +276,26 @@ export function InquiryModal({
       </div>
 
       <style>{`
+        .inquiry-scope .inquiry-scroll::-webkit-scrollbar {
+          width: 5px;
+        }
+        .inquiry-scope .inquiry-scroll::-webkit-scrollbar-track {
+          background: transparent;
+          margin: 20px 0;
+        }
+        .inquiry-scope .inquiry-scroll::-webkit-scrollbar-thumb {
+          background: rgba(148, 163, 184, 0.35);
+          border-radius: 999px;
+        }
+        .inquiry-scope .inquiry-scroll::-webkit-scrollbar-thumb:hover {
+          background: rgba(139, 92, 246, 0.45);
+        }
         .inquiry-scope .iq-input {
           width: 100%;
-          border-radius: 0.75rem;
+          border-radius: 0.85rem;
           border: 1px solid rgb(226 232 240);
           background: rgba(255, 255, 255, 0.9);
-          padding: 0.7rem 0.95rem;
+          padding: 0.75rem 1rem;
           font-size: 0.875rem;
           color: rgb(15 23 42);
           outline: none;
@@ -290,9 +304,9 @@ export function InquiryModal({
         .inquiry-scope .iq-input::placeholder { color: rgb(148 163 184); }
         .inquiry-scope .iq-input:hover { border-color: rgb(203 213 225); }
         .inquiry-scope .iq-input:focus {
-          border-color: rgb(139 92 246);
+          border-color: rgb(167 139 250);
           background: #fff;
-          box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+          box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.12);
         }
       `}</style>
     </div>
@@ -310,8 +324,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {label} {required && <span className="text-fuchsia-500">*</span>}
+      <label className="mb-2 flex items-center gap-1.5 text-[13px] font-medium text-slate-500">
+        {label}
+        {required && <span className="text-[10px] text-fuchsia-500">*</span>}
       </label>
       {children}
     </div>
