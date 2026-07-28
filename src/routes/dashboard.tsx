@@ -470,6 +470,31 @@ function ProductEditor({
               )}
             </div>
           </Row>
+
+          <div className="rounded-2xl border border-border/60 bg-background/30 p-3">
+            <div className="mb-2 text-xs font-medium text-foreground">Lemon Squeezy 결제 (선택)</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">
+              두 값이 모두 설정되면 상세 페이지에 Lemon Squeezy 결제 버튼이 노출됩니다.
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <Row label="스토어 슬러그" hint="예: mystore.lemonsqueezy.com → mystore">
+                <input
+                  value={value.ls_store_slug}
+                  onChange={(e) => onChange({ ...value, ls_store_slug: e.target.value.trim() })}
+                  className="w-full rounded-xl border border-border bg-background/50 px-3 py-2 text-sm"
+                  placeholder="mystore"
+                />
+              </Row>
+              <Row label="Variant ID" hint="LS 대시보드 → Products → Variant">
+                <input
+                  value={value.ls_variant_id}
+                  onChange={(e) => onChange({ ...value, ls_variant_id: e.target.value.trim() })}
+                  className="w-full rounded-xl border border-border bg-background/50 px-3 py-2 text-sm"
+                  placeholder="123456"
+                />
+              </Row>
+            </div>
+          </div>
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-2">
