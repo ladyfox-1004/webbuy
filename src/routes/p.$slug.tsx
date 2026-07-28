@@ -162,13 +162,22 @@ function Detail({ product }: { product: Product }) {
                 ₩{product.amount.toLocaleString("ko-KR")}
               </div>
               <div className="grid gap-2">
+                {lsEnabled && (
+                  <button
+                    onClick={payWithLemon}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 px-5 py-3 text-sm font-semibold text-black hover:brightness-110"
+                  >
+                    <ShoppingBag className="h-4 w-4" />
+                    Lemon Squeezy로 결제 (해외카드)
+                  </button>
+                )}
                 <button
                   onClick={() => pay("CARD")}
                   disabled={loading}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-60"
                 >
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <CreditCard className="h-4 w-4" />}
-                  카드로 결제
+                  카드로 결제 (국내)
                 </button>
                 <button
                   onClick={() => pay("EASY_PAY")}
