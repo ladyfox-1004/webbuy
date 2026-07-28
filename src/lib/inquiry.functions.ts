@@ -15,7 +15,7 @@ const InquirySchema = z.object({
 export const submitInquiry = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InquirySchema.parse(input))
   .handler(async ({ data }) => {
-    const webhookUrl = process.env.GOOGLE_SHEET_WEBHOOK_URL;
+    const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
     if (!webhookUrl) {
       throw new Error("문의 접수 서버가 설정되지 않았습니다. 관리자에게 문의해주세요.");
     }
