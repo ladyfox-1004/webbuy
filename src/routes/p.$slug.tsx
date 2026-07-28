@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowUpRight, CreditCard, Loader2, Smartphone, Store, Lemon } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CreditCard, Loader2, Smartphone, Store, ShoppingBag } from "lucide-react";
 import { getProductBySlug, verifyPayment } from "@/lib/payments.functions";
 import { PORTONE_CONFIG } from "@/lib/portone-config";
 import { supabase } from "@/integrations/supabase/client";
