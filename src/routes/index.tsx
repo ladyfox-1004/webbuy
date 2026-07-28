@@ -187,7 +187,7 @@ const developItems = [
     desc: "매물 등록·검색, 지도 연동, 중개사 문의까지 갖춘 부동산 전용 홈페이지를 제작합니다. 반응형 디자인과 빠른 로딩 속도로 방문자 이탈을 줄입니다.",
     slug: "real-estate-site",
     price: 100000,
-    image: realEstateBg.url,
+    image: realEstateBg,
   },
   {
     icon: Gavel,
@@ -196,7 +196,7 @@ const developItems = [
     desc: "경매 물건 정보, 입찰 일정, 결과 조회 기능을 제공하는 경매 특화 플랫폼입니다. 실시간 데이터 갱신과 사용자 알림을 지원합니다.",
     slug: "real-estate-auction",
     price: 120000,
-    image: auctionBg.url,
+    image: auctionBg,
   },
   {
     icon: Bitcoin,
@@ -205,7 +205,7 @@ const developItems = [
     desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스 개발 경험이 있습니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
     slug: "crypto-dev",
     price: 150000,
-    image: cryptoBg.url,
+    image: cryptoBg,
   },
   {
     icon: Link2,
@@ -214,7 +214,7 @@ const developItems = [
     desc: "수익형 제휴 마케팅 사이트, 추천 링크 추적, 실적 집계 기능을 구현합니다. 광고주와 프로모터 모두가 쓰기 편한 관리자 페이지를 함께 만듭니다.",
     slug: "affiliate-dev",
     price: 100000,
-    image: affiliateBg.url,
+    image: affiliateBg,
   },
   {
     icon: MapPinned,
@@ -223,7 +223,7 @@ const developItems = [
     desc: "위치 기반 매칭, 지도 위 핀 표시, 채팅 기능이 연동된 소개팅 서비스를 개발합니다. 사용자 경험과 프라이버시 보호를 동시에 고려합니다.",
     slug: "dating-map-app",
     price: 130000,
-    image: datingBg.url,
+    image: datingBg,
   },
   {
     icon: ShoppingBag,
@@ -232,7 +232,7 @@ const developItems = [
     desc: "당근마켓 스타일의 지역 기반 중고거래 플랫폼을 구축합니다. 상품 등록, 채팅, 거래 상태 관리, 신고 기능까지 포함합니다.",
     slug: "c2c-marketplace",
     price: 130000,
-    image: marketplaceBg.url,
+    image: marketplaceBg,
   },
   {
     icon: Sparkles,
@@ -241,18 +241,18 @@ const developItems = [
     desc: "AI로 제품 이미지와 스크립트를 넣으면 즉시 광고용 숏폼을 뽑아주는 생성기를 개발합니다. SNS 마케팅 자동화에 최적화된 파이프라인입니다.",
     slug: "shorts-generator",
     price: 150000,
-    image: shortsBg.url,
+    image: shortsBg,
   },
 ];
 
 const categoryBgMap: Record<string, string> = {
-  "Real Estate": realEstateBg.url,
-  "Auction": auctionBg.url,
-  "Crypto": cryptoBg.url,
-  "Affiliate": affiliateBg.url,
-  "Social / Dating": datingBg.url,
-  "C2C Marketplace": marketplaceBg.url,
-  "Shorts / AI": shortsBg.url,
+  "Real Estate": realEstateBg,
+  "Auction": auctionBg,
+  "Crypto": cryptoBg,
+  "Affiliate": affiliateBg,
+  "Social / Dating": datingBg,
+  "C2C Marketplace": marketplaceBg,
+  "Shorts / AI": shortsBg,
 };
 
 function Develop() {
