@@ -31,12 +31,15 @@ import {
   Package,
   Webhook,
 } from "lucide-react";
-import { PORTONE_CONFIG } from "@/lib/portone-config";
-import { verifyPayment } from "@/lib/payments.functions";
 import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { InquiryModal } from "@/components/InquiryModal";
+
+function openInquiry(service?: string) {
+  window.dispatchEvent(new CustomEvent("open-inquiry", { detail: { service } }));
+}
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -61,6 +64,19 @@ type Product = {
 };
 
 function Index() {
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [defaultService, setDefaultService] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { service?: string } | undefined;
+      setDefaultService(detail?.service);
+      setInquiryOpen(true);
+    };
+    window.addEventListener("open-inquiry", handler);
+    return () => window.removeEventListener("open-inquiry", handler);
+  }, []);
+
   return (
     <div className="min-h-screen text-foreground">
       <Nav />
@@ -72,6 +88,11 @@ function Index() {
       <About />
       <Contact />
       <Footer />
+      <InquiryModal
+        open={inquiryOpen}
+        onOpenChange={setInquiryOpen}
+        defaultService={defaultService}
+      />
     </div>
   );
 }
@@ -220,6 +241,14 @@ const developItems = [
     slug: "c2c-marketplace",
     price: 130000,
   },
+  {
+    icon: Sparkles,
+    title: "제품 광고 숏폼 생성기",
+    tag: "Shorts / AI",
+    desc: "AI로 제품 이미지와 스크립트를 넣으면 즉시 광고용 숏폼을 뽑아주는 생성기를 개발합니다. SNS 마케팅 자동화에 최적화된 파이프라인입니다.",
+    slug: "shorts-generator",
+    price: 150000,
+  },
 ];
 
 function Develop() {
@@ -240,11 +269,11 @@ function Develop() {
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {developItems.map((item) => (
-            <Link
+            <button
               key={item.title}
-              to="/p/$slug"
-              params={{ slug: item.slug }}
-              className="glass glow-hover flex flex-col rounded-2xl border border-border bg-surface/60 p-6 transition hover:border-primary/40"
+              type="button"
+              onClick={() => openInquiry(item.title)}
+              className="glass glow-hover flex flex-col rounded-2xl border border-border bg-surface/60 p-6 text-left transition hover:border-primary/40"
             >
               <div className="mb-4 flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
@@ -259,14 +288,12 @@ function Develop() {
                 {item.desc}
               </p>
               <div className="mt-5 flex items-center justify-between border-t border-border/60 pt-4">
-                <span className="font-display text-lg font-bold">
-                  ₩{item.price.toLocaleString("ko-KR")}
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-glow">
-                  구매하기 <ArrowUpRight className="h-3.5 w-3.5" />
+                <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground">
+                  <MessageCircle className="h-3.5 w-3.5" /> 문의하기
                 </span>
               </div>
-            </Link>
+            </button>
           ))}
         </div>
 
@@ -651,54 +678,6 @@ function Projects() {
 }
 
 function ProjectCard({ project }: { project: Product }) {
-  const [loading, setLoading] = useState(false);
-  const verify = useServerFn(verifyPayment);
-  const navigate = useNavigate();
-
-  async function pay(method: "CARD" | "EASY_PAY") {
-    const channelKey = method === "CARD" ? PORTONE_CONFIG.channelKeyCard : PORTONE_CONFIG.channelKeyEasyPay;
-    if (!channelKey) {
-      toast.error("카드 결제 채널이 아직 설정되지 않았습니다. 간편결제를 이용해 주세요.");
-      return;
-    }
-    setLoading(true);
-    try {
-      const PortOne = (await import("@portone/browser-sdk/v2")).default;
-      const paymentId = `pay-${crypto.randomUUID()}`;
-      const result = await PortOne.requestPayment({
-        storeId: PORTONE_CONFIG.storeId,
-        channelKey,
-        paymentId,
-        orderName: project.title,
-        totalAmount: project.amount,
-        currency: "CURRENCY_KRW",
-        payMethod: method,
-      });
-
-      if (result?.code !== undefined) {
-        toast.error(result.message ?? "결제가 취소되었습니다.");
-        return;
-      }
-
-      toast.loading("결제 검증 중…", { id: paymentId });
-      const verification = await verify({
-        data: {
-          paymentId,
-          expectedAmount: project.amount,
-          productTitle: project.title,
-          productId: project.id,
-        },
-      });
-      toast.dismiss(paymentId);
-      navigate({ to: "/payment/result", search: { paymentId, ok: verification.ok ? 1 : 0 } });
-    } catch (err) {
-      console.error(err);
-      toast.error("결제 처리 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
@@ -729,27 +708,13 @@ function ProjectCard({ project }: { project: Product }) {
             {project.description}
           </p>
           <div className="mt-6 flex items-center justify-between gap-3 border-t border-border/60 pt-4">
-            <span className="font-display text-lg font-semibold whitespace-nowrap">
-              ₩{project.amount.toLocaleString("ko-KR")}
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => pay("CARD")}
-                disabled={loading}
-                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
-              >
-                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CreditCard className="h-3.5 w-3.5" />}
-                카드
-              </button>
-              <button
-                onClick={() => pay("EASY_PAY")}
-                disabled={loading}
-                className="inline-flex items-center gap-1.5 rounded-full bg-foreground/10 px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-gradient-to-br hover:from-primary hover:to-primary-glow hover:text-primary-foreground disabled:opacity-60"
-              >
-                {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Smartphone className="h-3.5 w-3.5" />}
-                간편결제
-              </button>
-            </div>
+            <span className="text-xs text-muted-foreground">견적·상담 후 진행</span>
+            <button
+              onClick={() => openInquiry(project.title)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
+            >
+              <MessageCircle className="h-3.5 w-3.5" /> 문의하기
+            </button>
           </div>
         </div>
       </div>
@@ -805,11 +770,17 @@ function Contact() {
               협업, 외주, 혹은 그냥 인사. 무엇이든 환영합니다.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
+              <button
+                onClick={() => openInquiry()}
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-semibold text-primary-foreground transition hover:scale-[1.02]"
+              >
+                <MessageCircle className="h-4 w-4" /> 문의하기
+              </button>
               <a
                 href="mailto:nancoco0705@gmail.com"
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3 font-medium text-primary-foreground transition hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 font-medium text-foreground transition hover:bg-surface"
               >
-                <Mail className="h-4 w-4" /><span>nancoco0705@gmail.com</span>
+                <Mail className="h-4 w-4 text-primary-glow" /><span>nancoco0705@gmail.com</span>
               </a>
               <button
                 onClick={() => {
