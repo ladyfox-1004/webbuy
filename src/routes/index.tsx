@@ -683,9 +683,21 @@ function ProjectCard({ project }: { project: Product }) {
     <article
       className={`glow-hover group relative overflow-hidden rounded-3xl border border-border bg-surface/60 p-6 ${project.span}`}
     >
-      <div
-        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${project.accent} opacity-60`}
-      />
+      {project.thumbnail_url ? (
+        <>
+          <img
+            src={project.thumbnail_url}
+            alt=""
+            loading="lazy"
+            className="pointer-events-none absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/40" />
+        </>
+      ) : (
+        <div
+          className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${project.accent} opacity-60`}
+        />
+      )}
       <div className="relative flex h-full flex-col justify-between gap-8">
         <div className="flex items-start justify-between">
           <span className="rounded-full border border-border/80 bg-background/40 px-3 py-1 text-xs text-muted-foreground backdrop-blur">
