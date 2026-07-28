@@ -404,8 +404,8 @@ function Nav() {
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
             <a href="#develop" className="transition hover:text-foreground">개발 경험</a>
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
-            <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>
-            <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>
+            {isAdmin && <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>}
+            {isAdmin && <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>}
           </div>
 
           {/* Desktop user actions */}
@@ -474,14 +474,7 @@ function Nav() {
                   </div>
                 )}
               </div>
-            ) : (
-              <Link
-                to="/login"
-                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-              >
-                <LogIn className="h-4 w-4" />로그인
-              </Link>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile menu toggle */}
@@ -501,8 +494,8 @@ function Nav() {
               <a href="#portfolio" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">포트폴리오</a>
               <a href="#develop" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">개발 경험</a>
               <a href="#projects" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">Projects</a>
-              <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>
-              <Link to="/sell" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">판매하기</Link>
+              {isAdmin && <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>}
+              {isAdmin && <Link to="/sell" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">판매하기</Link>}
               {user && (
                 <>
                   <div className="my-1 h-px bg-border" />
@@ -535,15 +528,6 @@ function Nav() {
                     <LogOut className="h-4 w-4" /> 로그아웃
                   </button>
                 </>
-              )}
-              {!user && (
-                <Link
-                  to="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow px-3 py-2.5 text-sm font-medium text-primary-foreground"
-                >
-                  <LogIn className="h-4 w-4" />로그인
-                </Link>
               )}
             </div>
           </div>
