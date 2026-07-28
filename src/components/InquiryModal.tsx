@@ -310,8 +310,9 @@ function Field({
 }) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-        {label} {required && <span className="text-fuchsia-500">*</span>}
+      <label className="mb-2 flex items-center gap-1.5 text-[13px] font-medium text-slate-500">
+        {label}
+        {required && <span className="text-[10px] text-fuchsia-500">*</span>}
       </label>
       {children}
     </div>
