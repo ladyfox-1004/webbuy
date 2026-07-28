@@ -350,6 +350,17 @@ function Nav() {
   const isAdmin = useIsAdmin();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+  const userMenuRef = useState<HTMLDivElement | null>(null)[1];
+
+  useEffect(() => {
+    if (!userOpen) return;
+    const handle = (e: MouseEvent) => {
+      const el = document.getElementById("user-menu");
+      if (el && !el.contains(e.target as Node)) setUserOpen(false);
+    };
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, [userOpen]);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
