@@ -428,7 +428,9 @@ function Pricing() {
               <div className="mt-5 border-t border-border/60 pt-4">
                 <div className="font-display text-xl font-bold text-foreground">
                   ₩{t.price.toLocaleString()}
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">~</span>
+                  <span className="ml-1 text-sm font-normal text-muted-foreground">
+                    {t.recurring ? "/월" : "~"}
+                  </span>
                 </div>
               </div>
             </div>
