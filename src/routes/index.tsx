@@ -417,53 +417,76 @@ function Pricing() {
   const groupOrder = ["빠른 구축 · 1~3주", "업무 시스템 · 3~8주", "통합 시스템 · 8주~", "운영"];
 
   return (
-    <section id="pricing" className="px-4 py-24">
+    <section id="pricing" className="bg-slate-50 px-4 py-24 text-slate-900">
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/40 px-4 py-1.5 text-xs text-primary-glow">
+          <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-primary">
             <Sparkles className="h-3.5 w-3.5" />Pricing Guide
           </span>
           <h2 className="mt-5 font-display text-4xl font-bold tracking-tight md:text-5xl">
             프로젝트 유형별 <span className="text-gradient">시작 단가</span>
           </h2>
-          <p className="mt-4 text-muted-foreground">
+          <p className="mt-4 text-slate-600">
             기능 범위와 디자인 수준에 따라 조정됩니다.<br />30분 상담 후 확정 견적을 드립니다.
           </p>
         </div>
 
-        <div className="mt-14 space-y-12">
+        <div className="mt-14 space-y-10">
           {groupOrder.map((g) => (
             <div key={g}>
-              <div className="mb-5 flex items-center gap-3">
-                <h3 className="font-display text-xl font-semibold text-foreground">{g}</h3>
-                <div className="h-px flex-1 bg-border/60" />
+              <div className="mb-4 flex items-center gap-3">
+                <h3 className="font-display text-lg font-semibold text-slate-900">{g}</h3>
+                <div className="h-px flex-1 bg-slate-200" />
               </div>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                {groups[g]?.map((t) => (
-                  <div key={t.title} className="glass glow-hover rounded-2xl p-6 text-center">
-                    <span className="inline-flex rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary-glow">
-                      {t.tag}
-                    </span>
-                    <h4 className="mt-4 font-display text-lg font-semibold leading-snug">{t.title}</h4>
-                    <p className="mt-2 min-h-[40px] text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
-                    <div className="mt-5 border-t border-border/60 pt-4">
-                      <div className="font-display text-xl font-bold text-foreground">
-                        ₩{t.price.toLocaleString()}
-                        {t.recurring && <span className="text-sm font-normal text-muted-foreground">/월</span>}
-                        <span className="ml-1 text-sm font-normal text-muted-foreground">~</span>
-                      </div>
-                      {t.duration && (
-                        <div className="mt-1 text-[11px] text-muted-foreground">예상 기간 {t.duration}</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[640px] text-left">
+                    <thead>
+                      <tr className="bg-slate-100">
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">서비스</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">포함 내용</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">예상 기간</th>
+                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">시작 단가</th>
+                        <th className="px-5 py-3"></th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {groups[g]?.map((t) => (
+                        <tr key={t.title} className="transition hover:bg-slate-50">
+                          <td className="px-5 py-4">
+                            <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
+                              {t.tag}
+                            </span>
+                            <div className="mt-1.5 font-display text-sm font-semibold text-slate-900">{t.title}</div>
+                          </td>
+                          <td className="px-5 py-4 text-sm text-slate-600">{t.desc}</td>
+                          <td className="px-5 py-4 text-sm text-slate-600">{t.duration}</td>
+                          <td className="px-5 py-4">
+                            <div className="font-display text-base font-bold text-slate-900">
+                              ₩{t.price.toLocaleString()}
+                              {t.recurring && <span className="text-sm font-normal text-slate-500">/월</span>}
+                              {!t.recurring && <span className="text-sm font-normal text-slate-500">~</span>}
+                            </div>
+                          </td>
+                          <td className="px-5 py-4">
+                            <button
+                              onClick={() => openInquiry(t.title)}
+                              className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
+                            >
+                              <MessageCircle className="h-3.5 w-3.5" /> 문의
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-10 text-center text-xs text-muted-foreground">
+        <p className="mt-10 text-center text-xs text-slate-500">
           * 표기된 금액은 시작 단가이며, 요구 기능·디자인 범위에 따라 조정됩니다. 정확한 견적은 상담 후 안내드립니다.
         </p>
       </div>
