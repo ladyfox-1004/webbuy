@@ -385,23 +385,37 @@ function Develop() {
 }
 
 const pricingTiers = [
-  { tag: "Maintenance", title: "유지보수 / 운영 지원", desc: "정기 모니터링·보안 패치·기술 지원·긴급 대응", price: 300000, recurring: true },
-  { tag: "WordPress", title: "워드프레스 커스터마이징", desc: "테마 수정 및 기능 확장 대응", price: 400000 },
-  { tag: "CMS", title: "콘텐츠 관리 시스템", desc: "랜딩페이지나 블로그용 CMS 개발", price: 800000 },
-  { tag: "E-Commerce", title: "쇼핑몰 시스템", desc: "기초 쇼핑몰 기능 및 결제 연동 포함", price: 1200000 },
-  { tag: "LMS", title: "온라인 교육 시스템", desc: "강의 업로드, 수강, 평가 기능 제공", price: 1200000 },
-  { tag: "HR", title: "인사평가 관리 시스템", desc: "성과관리, 연봉계약 등 인사 모듈", price: 1000000 },
-  { tag: "WMS", title: "재고·창고 관리 시스템", desc: "입출고·로케이션 기반 재고관리", price: 1400000 },
-  { tag: "CRM", title: "고객관리 시스템", desc: "문의, 상담, 이력 기반 고객 관리", price: 700000 },
-  { tag: "Chatbot", title: "AI 챗봇 (RAG 기반)", desc: "문서 기반 질문 응답 챗봇 구현", price: 1600000 },
-  { tag: "ERP", title: "맞춤형 ERP", desc: "회계, 재무, 인사 등 통합 관리", price: 1400000 },
-  { tag: "Booking", title: "예약형 시스템", desc: "스케줄 기반 예약·결제 플랫폼", price: 600000 },
-  { tag: "Survey", title: "설문 시스템", desc: "결과 통계 포함 맞춤 설문 툴", price: 400000 },
-  { tag: "Forum", title: "커뮤니티/포럼 시스템", desc: "게시판, 댓글, 신고 기능 포함", price: 800000 },
+  // 빠른 구축 · 1~3주
+  { group: "빠른 구축 · 1~3주", tag: "Landing", title: "랜딩·브랜드 사이트", desc: "반응형 1~5페이지, 문의폼·배포 포함", price: 890000, duration: "1~2주" },
+  { group: "빠른 구축 · 1~3주", tag: "CMS", title: "CMS 구축", desc: "블로그·공지 관리형 콘텐츠 시스템", price: 1400000, duration: "2주" },
+  { group: "빠른 구축 · 1~3주", tag: "Survey", title: "설문·신청 폼 시스템", desc: "결과 통계·시트 연동 포함", price: 1800000, duration: "2주" },
+  { group: "빠른 구축 · 1~3주", tag: "Integration", title: "시스템 연동 · API 구축", desc: "리드 수신 API, 시트·CRM 연동, 키 발급 구조", price: 1900000, duration: "2~3주" },
+
+  // 업무 시스템 · 3~8주
+  { group: "업무 시스템 · 3~8주", tag: "Booking", title: "예약형 시스템", desc: "스케줄·결제 연동, 관리자 포함", price: 3800000, duration: "4주" },
+  { group: "업무 시스템 · 3~8주", tag: "Forum", title: "커뮤니티·포럼", desc: "게시판, 댓글, 신고, 권한 관리", price: 3800000, duration: "4주" },
+  { group: "업무 시스템 · 3~8주", tag: "CRM", title: "CRM 고객관리", desc: "문의·상담·이력, 담당자 배분", price: 4800000, duration: "5주" },
+  { group: "업무 시스템 · 3~8주", tag: "Chatbot", title: "AI 챗봇 (RAG)", desc: "문서 임베딩, 출처 표기, 관리자 학습", price: 5800000, duration: "5주" },
+  { group: "업무 시스템 · 3~8주", tag: "LMS", title: "LMS 온라인 교육", desc: "강의·수강·평가·수료 관리", price: 6800000, duration: "6~8주" },
+  { group: "업무 시스템 · 3~8주", tag: "HR", title: "HR 인사평가", desc: "성과관리, 연봉계약, 결재선", price: 6800000, duration: "6~8주" },
+
+  // 통합 시스템 · 8주~
+  { group: "통합 시스템 · 8주~", tag: "E-Commerce", title: "커머스 시스템", desc: "주문·정산·환불, PG 연동 및 심사 대응", price: 7800000, duration: "8주~" },
+  { group: "통합 시스템 · 8주~", tag: "WMS", title: "WMS 재고·창고", desc: "입출고, 로케이션, 바코드 연동", price: 9800000, duration: "10주~" },
+  { group: "통합 시스템 · 8주~", tag: "ERP", title: "맞춤형 ERP", desc: "회계·재무·인사 통합, 기존 시스템 연동", price: 14000000, duration: "12주~" },
+
+  // 운영
+  { group: "운영", tag: "Maintenance", title: "연동 유지보수", desc: "장애 감지·알림·복구, 스펙 변경 대응", price: 150000, duration: "월 단위", recurring: true },
 ];
 
 function Pricing() {
   const { openInquiry } = useInquiry();
+  const groups = pricingTiers.reduce<Record<string, typeof pricingTiers>>((acc, t) => {
+    (acc[t.group] ||= []).push(t);
+    return acc;
+  }, {});
+  const groupOrder = ["빠른 구축 · 1~3주", "업무 시스템 · 3~8주", "통합 시스템 · 8주~", "운영"];
+
   return (
     <section id="pricing" className="px-4 py-24">
       <div className="mx-auto max-w-6xl">
@@ -410,35 +424,47 @@ function Pricing() {
             <Sparkles className="h-3.5 w-3.5" />Pricing Guide
           </span>
           <h2 className="mt-5 font-display text-4xl font-bold tracking-tight md:text-5xl">
-            자주 문의받은 <span className="text-gradient">시스템 개발 단가</span> 안내
+            프로젝트 유형별 <span className="text-gradient">시작 단가</span>
           </h2>
           <p className="mt-4 text-muted-foreground">
-            고객님들이 가장 많이 요청하신 시스템을 기준으로<br />최소 개발 단가와 기능 요약을 정리했습니다.
+            기능 범위와 디자인 수준에 따라 조정됩니다.<br />30분 상담 후 확정 견적을 드립니다.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {pricingTiers.map((t) => (
-            <div key={t.title} className="glass glow-hover rounded-2xl p-6 text-center">
-              <span className="inline-flex rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary-glow">
-                {t.tag}
-              </span>
-              <h3 className="mt-4 font-display text-lg font-semibold leading-snug">{t.title}</h3>
-              <p className="mt-2 min-h-[40px] text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
-              <div className="mt-5 border-t border-border/60 pt-4">
-                <div className="font-display text-xl font-bold text-foreground">
-                  ₩{t.price.toLocaleString()}
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">
-                    {t.recurring ? "/월" : "~"}
-                  </span>
-                </div>
+        <div className="mt-14 space-y-12">
+          {groupOrder.map((g) => (
+            <div key={g}>
+              <div className="mb-5 flex items-center gap-3">
+                <h3 className="font-display text-xl font-semibold text-foreground">{g}</h3>
+                <div className="h-px flex-1 bg-border/60" />
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {groups[g]?.map((t) => (
+                  <div key={t.title} className="glass glow-hover rounded-2xl p-6 text-center">
+                    <span className="inline-flex rounded-full bg-primary/15 px-3 py-1 text-[11px] font-medium text-primary-glow">
+                      {t.tag}
+                    </span>
+                    <h4 className="mt-4 font-display text-lg font-semibold leading-snug">{t.title}</h4>
+                    <p className="mt-2 min-h-[40px] text-xs leading-relaxed text-muted-foreground">{t.desc}</p>
+                    <div className="mt-5 border-t border-border/60 pt-4">
+                      <div className="font-display text-xl font-bold text-foreground">
+                        ₩{t.price.toLocaleString()}
+                        {t.recurring && <span className="text-sm font-normal text-muted-foreground">/월</span>}
+                        <span className="ml-1 text-sm font-normal text-muted-foreground">~</span>
+                      </div>
+                      {t.duration && (
+                        <div className="mt-1 text-[11px] text-muted-foreground">예상 기간 {t.duration}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-8 text-center text-xs text-muted-foreground">
-          * 표기된 금액은 최소 단가이며, 요구 기능·디자인 범위에 따라 변동될 수 있습니다. 정확한 견적은 문의 부탁드립니다.
+        <p className="mt-10 text-center text-xs text-muted-foreground">
+          * 표기된 금액은 시작 단가이며, 요구 기능·디자인 범위에 따라 조정됩니다. 정확한 견적은 상담 후 안내드립니다.
         </p>
       </div>
     </section>
