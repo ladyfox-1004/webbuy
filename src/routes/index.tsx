@@ -353,7 +353,11 @@ function Develop() {
                   {item.desc}
                 </p>
                 <div className="mt-5 flex items-center justify-between border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {item.recurring
+                      ? `₩${item.price.toLocaleString()}/월`
+                      : `최소 ₩${item.price.toLocaleString()}`}
+                  </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
                     <MessageCircle className="h-3.5 w-3.5" /> 문의하기
                   </span>
