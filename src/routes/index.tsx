@@ -91,21 +91,21 @@ function Index() {
 }
 
 const portfolioSites = [
-  { title: "브랜드 랜딩 · Radiant", tag: "Landing", url: "https://radiant-marzipan-765729.netlify.app/" },
-  { title: "온라인 신청 폼 · 지원하기", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
-  { title: "펀카 렌터카 예약", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
-  { title: "VAN POS · 법률 특화", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
-  { title: "PSM VIP 마케팅", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
-  { title: "Lambent 랜딩", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
-  { title: "Thunderous 프로덕트", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
-  { title: "Preeminent 프로모션", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
-  { title: "Stellular 서비스", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
-  { title: "Sparkly 브랜드", tag: "Brand", url: "https://sparkly-smakager-4041fe.netlify.app/" },
-  { title: "Storied 콘텐츠", tag: "Content", url: "https://storied-licorice-8bf649.netlify.app/" },
-  { title: "Celadon 스튜디오", tag: "Studio", url: "https://celadon-puppy-3aca7f.netlify.app/" },
-  { title: "Timely 예약", tag: "Booking", url: "https://timely-cascaron-a8447e.netlify.app/" },
-  { title: "Vocal 커뮤니티", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
-  { title: "Tangerine 커머스", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
+  { title: "브랜드 랜딩 · AISOLUTION", tag: "Landing", url: "https://radiant-marzipan-765729.netlify.app/" },
+  { title: "온라인 신청 폼 · AISOLUTION", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
+  { title: "렌터카 예약 · AISOLUTION", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
+  { title: "VAN POS · AISOLUTION", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
+  { title: "VIP 마케팅 · AISOLUTION", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
+  { title: "서비스 랜딩 · AISOLUTION", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
+  { title: "프로덕트 페이지 · AISOLUTION", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
+  { title: "프로모션 페이지 · AISOLUTION", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
+  { title: "서비스 소개 · AISOLUTION", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
+  { title: "브랜드 페이지 · AISOLUTION", tag: "Brand", url: "https://sparkly-smakager-4041fe.netlify.app/" },
+  { title: "콘텐츠 페이지 · AISOLUTION", tag: "Content", url: "https://storied-licorice-8bf649.netlify.app/" },
+  { title: "스튜디오 소개 · AISOLUTION", tag: "Studio", url: "https://celadon-puppy-3aca7f.netlify.app/" },
+  { title: "예약 시스템 · AISOLUTION", tag: "Booking", url: "https://timely-cascaron-a8447e.netlify.app/" },
+  { title: "커뮤니티 · AISOLUTION", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
+  { title: "커머스 · AISOLUTION", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
 ];
 
 function shot(url: string) {
