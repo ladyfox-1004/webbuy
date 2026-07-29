@@ -32,6 +32,8 @@ import {
   LayoutDashboard,
   Package,
   Webhook,
+  Workflow,
+  Activity,
 } from "lucide-react";
 import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
