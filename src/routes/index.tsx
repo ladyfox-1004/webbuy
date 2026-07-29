@@ -385,6 +385,7 @@ function Develop() {
 }
 
 const pricingTiers = [
+  { tag: "Maintenance", title: "유지보수 / 운영 지원", desc: "정기 모니터링·보안 패치·기술 지원·긴급 대응", price: 300000, recurring: true },
   { tag: "WordPress", title: "워드프레스 커스터마이징", desc: "테마 수정 및 기능 확장 대응", price: 400000 },
   { tag: "CMS", title: "콘텐츠 관리 시스템", desc: "랜딩페이지나 블로그용 CMS 개발", price: 800000 },
   { tag: "E-Commerce", title: "쇼핑몰 시스템", desc: "기초 쇼핑몰 기능 및 결제 연동 포함", price: 1200000 },
