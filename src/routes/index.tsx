@@ -187,6 +187,25 @@ function Portfolio() {
 
 const developItems = [
   {
+    icon: Workflow,
+    title: "API 연동 / 자동화",
+    tag: "API Integration",
+    desc: "외부 플랫폼 API, 결제·배송·CRM 연동과 데이터 자동화 파이프라인을 구축합니다. 반복 업무를 줄이고 운영 효율을 높이는 구조로 설계합니다.",
+    slug: "api-integration",
+    price: 500000,
+    image: affiliateBg,
+  },
+  {
+    icon: Activity,
+    title: "유지보수 / 운영 지원",
+    tag: "Maintenance",
+    desc: "배포 후에도 안정적으로 운영될 수 있도록 모니터링, 보안 패치, 기능 개선, 기술 지원을 제공합니다. 정기 점검과 긴급 대응을 함께합니다.",
+    slug: "maintenance",
+    price: 300000,
+    recurring: true,
+    image: marketplaceBg,
+  },
+  {
     icon: Building2,
     title: "부동산 홈페이지",
     tag: "Real Estate",
@@ -270,6 +289,8 @@ const developItems = [
 ];
 
 const categoryBgMap: Record<string, string> = {
+  "API Integration": affiliateBg,
+  "Maintenance": marketplaceBg,
   "Real Estate": realEstateBg,
   "Auction": auctionBg,
   "Crypto": cryptoBg,
