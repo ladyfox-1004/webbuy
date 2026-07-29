@@ -32,6 +32,8 @@ import {
   LayoutDashboard,
   Package,
   Webhook,
+  Workflow,
+  Activity,
 } from "lucide-react";
 import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,21 +91,21 @@ function Index() {
 }
 
 const portfolioSites = [
-  { title: "브랜드 랜딩 · Radiant", tag: "Landing", url: "https://radiant-marzipan-765729.netlify.app/" },
-  { title: "온라인 신청 폼 · 지원하기", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
-  { title: "펀카 렌터카 예약", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
-  { title: "VAN POS · 법률 특화", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
-  { title: "PSM VIP 마케팅", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
-  { title: "Lambent 랜딩", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
-  { title: "Thunderous 프로덕트", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
-  { title: "Preeminent 프로모션", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
-  { title: "Stellular 서비스", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
-  { title: "Sparkly 브랜드", tag: "Brand", url: "https://sparkly-smakager-4041fe.netlify.app/" },
-  { title: "Storied 콘텐츠", tag: "Content", url: "https://storied-licorice-8bf649.netlify.app/" },
-  { title: "Celadon 스튜디오", tag: "Studio", url: "https://celadon-puppy-3aca7f.netlify.app/" },
-  { title: "Timely 예약", tag: "Booking", url: "https://timely-cascaron-a8447e.netlify.app/" },
-  { title: "Vocal 커뮤니티", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
-  { title: "Tangerine 커머스", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
+  { title: "브랜드 랜딩 · AISOLUTION", tag: "Landing", url: "https://radiant-marzipan-765729.netlify.app/" },
+  { title: "온라인 신청 폼 · AISOLUTION", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
+  { title: "렌터카 예약 · AISOLUTION", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
+  { title: "VAN POS · AISOLUTION", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
+  { title: "VIP 마케팅 · AISOLUTION", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
+  { title: "서비스 랜딩 · AISOLUTION", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
+  { title: "프로덕트 페이지 · AISOLUTION", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
+  { title: "프로모션 페이지 · AISOLUTION", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
+  { title: "서비스 소개 · AISOLUTION", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
+  { title: "브랜드 페이지 · AISOLUTION", tag: "Brand", url: "https://sparkly-smakager-4041fe.netlify.app/" },
+  { title: "콘텐츠 페이지 · AISOLUTION", tag: "Content", url: "https://storied-licorice-8bf649.netlify.app/" },
+  { title: "스튜디오 소개 · AISOLUTION", tag: "Studio", url: "https://celadon-puppy-3aca7f.netlify.app/" },
+  { title: "예약 시스템 · AISOLUTION", tag: "Booking", url: "https://timely-cascaron-a8447e.netlify.app/" },
+  { title: "커뮤니티 · AISOLUTION", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
+  { title: "커머스 · AISOLUTION", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
 ];
 
 function shot(url: string) {
@@ -185,6 +187,25 @@ function Portfolio() {
 
 const developItems = [
   {
+    icon: Workflow,
+    title: "API 연동 / 자동화",
+    tag: "API Integration",
+    desc: "외부 플랫폼 API, 결제·배송·CRM 연동과 데이터 자동화 파이프라인을 구축합니다. 반복 업무를 줄이고 운영 효율을 높이는 구조로 설계합니다.",
+    slug: "api-integration",
+    price: 500000,
+    image: affiliateBg,
+  },
+  {
+    icon: Activity,
+    title: "유지보수 / 운영 지원",
+    tag: "Maintenance",
+    desc: "배포 후에도 안정적으로 운영될 수 있도록 모니터링, 보안 패치, 기능 개선, 기술 지원을 제공합니다. 정기 점검과 긴급 대응을 함께합니다.",
+    slug: "maintenance",
+    price: 300000,
+    recurring: true,
+    image: marketplaceBg,
+  },
+  {
     icon: Building2,
     title: "부동산 홈페이지",
     tag: "Real Estate",
@@ -206,7 +227,7 @@ const developItems = [
     icon: Bitcoin,
     title: "암호화폐 개발건",
     tag: "Crypto",
-    desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스 개발 경험이 있습니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
+    desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스를 구축합니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
     slug: "crypto-dev",
     price: 150000,
     image: cryptoBg,
@@ -268,6 +289,8 @@ const developItems = [
 ];
 
 const categoryBgMap: Record<string, string> = {
+  "API Integration": affiliateBg,
+  "Maintenance": marketplaceBg,
   "Real Estate": realEstateBg,
   "Auction": auctionBg,
   "Crypto": cryptoBg,
@@ -330,7 +353,11 @@ function Develop() {
                   {item.desc}
                 </p>
                 <div className="mt-5 flex items-center justify-between border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
-                  <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {item.recurring
+                      ? `₩${item.price.toLocaleString()}/월`
+                      : `최소 ₩${item.price.toLocaleString()}`}
+                  </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
                     <MessageCircle className="h-3.5 w-3.5" /> 문의하기
                   </span>
@@ -358,6 +385,7 @@ function Develop() {
 }
 
 const pricingTiers = [
+  { tag: "Maintenance", title: "유지보수 / 운영 지원", desc: "정기 모니터링·보안 패치·기술 지원·긴급 대응", price: 300000, recurring: true },
   { tag: "WordPress", title: "워드프레스 커스터마이징", desc: "테마 수정 및 기능 확장 대응", price: 400000 },
   { tag: "CMS", title: "콘텐츠 관리 시스템", desc: "랜딩페이지나 블로그용 CMS 개발", price: 800000 },
   { tag: "E-Commerce", title: "쇼핑몰 시스템", desc: "기초 쇼핑몰 기능 및 결제 연동 포함", price: 1200000 },
@@ -400,7 +428,9 @@ function Pricing() {
               <div className="mt-5 border-t border-border/60 pt-4">
                 <div className="font-display text-xl font-bold text-foreground">
                   ₩{t.price.toLocaleString()}
-                  <span className="ml-1 text-sm font-normal text-muted-foreground">~</span>
+                  <span className="ml-1 text-sm font-normal text-muted-foreground">
+                    {t.recurring ? "/월" : "~"}
+                  </span>
                 </div>
               </div>
             </div>
