@@ -738,6 +738,9 @@ function Projects() {
           <div>
             <div className="mb-3 text-sm font-medium text-primary-glow">— Projects</div>
             <h2 className="font-display text-4xl font-bold md:text-5xl">컬렉션</h2>
+            <p className="mt-3 max-w-xl text-muted-foreground">
+              한눈에 비교하고, 필요한 서비스를 바로 문의하세요.
+            </p>
           </div>
         </div>
 
@@ -787,74 +790,84 @@ function Projects() {
             검색 결과가 없어요.
           </div>
         ) : (
-          <div className="grid auto-rows-[minmax(0,auto)] grid-cols-1 gap-4 md:grid-cols-3">
-            {((products ?? []) as Product[]).map((p) => (
-              <ProjectCard key={p.id} project={{ ...p, span: "min-h-[260px]", accent: "from-primary/30 to-transparent" }} />
-            ))}
+          <div className="overflow-hidden rounded-3xl border border-border bg-surface/40">
+            <div className="hidden grid-cols-12 gap-4 border-b border-border bg-surface/70 px-6 py-3 text-xs font-medium text-muted-foreground md:grid">
+              <div className="col-span-5">서비스</div>
+              <div className="col-span-2">분야</div>
+              <div className="col-span-3">시작 단가</div>
+              <div className="col-span-2 text-right">문의</div>
+            </div>
+            {((products ?? []) as Product[]).map((p) => {
+              const thumb = p.thumbnail_url || categoryBgMap[p.tag ?? ""] || shortsBg;
+              const priceText = p.amount > 0 ? `₩${p.amount.toLocaleString()}` : "견적 상담";
+              return (
+                <div
+                  key={p.id}
+                  className="group grid grid-cols-1 items-start gap-3 border-b border-border/50 px-5 py-4 transition last:border-b-0 hover:bg-surface/70 md:grid-cols-12 md:items-center md:gap-4 md:px-6 md:py-4"
+                >
+                  <div className="col-span-5 flex items-center gap-4">
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-background/40">
+                      <img
+                        src={thumb}
+                        alt=""
+                        loading="lazy"
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="min-w-0">
+                      {p.slug ? (
+                        <Link to="/p/$slug" params={{ slug: p.slug }} className="block group/title">
+                          <h3 className="truncate font-display text-base font-semibold text-foreground transition group-hover/title:text-primary-glow">
+                            {p.title}
+                          </h3>
+                        </Link>
+                      ) : (
+                        <h3 className="truncate font-display text-base font-semibold text-foreground">
+                          {p.title}
+                        </h3>
+                      )}
+                      <p className="mt-0.5 line-clamp-1 text-sm text-muted-foreground">{p.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="col-span-2 flex items-center gap-2">
+                    <span className="inline-flex items-center rounded-full border border-border bg-surface/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                      {p.tag || p.category || "기타"}
+                    </span>
+                  </div>
+
+                  <div className="col-span-3 flex items-center gap-2 text-sm font-medium text-foreground">
+                    {priceText}
+                    {p.amount > 0 && (
+                      <span className="text-[11px] font-normal text-muted-foreground">부터</span>
+                    )}
+                  </div>
+
+                  <div className="col-span-2 flex items-center justify-start gap-2 md:justify-end">
+                    <button
+                      onClick={() => openInquiry(p.title)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3.5 py-1.5 text-xs font-medium text-primary-foreground transition hover:opacity-90"
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" /> 문의
+                    </button>
+                    {p.slug && (
+                      <Link
+                        to="/p/$slug"
+                        params={{ slug: p.slug }}
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-border bg-surface/60 text-muted-foreground transition hover:text-foreground"
+                        aria-label="상세 보기"
+                      >
+                        <ArrowUpRight className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
     </section>
-  );
-}
-
-function ProjectCard({ project }: { project: Product }) {
-  const { openInquiry } = useInquiry();
-  const bgUrl = project.thumbnail_url || categoryBgMap[project.tag ?? ""] || shortsBg;
-  return (
-    <article
-      className={`glow-hover group flex flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/95 shadow-sm transition hover:border-primary/40 hover:shadow-md dark:border-slate-700/60 dark:bg-slate-900/95 ${project.span}`}
-    >
-      {bgUrl ? (
-        <div className="relative aspect-[16/7] w-full overflow-hidden">
-          <img
-            src={bgUrl}
-            alt=""
-            loading="lazy"
-            width={1280}
-            height={800}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        </div>
-      ) : (
-        <div
-          className={`aspect-[16/7] w-full bg-gradient-to-br ${project.accent} opacity-60`}
-        />
-      )}
-      <div className="flex h-full flex-col justify-between gap-6 p-6">
-        <div className="flex items-start justify-between">
-          <span className="rounded-full border border-slate-200/80 bg-slate-100/80 px-3 py-1 text-xs font-medium text-slate-600 dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300">
-            {project.tag}
-          </span>
-          <ArrowUpRight className="h-5 w-5 text-slate-400 transition group-hover:rotate-45 group-hover:text-primary-glow dark:text-slate-500" />
-        </div>
-        <div>
-          {project.slug ? (
-            <Link to="/p/$slug" params={{ slug: project.slug }} className="block group/title">
-              <h3 className="font-display text-2xl font-semibold text-slate-900 transition group-hover/title:text-primary-glow md:text-3xl dark:text-slate-100">
-                {project.title}
-              </h3>
-            </Link>
-          ) : (
-            <h3 className="font-display text-2xl font-semibold text-slate-900 md:text-3xl dark:text-slate-100">
-              {project.title}
-            </h3>
-          )}
-          <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base dark:text-slate-400">
-            {project.description}
-          </p>
-          <div className="mt-6 flex items-center justify-between gap-3 border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
-            <span className="text-xs text-slate-500 dark:text-slate-400">견적·상담 후 진행</span>
-            <button
-              onClick={() => openInquiry(project.title)}
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-xs font-medium text-primary-foreground transition hover:opacity-90"
-            >
-              <MessageCircle className="h-3.5 w-3.5" /> 문의하기
-            </button>
-          </div>
-        </div>
-      </div>
-    </article>
   );
 }
 
