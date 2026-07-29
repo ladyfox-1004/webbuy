@@ -227,7 +227,7 @@ const developItems = [
     icon: Bitcoin,
     title: "암호화폐 개발건",
     tag: "Crypto",
-    desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스 개발 경험이 있습니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
+    desc: "코인 정보 대시보드, 지갑 연동, 차트 시각화 등 암호화폐 서비스를 구축합니다. 보안과 실시간성을 중시하는 구조로 설계합니다.",
     slug: "crypto-dev",
     price: 150000,
     image: cryptoBg,
