@@ -1,0 +1,14 @@
+# 에이아이솔루션 — 검색 크롤러 안내
+# 🚨 이 파일이 없을 때는 Cloudflare 관리 robots.txt 가 대신 나갔다. 그건 AI 크롤러를
+#    전부 막고 Sitemap 줄이 없었다. 검색 유입이 목적이므로 우리가 직접 관리한다.
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /me
+Disallow: /login
+Disallow: /signup
+Disallow: /payment
+
+Sitemap: https://ai-solution.co.kr/sitemap.xml
