@@ -74,20 +74,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AISOLUTION" },
-      { name: "description", content: "AI자동화와 함께 빠르게 결과물을 받아보세요." },
-      { name: "author", content: "AISOLUTION" },
-      { property: "og:title", content: "AISOLUTION" },
-      { property: "og:description", content: "AI자동화와 함께 빠르게 결과물을 받아보세요." },
+      // 🚨 제목·설명은 **검색어**가 들어가야 한다. 예전엔 "AISOLUTION" 뿐이라
+      //    브랜드명을 아는 사람만 찾을 수 있었다 — 사려는 사람은 "랜딩페이지 제작",
+      //    "예약 시스템 개발" 을 친다.
+      { title: "랜딩페이지 제작 · 예약 플랫폼 개발 | 에이아이솔루션" },
+      { name: "description", content: "병원·법무법인·분양·통신 등 업종 12곳의 상담 랜딩을 만들어 왔고, 예약·매칭·일정 플랫폼까지 직접 개발합니다. 필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다." },
+      { name: "author", content: "에이아이솔루션" },
+      { name: "robots", content: "index, follow" },
+
+      // 카톡·카페·문자로 링크를 붙였을 때 뜨는 카드.
+      // 🚨 og:image 는 **우리 도메인**이어야 한다. 예전엔 러버블 미리보기 서버를
+      //    가리켜, 우리가 통제하지 못하는 주소가 대표 이미지였다.
+      { property: "og:title", content: "상담이 들어오는 페이지, 운영까지 되는 시스템" },
+      { property: "og:description", content: "병원·법무법인·분양·통신 등 업종 12곳의 상담 랜딩을 만들어 왔고, 예약·매칭·일정 플랫폼까지 직접 개발합니다. 필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@AISOLUTION" },
-      { name: "twitter:title", content: "AISOLUTION" },
-      { name: "twitter:description", content: "AI자동화와 함께 빠르게 결과물을 받아보세요." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a12e9588-245f-41cb-96f4-508486d5e11c/id-preview-1cba1660--107f1bcc-26eb-4d3c-8cb5-f234969e5b46.lovable.app-1779258694965.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a12e9588-245f-41cb-96f4-508486d5e11c/id-preview-1cba1660--107f1bcc-26eb-4d3c-8cb5-f234969e5b46.lovable.app-1779258694965.png" },
+      { property: "og:site_name", content: "에이아이솔루션" },
+      { property: "og:locale", content: "ko_KR" },
+      { property: "og:url", content: "https://ai-solution.co.kr" },
+      { property: "og:image", content: "https://ai-solution.co.kr/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+
+      // summary 는 작은 썸네일이다. 큰 카드가 클릭률이 훨씬 낫다.
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "상담이 들어오는 페이지, 운영까지 되는 시스템" },
+      { name: "twitter:description", content: "병원·법무법인·분양·통신 등 업종 12곳의 상담 랜딩을 만들어 왔고, 예약·매칭·일정 플랫폼까지 직접 개발합니다. 필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다." },
+      { name: "twitter:image", content: "https://ai-solution.co.kr/og.png" },
     ],
     links: [
+      { rel: "canonical", href: "https://ai-solution.co.kr" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
