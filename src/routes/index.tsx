@@ -33,12 +33,21 @@ import {
   Webhook,
   Workflow,
   Activity,
+  QrCode,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { searchProducts, listCategories } from "@/lib/discover.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg";
 import auctionBg from "@/assets/card-bg/auction-bg.jpg";
 import cryptoBg from "@/assets/card-bg/crypto-bg.jpg";
@@ -48,6 +57,8 @@ import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg";
 import shortsBg from "@/assets/card-bg/shorts-bg.jpg";
 import blogAutomationBg from "@/assets/card-bg/blog-automation-bg.jpg";
 import snsAutoBg from "@/assets/card-bg/sns-auto-bg.jpg";
+import tossMiniappShot from "@/assets/portfolio/toss-miniapp-kkalkkeum.jpg";
+import tossMiniappQr from "@/assets/portfolio/toss-miniapp-qr.png";
 
 
 export const Route = createFileRoute("/")({
@@ -116,6 +127,50 @@ function shot(url: string) {
   return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800`;
 }
 
+// 토스 미니앱은 토스 앱 컨테이너 안에서만 실행된다.
+// 그래서 이 카드만 shot() 데스크톱 스크린샷을 쓰지 않고 실제 앱 화면을 세로 목업으로 넣는다.
+const TOSS_MINIAPP_URL = "https://minion.toss.im/VlDAkiWn";
+
+// 카드 내용은 하나인데 넓은 화면(QR 다이얼로그)과 좁은 화면(직접 링크)에서 감싸는 요소가 다르다.
+function TossMiniAppCardBody({ Icon, action }: { Icon: LucideIcon; action: string }) {
+  return (
+    <>
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-background/40">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/25 via-surface/70 to-primary-glow/20" />
+        <div className="absolute inset-0 grid place-items-center px-3 pt-3 pb-12">
+          {/* 904x1905 원본 비율을 박스에 못박는다. w-auto로 두면 lazy 이미지가 폭 0이라 영영 안 뜬다 */}
+          <div className="aspect-[904/1905] h-full overflow-hidden rounded-xl bg-background shadow-lg ring-1 ring-border/70 transition duration-500 group-hover:scale-[1.03]">
+            <img
+              src={tossMiniappShot}
+              alt="깔끔집사 토스 미니앱 화면"
+              width={904}
+              height={1905}
+              loading="lazy"
+              className="h-full w-full"
+            />
+          </div>
+        </div>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
+        <span className="absolute left-3 top-3 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
+          Toss Mini App
+        </span>
+        <span className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-background/70 text-foreground/80 backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+        <span className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] whitespace-nowrap text-muted-foreground backdrop-blur">
+          <Smartphone className="h-3 w-3" /> 모바일에서 열립니다
+        </span>
+      </div>
+      <div className="flex items-center justify-between gap-3 p-4">
+        <h3 className="min-w-0 truncate font-display text-base font-semibold">
+          깔끔집사 · 청소 기사 매칭
+        </h3>
+        <span className="shrink-0 text-[11px] text-muted-foreground">{action}</span>
+      </div>
+    </>
+  );
+}
+
 function Portfolio() {
   return (
     <section id="portfolio" className="px-4 py-20">
@@ -168,6 +223,49 @@ function Portfolio() {
               </div>
             </a>
           ))}
+
+          {/* 좁은 화면: QR은 쓸모없으니 토스로 바로 보낸다 */}
+          <a
+            href={TOSS_MINIAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 md:hidden"
+          >
+            <TossMiniAppCardBody Icon={ExternalLink} action="토스에서 열기" />
+          </a>
+
+          {/* 넓은 화면: 눌러도 열리지 않는 링크 대신 폰으로 찍을 QR을 띄운다 */}
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="glow-hover group relative hidden cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 text-left md:flex"
+              >
+                <TossMiniAppCardBody Icon={QrCode} action="QR로 열기" />
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-sm rounded-2xl border-border bg-surface">
+              <DialogTitle className="font-display text-lg font-semibold">
+                깔끔집사 · 토스 미니앱
+              </DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                토스 앱 안에서 도는 미니앱이라 PC 브라우저로는 열리지 않습니다. 폰 카메라로 아래 QR을
+                찍으면 토스에서 바로 열립니다.
+              </DialogDescription>
+              <div className="flex flex-col items-center gap-3">
+                <div className="rounded-xl border border-border bg-white p-3">
+                  <img
+                    src={tossMiniappQr}
+                    alt="깔끔집사 토스 미니앱 QR 코드"
+                    className="h-64 w-64"
+                  />
+                </div>
+                <div className="text-center text-xs break-all text-muted-foreground select-all">
+                  {TOSS_MINIAPP_URL}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface/40 p-8 text-center md:flex-row md:justify-between md:text-left">
