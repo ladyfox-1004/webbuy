@@ -111,23 +111,23 @@ function Index() {
 }
 
 const portfolioSites = [
-  { title: "브랜드 랜딩 · AISOLUTION", tag: "Landing", url: "https://radiant-marzipan-765729.netlify.app/" },
-  { title: "온라인 신청 폼 · AISOLUTION", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
-  { title: "렌터카 예약 · AISOLUTION", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
-  { title: "VAN POS · AISOLUTION", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
-  { title: "기사 일정 관리 · AISOLUTION", tag: "POS/SaaS", url: "https://ilzik.com/" },
-  { title: "VIP 마케팅 · AISOLUTION", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
-  { title: "서비스 랜딩 · AISOLUTION", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
-  { title: "법무법인 상담 랜딩 · AISOLUTION", tag: "Landing", url: "https://mjcrime.netlify.app/" },
-  { title: "프로덕트 페이지 · AISOLUTION", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
-  { title: "프로모션 페이지 · AISOLUTION", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
-  { title: "서비스 소개 · AISOLUTION", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
-  { title: "브랜드 페이지 · AISOLUTION", tag: "Brand", url: "https://sparkly-smakager-4041fe.netlify.app/" },
-  { title: "콘텐츠 페이지 · AISOLUTION", tag: "Content", url: "https://storied-licorice-8bf649.netlify.app/" },
-  { title: "스튜디오 소개 · AISOLUTION", tag: "Studio", url: "https://celadon-puppy-3aca7f.netlify.app/" },
-  { title: "예약 시스템 · AISOLUTION", tag: "Booking", url: "https://timely-cascaron-a8447e.netlify.app/" },
-  { title: "커뮤니티 · AISOLUTION", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
-  { title: "커머스 · AISOLUTION", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
+  { title: "모발이식 상담 랜딩 · AISOLUTION", tag: "의료", url: "https://radiant-marzipan-765729.netlify.app/" },
+  { title: "정부지원 신청 랜딩 · AISOLUTION", tag: "신청/폼", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
+  { title: "장기렌트 견적 랜딩 · AISOLUTION", tag: "견적", url: "https://funcar-rentcar.netlify.app/" },
+  { title: "법무법인 상담 랜딩 · AISOLUTION", tag: "법률", url: "https://van-pos-legal.netlify.app/" },
+  { title: "기사 일정 관리 SaaS · AISOLUTION", tag: "플랫폼", url: "https://ilzik.com/" },
+  { title: "마켓 운영대행 소개 · AISOLUTION", tag: "서비스", url: "https://psm-vip-marketing.netlify.app/" },
+  { title: "안과 시력교정 랜딩 · AISOLUTION", tag: "의료", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
+  { title: "형사전문 법무법인 랜딩 · AISOLUTION", tag: "법률", url: "https://mjcrime.netlify.app/" },
+  { title: "식당 브랜드 페이지 · AISOLUTION", tag: "요식", url: "https://thunderous-semolina-973f49.netlify.app/" },
+  { title: "오피스텔 분양 방문예약 · AISOLUTION", tag: "분양", url: "https://preeminent-longma-670789.netlify.app/" },
+  { title: "자동매매 서비스 소개 · AISOLUTION", tag: "서비스", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
+  { title: "라미네이트 센터 랜딩 · AISOLUTION", tag: "의료", url: "https://sparkly-smakager-4041fe.netlify.app/" },
+  { title: "아파트 분양 안내 · AISOLUTION", tag: "분양", url: "https://storied-licorice-8bf649.netlify.app/" },
+  { title: "남성의학 센터 랜딩 · AISOLUTION", tag: "의료", url: "https://celadon-puppy-3aca7f.netlify.app/" },
+  { title: "비뇨의학과 랜딩 · AISOLUTION", tag: "의료", url: "https://timely-cascaron-a8447e.netlify.app/" },
+  { title: "인터넷 가입 센터 랜딩 · AISOLUTION", tag: "통신", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
+  { title: "GPA KOREA 브랜드 페이지 · AISOLUTION", tag: "브랜드", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
 ];
 
 // 에이아이솔루션 1:1 오픈채팅 (개인 카톡 아이디 대신 영업 창구로 사용)
@@ -541,20 +541,31 @@ const portfolioByName = new Map(
   portfolioSites.map((s) => [s.title.split(" · ")[0], s] as const),
 );
 
+// 배지에 쓸 수 있는 숫자는 "항목 개수" 가 아니라 "실제로 사례를 걸 수 있는 항목 개수" 다.
+function countLinked(items: Capability[]) {
+  return items.filter(
+    (c) => (c.cases ?? []).some((n) => portfolioByName.has(n)) || c.tossMiniApp,
+  ).length;
+}
+
 type Capability = {
   icon: LucideIcon;
   /** 사장님이 말하는 증상 그대로 */
   title: string;
   /** 스캔되게 칩으로 뿌린다 */
   features: string[];
-  /** portfolioSites 의 이름 (예: "렌터카 예약") */
+  /** portfolioSites 의 이름 (예: "기사 일정 관리 SaaS"). 없으면 카드가 상담 문의로 바뀐다 */
   cases?: string[];
   /** 토스 미니앱 사례. PC 에서는 링크가 막다른 길이라 QR 다이얼로그를 연다 */
   tossMiniApp?: boolean;
 };
 
-// A. 사례가 있는 것
+// A. 만들어 본 것
+// 순서는 사장님 방향(랜딩은 충분히 했다, 이제 플랫폼으로 확장한다)을 그대로 따른다.
+// 1) 플랫폼·SaaS → 2) 업무 시스템 → 3) 전환 페이지.
+// cases 는 "정말 그 기능을 만든 사이트"만 적는다. 없으면 비워 두면 카드가 알아서 상담 문의로 바뀐다.
 const provenCapabilities: Capability[] = [
+  // ── 1. 플랫폼·SaaS ────────────────────────────────────────────────
   {
     icon: CalendarCheck,
     title: "예약을 받고 싶다",
@@ -567,35 +578,9 @@ const provenCapabilities: Capability[] = [
       "중복예약 차단",
       "예약 변경·양도",
     ],
-    cases: ["렌터카 예약", "예약 시스템"],
-  },
-  {
-    icon: Inbox,
-    title: "문의가 여기저기 흩어진다",
-    features: [
-      "폼·전화·카톡 문의를 한 곳에",
-      "담당자 자동 배정",
-      "상담 이력 타임라인",
-      "재문의 알림",
-      "처리 상태 관리",
-      "응답 시간 통계",
-      "첨부파일 보관",
-    ],
-    cases: ["법무법인 상담 랜딩", "온라인 신청 폼"],
-  },
-  {
-    icon: CreditCard,
-    title: "결제를 붙이고 싶다",
-    features: [
-      "PG 심사 대응(사업자 서류·약관)",
-      "카드·간편결제",
-      "부분 취소와 환불",
-      "정기 결제",
-      "정산 리포트",
-      "결제 실패 재시도",
-      "웹훅 중복 처리",
-    ],
-    cases: ["커머스", "VAN POS"],
+    // 예전에 걸려 있던 "렌터카 예약"·"예약 시스템"은 실제로는 견적·병원 랜딩이었다.
+    // 진짜 일정을 굴리는 것은 일:찍 하나뿐이라 그것만 남긴다.
+    cases: ["기사 일정 관리 SaaS"],
   },
   {
     icon: Store,
@@ -609,61 +594,8 @@ const provenCapabilities: Capability[] = [
       "근무 기록",
       "모바일 우선 화면",
     ],
-    cases: ["VAN POS", "기사 일정 관리"],
-  },
-  {
-    icon: Users,
-    title: "사람들이 모이는 공간이 필요하다",
-    features: [
-      "게시판·댓글·대댓글",
-      "신고와 차단",
-      "등급·권한 분리",
-      "알림",
-      "검색",
-      "스팸 방지",
-      "운영자 화면",
-    ],
-    cases: ["커뮤니티"],
-  },
-  {
-    icon: ShoppingBag,
-    title: "물건을 팔고 싶다",
-    features: [
-      "상품·옵션·재고",
-      "장바구니",
-      "주문·배송 상태",
-      "쿠폰과 할인",
-      "리뷰",
-      "정산",
-      "판매자 화면",
-    ],
-    cases: ["커머스"],
-  },
-  {
-    icon: ClipboardList,
-    title: "신청·설문을 받고 싶다",
-    features: [
-      "조건부 문항 분기",
-      "파일 첨부",
-      "중복 제출 방지",
-      "결과 통계",
-      "시트 자동 적재",
-      "신청자 알림 메일",
-    ],
-    cases: ["온라인 신청 폼"],
-  },
-  {
-    icon: Globe,
-    title: "브랜드를 보여줄 페이지가 필요하다",
-    features: [
-      "반응형 1~5페이지",
-      "문의 폼",
-      "검색 노출 기본기(제목·설명·OG)",
-      "속도 최적화",
-      "도메인·SSL 연결",
-      "방문 통계",
-    ],
-    cases: ["브랜드 랜딩", "서비스 랜딩", "프로덕트 페이지", "프로모션 페이지"],
+    // 예전에 POS 사례로 걸어 둔 van-pos-legal 은 실제로는 법무법인 랜딩이었다. 뺀다.
+    cases: ["기사 일정 관리 SaaS"],
   },
   {
     icon: Smartphone,
@@ -678,17 +610,34 @@ const provenCapabilities: Capability[] = [
     tossMiniApp: true,
   },
   {
-    icon: Newspaper,
-    title: "콘텐츠를 계속 올려야 한다",
+    icon: CreditCard,
+    title: "결제를 붙이고 싶다",
     features: [
-      "글·공지 관리 화면",
-      "이미지 업로드",
-      "예약 발행",
-      "카테고리·태그",
-      "검색",
-      "작성자 권한",
+      "PG 심사 대응(사업자 서류·약관)",
+      "카드·간편결제",
+      "부분 취소와 환불",
+      "정기 결제",
+      "정산 리포트",
+      "결제 실패 재시도",
+      "웹훅 중복 처리",
     ],
-    cases: ["콘텐츠 페이지", "스튜디오 소개"],
+    // 걸려 있던 두 사례(tangerine-gumdrop·van-pos-legal)에 결제 흔적이 0건이었다. 상담으로 보낸다.
+  },
+
+  // ── 2. 업무 시스템 ────────────────────────────────────────────────
+  {
+    icon: Inbox,
+    title: "문의가 여기저기 흩어진다",
+    features: [
+      "폼·전화·카톡 문의를 한 곳에",
+      "담당자 자동 배정",
+      "상담 이력 타임라인",
+      "재문의 알림",
+      "처리 상태 관리",
+      "응답 시간 통계",
+      "첨부파일 보관",
+    ],
+    cases: ["법무법인 상담 랜딩", "형사전문 법무법인 랜딩", "정부지원 신청 랜딩"],
   },
   {
     icon: Workflow,
@@ -701,7 +650,93 @@ const provenCapabilities: Capability[] = [
       "API 키 발급·회수",
       "연동 장애 알림",
     ],
-    cases: ["VIP 마케팅", "서비스 소개"],
+    // "VIP 마케팅"·"서비스 소개" 는 연동 사례가 아니라 서비스 소개 랜딩이었다.
+  },
+  {
+    icon: Newspaper,
+    title: "콘텐츠를 계속 올려야 한다",
+    features: [
+      "글·공지 관리 화면",
+      "이미지 업로드",
+      "예약 발행",
+      "카테고리·태그",
+      "검색",
+      "작성자 권한",
+    ],
+    // "콘텐츠 페이지"·"스튜디오 소개" 는 분양 안내·병원 랜딩이었다. CMS 사례가 아니다.
+  },
+  {
+    icon: Users,
+    title: "사람들이 모이는 공간이 필요하다",
+    features: [
+      "게시판·댓글·대댓글",
+      "신고와 차단",
+      "등급·권한 분리",
+      "알림",
+      "검색",
+      "스팸 방지",
+      "운영자 화면",
+    ],
+    // "커뮤니티" 는 인터넷 가입 랜딩이었다. 게시판이 0건이다.
+  },
+  {
+    icon: ShoppingBag,
+    title: "물건을 팔고 싶다",
+    features: [
+      "상품·옵션·재고",
+      "장바구니",
+      "주문·배송 상태",
+      "쿠폰과 할인",
+      "리뷰",
+      "정산",
+      "판매자 화면",
+    ],
+    // "커머스" 는 GPA KOREA 브랜드 페이지였다. 장바구니가 0건이다.
+  },
+
+  // ── 3. 전환 페이지 ────────────────────────────────────────────────
+  {
+    icon: Globe,
+    title: "브랜드를 보여줄 페이지가 필요하다",
+    features: [
+      "반응형 1~5페이지",
+      "문의 폼",
+      "검색 노출 기본기(제목·설명·OG)",
+      "속도 최적화",
+      "도메인·SSL 연결",
+      "방문 통계",
+    ],
+    // 실제로 가장 두꺼운 영역이다. 납품한 랜딩을 전부 건다.
+    cases: [
+      "모발이식 상담 랜딩",
+      "안과 시력교정 랜딩",
+      "라미네이트 센터 랜딩",
+      "남성의학 센터 랜딩",
+      "비뇨의학과 랜딩",
+      "법무법인 상담 랜딩",
+      "형사전문 법무법인 랜딩",
+      "장기렌트 견적 랜딩",
+      "인터넷 가입 센터 랜딩",
+      "식당 브랜드 페이지",
+      "GPA KOREA 브랜드 페이지",
+      "마켓 운영대행 소개",
+      "자동매매 서비스 소개",
+      "아파트 분양 안내",
+      "오피스텔 분양 방문예약",
+    ],
+  },
+  {
+    icon: ClipboardList,
+    title: "신청·설문을 받고 싶다",
+    features: [
+      "조건부 문항 분기",
+      "파일 첨부",
+      "중복 제출 방지",
+      "결과 통계",
+      "시트 자동 적재",
+      "신청자 알림 메일",
+    ],
+    cases: ["정부지원 신청 랜딩", "오피스텔 분양 방문예약"],
   },
 ];
 
@@ -814,6 +849,8 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
     const site = portfolioByName.get(name);
     return site ? [{ name, url: site.url }] : [];
   });
+  // 걸 사례가 없으면 "사례" 라벨만 덩그러니 남는다. 그건 없는 걸 있는 척하는 자리다.
+  const showCases = cases.length > 0 || item.tossMiniApp;
 
   return (
     <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
@@ -837,7 +874,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
         ))}
       </div>
 
-      {consult ? (
+      {consult || !showCases ? (
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-200/70 pt-3">
           <span className="text-[11px] text-slate-400">공개 사례 준비 중</span>
           <button
@@ -893,21 +930,22 @@ function Capabilities() {
           <p className="mt-4 text-slate-600">
             분야 이름 대신 기능으로 적었습니다. 훑어보시다 &ldquo;이거 우리 얘기다&rdquo; 싶은 항목을 눌러 주세요.
             <br />
-            만들어 본 것에는 실제 사이트를 붙여 뒀습니다. 눌러서 바로 확인하실 수 있습니다.
+            사례를 붙일 수 있는 항목에만 실제 사이트를 걸어 뒀습니다. 눌러서 바로 확인하실 수 있습니다.
           </p>
         </div>
 
-        {/* A. 사례가 있는 것 */}
+        {/* A. 만들어 본 것 — 플랫폼·SaaS 가 앞, 전환 페이지가 뒤 */}
         <div className="mt-14">
           <div className="mb-2 flex flex-wrap items-center gap-3">
-            <h3 className="font-display text-lg font-semibold text-slate-900">사례가 있는 것</h3>
+            <h3 className="font-display text-lg font-semibold text-slate-900">웹·앱으로 만드는 것</h3>
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-              <ExternalLink className="h-3 w-3" /> 실제 사이트 {provenCapabilities.length}개 항목
+              <ExternalLink className="h-3 w-3" /> 실제 사이트를 붙인 항목 {countLinked(provenCapabilities)}개
             </span>
             <div className="hidden h-px flex-1 bg-slate-200 sm:block" />
           </div>
           <p className="mb-5 text-sm text-slate-600">
-            납품해서 지금 돌아가고 있는 것들입니다. 항목 아래 사례를 눌러 직접 보세요.
+            보여드릴 사이트가 있는 항목에는 사례를 붙여 뒀습니다. 눌러서 바로 확인하세요.
+            사례를 아직 공개하지 못하는 항목은 상담부터 시작합니다.
           </p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {provenCapabilities.map((item) => (
