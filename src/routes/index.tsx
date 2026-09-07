@@ -34,6 +34,16 @@ import {
   Workflow,
   Activity,
   QrCode,
+  CalendarCheck,
+  Inbox,
+  Store,
+  Users,
+  ClipboardList,
+  Globe,
+  Newspaper,
+  Warehouse,
+  GraduationCap,
+  UserCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { searchProducts, listCategories } from "@/lib/discover.functions";
@@ -92,7 +102,7 @@ function Index() {
       <Portfolio />
       <Develop />
       <Projects />
-      <Pricing />
+      <Capabilities />
       <About />
       <Contact />
       <Footer />
@@ -130,6 +140,29 @@ function shot(url: string) {
 // 토스 미니앱은 토스 앱 컨테이너 안에서만 실행된다.
 // 그래서 이 카드만 shot() 데스크톱 스크린샷을 쓰지 않고 실제 앱 화면을 세로 목업으로 넣는다.
 const TOSS_MINIAPP_URL = "https://minion.toss.im/VlDAkiWn";
+
+// QR 다이얼로그 내용. 포트폴리오 카드와 "이런 것을 만듭니다" 사례 링크가 같이 쓴다.
+function TossMiniAppQrDialogContent() {
+  return (
+    <DialogContent className="max-w-sm rounded-2xl border-border bg-surface">
+      <DialogTitle className="font-display text-lg font-semibold">
+        깔끔집사 · 토스 미니앱
+      </DialogTitle>
+      <DialogDescription className="text-sm text-muted-foreground">
+        토스 앱 안에서 도는 미니앱이라 PC 브라우저로는 열리지 않습니다. 폰 카메라로 아래 QR을 찍으면
+        토스에서 바로 열립니다.
+      </DialogDescription>
+      <div className="flex flex-col items-center gap-3">
+        <div className="rounded-xl border border-border bg-white p-3">
+          <img src={tossMiniappQr} alt="깔끔집사 토스 미니앱 QR 코드" className="h-64 w-64" />
+        </div>
+        <div className="text-center text-xs break-all text-muted-foreground select-all">
+          {TOSS_MINIAPP_URL}
+        </div>
+      </div>
+    </DialogContent>
+  );
+}
 
 // 카드 내용은 하나인데 넓은 화면(QR 다이얼로그)과 좁은 화면(직접 링크)에서 감싸는 요소가 다르다.
 function TossMiniAppCardBody({ Icon, action }: { Icon: LucideIcon; action: string }) {
@@ -244,27 +277,7 @@ function Portfolio() {
                 <TossMiniAppCardBody Icon={QrCode} action="QR로 열기" />
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-sm rounded-2xl border-border bg-surface">
-              <DialogTitle className="font-display text-lg font-semibold">
-                깔끔집사 · 토스 미니앱
-              </DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                토스 앱 안에서 도는 미니앱이라 PC 브라우저로는 열리지 않습니다. 폰 카메라로 아래 QR을
-                찍으면 토스에서 바로 열립니다.
-              </DialogDescription>
-              <div className="flex flex-col items-center gap-3">
-                <div className="rounded-xl border border-border bg-white p-3">
-                  <img
-                    src={tossMiniappQr}
-                    alt="깔끔집사 토스 미니앱 QR 코드"
-                    className="h-64 w-64"
-                  />
-                </div>
-                <div className="text-center text-xs break-all text-muted-foreground select-all">
-                  {TOSS_MINIAPP_URL}
-                </div>
-              </div>
-            </DialogContent>
+            <TossMiniAppQrDialogContent />
           </Dialog>
         </div>
 
@@ -484,6 +497,8 @@ function Develop() {
   );
 }
 
+// ⚠️ 화면에서는 금액을 빼기로 했다(2026-09-07). 데이터는 나중에 되살릴 수 있게 남겨 둔다.
+//    아래 pricingTiers / pricingGroupLabels 는 현재 어디에서도 렌더하지 않는다.
 const pricingTiers = [
   // 빠른 구축 · 1~3주
   { group: "빠른 구축 · 1~3주", tag: "Landing", title: "랜딩·브랜드 사이트", desc: "반응형 1~5페이지, 문의폼·배포 포함", price: 890000, duration: "1~2주" },
@@ -516,70 +531,444 @@ const pricingGroupLabels: Record<string, string> = {
   "운영": "운영",
 };
 
-function Pricing() {
+// ── "이런 것을 만듭니다" 섹션 ───────────────────────────────────────────────
+// 카테고리를 나열하면 사려는 사람이 자기 문제를 못 찾는다. 그래서 제목은 증상,
+// 내용은 기능 단위로 쪼개고, 사례가 있는 것에는 실제 포트폴리오를 붙인다.
+
+// 사례 링크는 portfolioSites 를 이름으로 찾아 쓴다.
+// 주소를 여기 다시 적으면 두 벌이 되어 한쪽만 고쳐진다.
+const portfolioByName = new Map(
+  portfolioSites.map((s) => [s.title.split(" · ")[0], s] as const),
+);
+
+type Capability = {
+  icon: LucideIcon;
+  /** 사장님이 말하는 증상 그대로 */
+  title: string;
+  /** 스캔되게 칩으로 뿌린다 */
+  features: string[];
+  /** portfolioSites 의 이름 (예: "렌터카 예약") */
+  cases?: string[];
+  /** 토스 미니앱 사례. PC 에서는 링크가 막다른 길이라 QR 다이얼로그를 연다 */
+  tossMiniApp?: boolean;
+};
+
+// A. 사례가 있는 것
+const provenCapabilities: Capability[] = [
+  {
+    icon: CalendarCheck,
+    title: "예약을 받고 싶다",
+    features: [
+      "시간대별 정원 관리",
+      "노쇼 방지 선결제",
+      "취소·환불 규정 자동 적용",
+      "알림 리마인드",
+      "관리자 캘린더",
+      "중복예약 차단",
+      "예약 변경·양도",
+    ],
+    cases: ["렌터카 예약", "예약 시스템"],
+  },
+  {
+    icon: Inbox,
+    title: "문의가 여기저기 흩어진다",
+    features: [
+      "폼·전화·카톡 문의를 한 곳에",
+      "담당자 자동 배정",
+      "상담 이력 타임라인",
+      "재문의 알림",
+      "처리 상태 관리",
+      "응답 시간 통계",
+      "첨부파일 보관",
+    ],
+    cases: ["법무법인 상담 랜딩", "온라인 신청 폼"],
+  },
+  {
+    icon: CreditCard,
+    title: "결제를 붙이고 싶다",
+    features: [
+      "PG 심사 대응(사업자 서류·약관)",
+      "카드·간편결제",
+      "부분 취소와 환불",
+      "정기 결제",
+      "정산 리포트",
+      "결제 실패 재시도",
+      "웹훅 중복 처리",
+    ],
+    cases: ["커머스", "VAN POS"],
+  },
+  {
+    icon: Store,
+    title: "매장·현장 업무를 시스템으로",
+    features: [
+      "주문·결제 단말 연동",
+      "일 마감 정산",
+      "재고 차감",
+      "기사·직원 일정 배정",
+      "이동 동선 정리",
+      "근무 기록",
+      "모바일 우선 화면",
+    ],
+    cases: ["VAN POS", "기사 일정 관리"],
+  },
+  {
+    icon: Users,
+    title: "사람들이 모이는 공간이 필요하다",
+    features: [
+      "게시판·댓글·대댓글",
+      "신고와 차단",
+      "등급·권한 분리",
+      "알림",
+      "검색",
+      "스팸 방지",
+      "운영자 화면",
+    ],
+    cases: ["커뮤니티"],
+  },
+  {
+    icon: ShoppingBag,
+    title: "물건을 팔고 싶다",
+    features: [
+      "상품·옵션·재고",
+      "장바구니",
+      "주문·배송 상태",
+      "쿠폰과 할인",
+      "리뷰",
+      "정산",
+      "판매자 화면",
+    ],
+    cases: ["커머스"],
+  },
+  {
+    icon: ClipboardList,
+    title: "신청·설문을 받고 싶다",
+    features: [
+      "조건부 문항 분기",
+      "파일 첨부",
+      "중복 제출 방지",
+      "결과 통계",
+      "시트 자동 적재",
+      "신청자 알림 메일",
+    ],
+    cases: ["온라인 신청 폼"],
+  },
+  {
+    icon: Globe,
+    title: "브랜드를 보여줄 페이지가 필요하다",
+    features: [
+      "반응형 1~5페이지",
+      "문의 폼",
+      "검색 노출 기본기(제목·설명·OG)",
+      "속도 최적화",
+      "도메인·SSL 연결",
+      "방문 통계",
+    ],
+    cases: ["브랜드 랜딩", "서비스 랜딩", "프로덕트 페이지", "프로모션 페이지"],
+  },
+  {
+    icon: Smartphone,
+    title: "앱처럼 쓰이게 하고 싶다",
+    features: [
+      "토스 미니앱",
+      "모바일 웹앱(PWA)",
+      "홈 화면 추가",
+      "푸시 알림",
+      "오프라인 대응",
+    ],
+    tossMiniApp: true,
+  },
+  {
+    icon: Newspaper,
+    title: "콘텐츠를 계속 올려야 한다",
+    features: [
+      "글·공지 관리 화면",
+      "이미지 업로드",
+      "예약 발행",
+      "카테고리·태그",
+      "검색",
+      "작성자 권한",
+    ],
+    cases: ["콘텐츠 페이지", "스튜디오 소개"],
+  },
+  {
+    icon: Workflow,
+    title: "시스템끼리 연결하고 싶다",
+    features: [
+      "리드 수신 API",
+      "시트·CRM 연동",
+      "카카오 알림톡",
+      "웹훅 발신과 재시도",
+      "API 키 발급·회수",
+      "연동 장애 알림",
+    ],
+    cases: ["VIP 마케팅", "서비스 소개"],
+  },
+];
+
+// B. 아직 공개할 사례가 없는 것 — 링크 대신 상담으로 연결한다
+const consultCapabilities: Capability[] = [
+  {
+    icon: Building2,
+    title: "회계·재고·인사를 한 시스템으로",
+    features: [
+      "맞춤형 ERP",
+      "기존 시스템 연동",
+      "회계·재무",
+      "인사·급여",
+      "권한 결재선",
+      "데이터 이관",
+      "리포트",
+    ],
+  },
+  {
+    icon: Warehouse,
+    title: "창고·재고를 정확히",
+    features: [
+      "WMS",
+      "입출고",
+      "로케이션 관리",
+      "바코드·QR 스캔",
+      "실사 재고",
+      "재고 알림",
+      "출고 오류 추적",
+    ],
+  },
+  {
+    icon: GraduationCap,
+    title: "교육을 온라인으로",
+    features: [
+      "LMS",
+      "강의 업로드",
+      "수강 진도",
+      "퀴즈·평가",
+      "수료증 발급",
+      "기수 관리",
+      "진도 통계",
+    ],
+  },
+  {
+    icon: UserCheck,
+    title: "인사평가를 체계적으로",
+    features: [
+      "HR",
+      "목표·성과 관리",
+      "다면 평가",
+      "연봉 계약",
+      "결재선",
+      "평가 이력",
+    ],
+  },
+];
+
+// 🚨 이 리포에 실제 흔적이 있는 것만 적는다.
+//    포트원 = @portone/browser-sdk + src/lib/portone-config.ts
+//    토스페이 = portone-config 의 간편결제 채널키
+//    토스 미니앱 = 깔끔집사(TOSS_MINIAPP_URL)
+//    Supabase = supabase/migrations + 문의 첨부 스토리지 버킷
+//    Cloudflare = wrangler.jsonc (ai-solution.co.kr 커스텀 도메인)
+//    웹훅 = src/routes/api/public/webhooks/lemonsqueezy.ts + /admin/webhooks 로그
+//    메일 = src/routes/lovable/email/* + 수신거부(suppressed_emails)
+//    카카오 오픈채팅 = KAKAO_OPENCHAT_URL
+const integrations = [
+  "포트원(PortOne) 결제",
+  "토스페이 간편결제",
+  "토스 미니앱",
+  "Supabase · DB/인증/파일 스토리지",
+  "Cloudflare Workers 배포",
+  "웹훅 수신 · 중복 처리 · 로그",
+  "트랜잭션 메일 발송 · 수신거부 처리",
+  "카카오 오픈채팅 상담 연결",
+];
+
+// 토스 미니앱 사례 링크. 좁은 화면은 토스로 바로, 넓은 화면은 QR 다이얼로그로.
+// (포트폴리오 카드와 같은 주소·같은 QR을 쓴다)
+function TossMiniAppCaseLink() {
+  return (
+    <>
+      <a
+        href={TOSS_MINIAPP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary transition hover:bg-primary/10 md:hidden"
+      >
+        깔끔집사 토스 미니앱 <ExternalLink className="h-3 w-3" />
+      </a>
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="hidden items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary transition hover:bg-primary/10 md:inline-flex"
+          >
+            깔끔집사 토스 미니앱 <QrCode className="h-3 w-3" />
+          </button>
+        </DialogTrigger>
+        <TossMiniAppQrDialogContent />
+      </Dialog>
+    </>
+  );
+}
+
+function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean }) {
   const { openInquiry } = useInquiry();
-  const groups = pricingTiers.reduce<Record<string, typeof pricingTiers>>((acc, t) => {
-    (acc[t.group] ||= []).push(t);
-    return acc;
-  }, {});
-  const groupOrder = ["빠른 구축 · 1~3주", "업무 시스템 · 3~8주", "통합 시스템 · 8주~", "운영"];
+  const cases = (item.cases ?? []).flatMap((name) => {
+    const site = portfolioByName.get(name);
+    return site ? [{ name, url: site.url }] : [];
+  });
+
+  return (
+    <div className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md">
+      <div className="flex items-start gap-3">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow">
+          <item.icon className="h-4 w-4" />
+        </span>
+        <h4 className="mt-1 font-display text-base leading-snug font-semibold text-slate-900">
+          {item.title}
+        </h4>
+      </div>
+
+      <div className="mt-4 flex flex-1 flex-wrap content-start gap-1.5">
+        {item.features.map((f) => (
+          <span
+            key={f}
+            className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] leading-none text-slate-600"
+          >
+            {f}
+          </span>
+        ))}
+      </div>
+
+      {consult ? (
+        <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-200/70 pt-3">
+          <span className="text-[11px] text-slate-400">공개 사례 준비 중</span>
+          <button
+            type="button"
+            onClick={() => openInquiry(item.title)}
+            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3.5 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
+          >
+            <MessageCircle className="h-3.5 w-3.5" /> 상담 문의
+          </button>
+        </div>
+      ) : (
+        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-slate-200/70 pt-3">
+          <span className="text-[11px] text-slate-400">사례</span>
+          {cases.map((c) => (
+            <a
+              key={c.url}
+              href={c.url}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary transition hover:bg-primary/10"
+            >
+              {c.name} <ExternalLink className="h-3 w-3" />
+            </a>
+          ))}
+          {item.tossMiniApp && <TossMiniAppCaseLink />}
+          <button
+            type="button"
+            onClick={() => openInquiry(item.title)}
+            className="ml-auto inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium text-slate-500 transition hover:text-primary"
+          >
+            <MessageCircle className="h-3 w-3" /> 문의
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Capabilities() {
+  const { openInquiry } = useInquiry();
 
   return (
     <section id="pricing" className="bg-slate-50 px-4 py-24 text-slate-900">
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />What We Build
+            <Sparkles className="h-3.5 w-3.5" />
+            What We Build
           </span>
           <h2 className="mt-5 font-display text-4xl font-bold tracking-tight md:text-5xl">
             이런 것을 <span className="text-gradient">만듭니다</span>
           </h2>
           <p className="mt-4 text-slate-600">
-            랜딩 페이지부터 업무 시스템, 통합 ERP까지 직접 만들어 온 것들입니다.<br />필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다.
+            분야 이름 대신 기능으로 적었습니다. 훑어보시다 &ldquo;이거 우리 얘기다&rdquo; 싶은 항목을 눌러 주세요.
+            <br />
+            만들어 본 것에는 실제 사이트를 붙여 뒀습니다. 눌러서 바로 확인하실 수 있습니다.
           </p>
         </div>
 
-        <div className="mt-14 space-y-10">
-          {groupOrder.map((g) => (
-            <div key={g}>
-              <div className="mb-4 flex items-center gap-3">
-                <h3 className="font-display text-lg font-semibold text-slate-900">{pricingGroupLabels[g] ?? g}</h3>
-                <div className="h-px flex-1 bg-slate-200" />
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {groups[g]?.map((t) => (
-                  <button
-                    key={t.title}
-                    type="button"
-                    onClick={() => openInquiry(t.title)}
-                    className="glow-hover group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-primary/40 hover:shadow-md"
-                  >
-                    <span className="inline-flex self-start rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-                      {t.tag}
-                    </span>
-                    <h4 className="mt-2.5 font-display text-base font-semibold text-slate-900">{t.title}</h4>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{t.desc}</p>
-                    <span className="mt-4 inline-flex items-center gap-1 border-t border-slate-200/70 pt-3 text-xs font-medium text-primary">
-                      <MessageCircle className="h-3.5 w-3.5" /> 견적 문의
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+        {/* A. 사례가 있는 것 */}
+        <div className="mt-14">
+          <div className="mb-2 flex flex-wrap items-center gap-3">
+            <h3 className="font-display text-lg font-semibold text-slate-900">사례가 있는 것</h3>
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
+              <ExternalLink className="h-3 w-3" /> 실제 사이트 {provenCapabilities.length}개 항목
+            </span>
+            <div className="hidden h-px flex-1 bg-slate-200 sm:block" />
+          </div>
+          <p className="mb-5 text-sm text-slate-600">
+            납품해서 지금 돌아가고 있는 것들입니다. 항목 아래 사례를 눌러 직접 보세요.
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {provenCapabilities.map((item) => (
+              <CapabilityCard key={item.title} item={item} />
+            ))}
+          </div>
         </div>
 
-        <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+        {/* B. 아직 공개할 사례가 없는 것 */}
+        <div className="mt-14">
+          <div className="mb-2 flex flex-wrap items-center gap-3">
+            <h3 className="font-display text-lg font-semibold text-slate-900">사례가 아직 없는 것</h3>
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-200/70 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+              <MessageCircle className="h-3 w-3" /> 상담으로 시작합니다
+            </span>
+            <div className="hidden h-px flex-1 bg-slate-200 sm:block" />
+          </div>
+          <p className="mb-5 text-sm text-slate-600">
+            공개할 수 있는 사례가 아직 없는 영역입니다. 요구사항을 들은 뒤 범위와 일정을 정리해 드립니다.
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {consultCapabilities.map((item) => (
+              <CapabilityCard key={item.title} item={item} consult />
+            ))}
+          </div>
+        </div>
+
+        {/* C. 연동해 본 것 */}
+        <div className="mt-14 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="flex flex-wrap items-center gap-3">
+            <h3 className="inline-flex items-center gap-2 font-display text-lg font-semibold text-slate-900">
+              <Link2 className="h-4 w-4 text-primary" /> 연동해 본 것
+            </h3>
+            <div className="hidden h-px flex-1 bg-slate-200 sm:block" />
+          </div>
+          <p className="mt-2 text-sm text-slate-600">
+            이 사이트와 납품 프로젝트에서 실제로 붙여 본 것만 적었습니다.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {integrations.map((name) => (
+              <span
+                key={name}
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700"
+              >
+                <ShieldCheck className="h-3.5 w-3.5 text-primary" /> {name}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
           <div className="font-display text-lg font-semibold text-slate-900">필요한 기능이 목록에 없나요?</div>
           <div className="mt-2 text-sm text-slate-600">
-            요구 기능과 디자인 범위에 따라 일정과 견적이 달라집니다. 상담 후 정확한 견적을 안내드립니다.
+            쓰던 방식과 불편한 지점을 그대로 말씀해 주시면, 어떻게 만들지 정리해서 알려드립니다.
           </div>
           <button
             type="button"
             onClick={() => openInquiry()}
             className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
           >
-            <MessageCircle className="h-4 w-4" /> 견적 문의하기
+            <MessageCircle className="h-4 w-4" /> 상담 문의하기
           </button>
         </div>
       </div>
