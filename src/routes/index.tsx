@@ -73,12 +73,10 @@ import tossMiniappQr from "@/assets/portfolio/toss-miniapp-qr.png";
 
 export const Route = createFileRoute("/")({
   component: Index,
-  head: () => ({
-    meta: [
-      { title: "AISOLUTION" },
-      { name: "description", content: "AI자동화와 함께 빠르게 결과물을 받아보세요." },
-    ],
-  }),
+  // 🚨 여기서 title/description 을 다시 정의하지 마라. 라우트 head 가 루트(__root.tsx)를
+  //    덮어써서, 루트의 검색어 중심 제목·설명이 조용히 무시된다. 실제로 그렇게 돼 있었고
+  //    og:* 만 새 값이고 title 은 "AISOLUTION" 인 채로 배포됐다.
+  //    홈은 사이트 대표 페이지라 루트 메타를 그대로 쓴다.
 });
 
 type Product = {
