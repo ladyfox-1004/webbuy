@@ -1,6 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "tanstack-start-app",
+// 🚨 이름을 템플릿 기본값("tanstack-start-app")으로 두지 마라.
+//    같은 템플릿으로 만든 다른 앱(ilzik.com)이 같은 이름을 쓰고 있어서,
+//    2026-09-07 에 이 사이트를 배포했다가 ilzik.com 을 통째로 덮어썼다.
+//    워커 이름은 그 자체가 배포 대상 식별자다.
+  "name": "aisolution",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": "src/server.ts",
