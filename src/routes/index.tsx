@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import {
   ArrowUpRight,
   ExternalLink,
@@ -95,8 +94,10 @@ const portfolioSites = [
   { title: "온라인 신청 폼 · AISOLUTION", tag: "Form/Apply", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
   { title: "렌터카 예약 · AISOLUTION", tag: "Booking", url: "https://funcar-rentcar.netlify.app/" },
   { title: "VAN POS · AISOLUTION", tag: "POS/SaaS", url: "https://van-pos-legal.netlify.app/" },
+  { title: "기사 일정 관리 · AISOLUTION", tag: "POS/SaaS", url: "https://ilzik.com/" },
   { title: "VIP 마케팅 · AISOLUTION", tag: "Marketing", url: "https://psm-vip-marketing.netlify.app/" },
   { title: "서비스 랜딩 · AISOLUTION", tag: "Landing", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
+  { title: "법무법인 상담 랜딩 · AISOLUTION", tag: "Landing", url: "https://mjcrime.netlify.app/" },
   { title: "프로덕트 페이지 · AISOLUTION", tag: "Product", url: "https://thunderous-semolina-973f49.netlify.app/" },
   { title: "프로모션 페이지 · AISOLUTION", tag: "Promo", url: "https://preeminent-longma-670789.netlify.app/" },
   { title: "서비스 소개 · AISOLUTION", tag: "Service", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
@@ -107,6 +108,9 @@ const portfolioSites = [
   { title: "커뮤니티 · AISOLUTION", tag: "Community", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
   { title: "커머스 · AISOLUTION", tag: "Commerce", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
 ];
+
+// 에이아이솔루션 1:1 오픈채팅 (개인 카톡 아이디 대신 영업 창구로 사용)
+const KAKAO_OPENCHAT_URL = "https://open.kakao.com/o/sd29wW8h";
 
 function shot(url: string) {
   return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800`;
@@ -354,9 +358,7 @@ function Develop() {
                 </p>
                 <div className="mt-5 flex items-center justify-between border-t border-slate-200/60 pt-4 dark:border-slate-700/50">
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    {item.recurring
-                      ? `₩${item.price.toLocaleString()}/월`
-                      : `최소 ₩${item.price.toLocaleString()}`}
+                    {item.recurring ? "월 구독형 · 견적 상담" : "견적 상담"}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-lg">
                     <MessageCircle className="h-3.5 w-3.5" /> 문의하기
@@ -408,6 +410,14 @@ const pricingTiers = [
   { group: "운영", tag: "Maintenance", title: "연동 유지보수", desc: "장애 감지·알림·복구, 스펙 변경 대응", price: 150000, duration: "월 단위", recurring: true },
 ];
 
+// 화면에 노출하는 그룹 이름 (데이터의 group 키에는 기간이 들어 있어 표시용으로만 분리한다)
+const pricingGroupLabels: Record<string, string> = {
+  "빠른 구축 · 1~3주": "빠른 구축",
+  "업무 시스템 · 3~8주": "업무 시스템",
+  "통합 시스템 · 8주~": "통합 시스템",
+  "운영": "운영",
+};
+
 function Pricing() {
   const { openInquiry } = useInquiry();
   const groups = pricingTiers.reduce<Record<string, typeof pricingTiers>>((acc, t) => {
@@ -421,13 +431,13 @@ function Pricing() {
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />Pricing Guide
+            <Sparkles className="h-3.5 w-3.5" />What We Build
           </span>
           <h2 className="mt-5 font-display text-4xl font-bold tracking-tight md:text-5xl">
-            프로젝트 유형별 <span className="text-gradient">시작 단가</span>
+            이런 것을 <span className="text-gradient">만듭니다</span>
           </h2>
           <p className="mt-4 text-slate-600">
-            기능 범위와 디자인 수준에 따라 조정됩니다.<br />30분 상담 후 확정 견적을 드립니다.
+            랜딩 페이지부터 업무 시스템, 통합 ERP까지 직접 만들어 온 것들입니다.<br />필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다.
           </p>
         </div>
 
@@ -435,60 +445,45 @@ function Pricing() {
           {groupOrder.map((g) => (
             <div key={g}>
               <div className="mb-4 flex items-center gap-3">
-                <h3 className="font-display text-lg font-semibold text-slate-900">{g}</h3>
+                <h3 className="font-display text-lg font-semibold text-slate-900">{pricingGroupLabels[g] ?? g}</h3>
                 <div className="h-px flex-1 bg-slate-200" />
               </div>
-              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[640px] text-left">
-                    <thead>
-                      <tr className="bg-slate-100">
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">서비스</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">포함 내용</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">예상 기간</th>
-                        <th className="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500">시작 단가</th>
-                        <th className="px-5 py-3"></th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {groups[g]?.map((t) => (
-                        <tr key={t.title} className="transition hover:bg-slate-50">
-                          <td className="px-5 py-4">
-                            <span className="inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
-                              {t.tag}
-                            </span>
-                            <div className="mt-1.5 font-display text-sm font-semibold text-slate-900">{t.title}</div>
-                          </td>
-                          <td className="px-5 py-4 text-sm text-slate-600">{t.desc}</td>
-                          <td className="px-5 py-4 text-sm text-slate-600">{t.duration}</td>
-                          <td className="px-5 py-4">
-                            <div className="font-display text-base font-bold text-slate-900">
-                              ₩{t.price.toLocaleString()}
-                              {t.recurring && <span className="text-sm font-normal text-slate-500">/월</span>}
-                              {!t.recurring && <span className="text-sm font-normal text-slate-500">~</span>}
-                            </div>
-                          </td>
-                          <td className="px-5 py-4">
-                            <button
-                              onClick={() => openInquiry(t.title)}
-                              className="inline-flex items-center gap-1 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
-                            >
-                              <MessageCircle className="h-3.5 w-3.5" /> 문의
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {groups[g]?.map((t) => (
+                  <button
+                    key={t.title}
+                    type="button"
+                    onClick={() => openInquiry(t.title)}
+                    className="glow-hover group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:border-primary/40 hover:shadow-md"
+                  >
+                    <span className="inline-flex self-start rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary">
+                      {t.tag}
+                    </span>
+                    <h4 className="mt-2.5 font-display text-base font-semibold text-slate-900">{t.title}</h4>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{t.desc}</p>
+                    <span className="mt-4 inline-flex items-center gap-1 border-t border-slate-200/70 pt-3 text-xs font-medium text-primary">
+                      <MessageCircle className="h-3.5 w-3.5" /> 견적 문의
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-10 text-center text-xs text-slate-500">
-          * 표기된 금액은 시작 단가이며, 요구 기능·디자인 범위에 따라 조정됩니다. 정확한 견적은 상담 후 안내드립니다.
-        </p>
+        <div className="mt-12 rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+          <div className="font-display text-lg font-semibold text-slate-900">필요한 기능이 목록에 없나요?</div>
+          <div className="mt-2 text-sm text-slate-600">
+            요구 기능과 디자인 범위에 따라 일정과 견적이 달라집니다. 상담 후 정확한 견적을 안내드립니다.
+          </div>
+          <button
+            type="button"
+            onClick={() => openInquiry()}
+            className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
+          >
+            <MessageCircle className="h-4 w-4" /> 견적 문의하기
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -792,20 +787,18 @@ function Projects() {
         ) : (
           <div className="overflow-hidden rounded-3xl border border-border bg-surface/40">
             <div className="hidden grid-cols-12 gap-4 border-b border-border bg-surface/70 px-6 py-3 text-xs font-medium text-muted-foreground md:grid">
-              <div className="col-span-5">서비스</div>
-              <div className="col-span-2">분야</div>
-              <div className="col-span-3">시작 단가</div>
-              <div className="col-span-2 text-right">문의</div>
+              <div className="col-span-6">서비스</div>
+              <div className="col-span-3">분야</div>
+              <div className="col-span-3 text-right">문의</div>
             </div>
             {((products ?? []) as Product[]).map((p) => {
               const thumb = p.thumbnail_url || categoryBgMap[p.tag ?? ""] || shortsBg;
-              const priceText = p.amount > 0 ? `₩${p.amount.toLocaleString()}` : "견적 상담";
               return (
                 <div
                   key={p.id}
                   className="group grid grid-cols-1 items-start gap-3 border-b border-border/50 px-5 py-4 transition last:border-b-0 hover:bg-surface/70 md:grid-cols-12 md:items-center md:gap-4 md:px-6 md:py-4"
                 >
-                  <div className="col-span-5 flex items-center gap-4">
+                  <div className="col-span-6 flex items-center gap-4">
                     <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl border border-border/50 bg-background/40">
                       <img
                         src={thumb}
@@ -830,20 +823,13 @@ function Projects() {
                     </div>
                   </div>
 
-                  <div className="col-span-2 flex items-center gap-2">
+                  <div className="col-span-3 flex items-center gap-2">
                     <span className="inline-flex items-center rounded-full border border-border bg-surface/60 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
                       {p.tag || p.category || "기타"}
                     </span>
                   </div>
 
-                  <div className="col-span-3 flex items-center gap-2 text-sm font-medium text-foreground">
-                    {priceText}
-                    {p.amount > 0 && (
-                      <span className="text-[11px] font-normal text-muted-foreground">부터</span>
-                    )}
-                  </div>
-
-                  <div className="col-span-2 flex items-center justify-start gap-2 md:justify-end">
+                  <div className="col-span-3 flex items-center justify-start gap-2 md:justify-end">
                     <button
                       onClick={() => openInquiry(p.title)}
                       className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3.5 py-1.5 text-xs font-medium text-primary-foreground transition hover:opacity-90"
@@ -932,15 +918,14 @@ function Contact() {
               >
                 <Mail className="h-4 w-4 text-primary-glow" /><span>contact@ai-solution.space</span>
               </a>
-              <button
-                onClick={() => {
-                  navigator.clipboard.writeText("pinkfox1015");
-                  toast.success("카톡아이디가 복사되었습니다");
-                }}
+              <a
+                href={KAKAO_OPENCHAT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 font-medium text-foreground transition hover:bg-surface"
               >
-                <MessageCircle className="h-4 w-4 text-primary-glow" /><span>카톡: pinkfox1015</span>
-              </button>
+                <MessageCircle className="h-4 w-4 text-primary-glow" /><span>카카오톡 상담</span>
+              </a>
             </div>
           </div>
         </div>
