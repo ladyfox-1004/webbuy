@@ -22,6 +22,12 @@ import { Route as AppDevRouteImport } from './routes/app-dev'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as USlugRouteImport } from './routes/u.$slug'
+import { Route as SolutionsTelecomRouteImport } from './routes/solutions/telecom'
+import { Route as SolutionsSubsidyRouteImport } from './routes/solutions/subsidy'
+import { Route as SolutionsRealestateRouteImport } from './routes/solutions/realestate'
+import { Route as SolutionsPlatformRouteImport } from './routes/solutions/platform'
+import { Route as SolutionsLawRouteImport } from './routes/solutions/law'
+import { Route as SolutionsHospitalRouteImport } from './routes/solutions/hospital'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -98,6 +104,36 @@ const USlugRoute = USlugRouteImport.update({
   path: '/u/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolutionsTelecomRoute = SolutionsTelecomRouteImport.update({
+  id: '/solutions/telecom',
+  path: '/solutions/telecom',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsSubsidyRoute = SolutionsSubsidyRouteImport.update({
+  id: '/solutions/subsidy',
+  path: '/solutions/subsidy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsRealestateRoute = SolutionsRealestateRouteImport.update({
+  id: '/solutions/realestate',
+  path: '/solutions/realestate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsPlatformRoute = SolutionsPlatformRouteImport.update({
+  id: '/solutions/platform',
+  path: '/solutions/platform',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsLawRoute = SolutionsLawRouteImport.update({
+  id: '/solutions/law',
+  path: '/solutions/law',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolutionsHospitalRoute = SolutionsHospitalRouteImport.update({
+  id: '/solutions/hospital',
+  path: '/solutions/hospital',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentResultRoute = PaymentResultRouteImport.update({
   id: '/payment/result',
   path: '/payment/result',
@@ -171,6 +207,12 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/solutions/hospital': typeof SolutionsHospitalRoute
+  '/solutions/law': typeof SolutionsLawRoute
+  '/solutions/platform': typeof SolutionsPlatformRoute
+  '/solutions/realestate': typeof SolutionsRealestateRoute
+  '/solutions/subsidy': typeof SolutionsSubsidyRoute
+  '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -196,6 +238,12 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/solutions/hospital': typeof SolutionsHospitalRoute
+  '/solutions/law': typeof SolutionsLawRoute
+  '/solutions/platform': typeof SolutionsPlatformRoute
+  '/solutions/realestate': typeof SolutionsRealestateRoute
+  '/solutions/subsidy': typeof SolutionsSubsidyRoute
+  '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -222,6 +270,12 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/solutions/hospital': typeof SolutionsHospitalRoute
+  '/solutions/law': typeof SolutionsLawRoute
+  '/solutions/platform': typeof SolutionsPlatformRoute
+  '/solutions/realestate': typeof SolutionsRealestateRoute
+  '/solutions/subsidy': typeof SolutionsSubsidyRoute
+  '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -249,6 +303,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
+    | '/solutions/hospital'
+    | '/solutions/law'
+    | '/solutions/platform'
+    | '/solutions/realestate'
+    | '/solutions/subsidy'
+    | '/solutions/telecom'
     | '/u/$slug'
     | '/lovable/email/suppression'
     | '/api/public/webhooks/lemonsqueezy'
@@ -274,6 +334,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
+    | '/solutions/hospital'
+    | '/solutions/law'
+    | '/solutions/platform'
+    | '/solutions/realestate'
+    | '/solutions/subsidy'
+    | '/solutions/telecom'
     | '/u/$slug'
     | '/lovable/email/suppression'
     | '/api/public/webhooks/lemonsqueezy'
@@ -299,6 +365,12 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
+    | '/solutions/hospital'
+    | '/solutions/law'
+    | '/solutions/platform'
+    | '/solutions/realestate'
+    | '/solutions/subsidy'
+    | '/solutions/telecom'
     | '/u/$slug'
     | '/lovable/email/suppression'
     | '/api/public/webhooks/lemonsqueezy'
@@ -323,6 +395,12 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PSlugRoute: typeof PSlugRoute
   PaymentResultRoute: typeof PaymentResultRoute
+  SolutionsHospitalRoute: typeof SolutionsHospitalRoute
+  SolutionsLawRoute: typeof SolutionsLawRoute
+  SolutionsPlatformRoute: typeof SolutionsPlatformRoute
+  SolutionsRealestateRoute: typeof SolutionsRealestateRoute
+  SolutionsSubsidyRoute: typeof SolutionsSubsidyRoute
+  SolutionsTelecomRoute: typeof SolutionsTelecomRoute
   USlugRoute: typeof USlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicWebhooksLemonsqueezyRoute: typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -422,6 +500,48 @@ declare module '@tanstack/react-router' {
       path: '/u/$slug'
       fullPath: '/u/$slug'
       preLoaderRoute: typeof USlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/telecom': {
+      id: '/solutions/telecom'
+      path: '/solutions/telecom'
+      fullPath: '/solutions/telecom'
+      preLoaderRoute: typeof SolutionsTelecomRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/subsidy': {
+      id: '/solutions/subsidy'
+      path: '/solutions/subsidy'
+      fullPath: '/solutions/subsidy'
+      preLoaderRoute: typeof SolutionsSubsidyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/realestate': {
+      id: '/solutions/realestate'
+      path: '/solutions/realestate'
+      fullPath: '/solutions/realestate'
+      preLoaderRoute: typeof SolutionsRealestateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/platform': {
+      id: '/solutions/platform'
+      path: '/solutions/platform'
+      fullPath: '/solutions/platform'
+      preLoaderRoute: typeof SolutionsPlatformRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/law': {
+      id: '/solutions/law'
+      path: '/solutions/law'
+      fullPath: '/solutions/law'
+      preLoaderRoute: typeof SolutionsLawRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/solutions/hospital': {
+      id: '/solutions/hospital'
+      path: '/solutions/hospital'
+      fullPath: '/solutions/hospital'
+      preLoaderRoute: typeof SolutionsHospitalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payment/result': {
@@ -525,6 +645,12 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PSlugRoute: PSlugRoute,
   PaymentResultRoute: PaymentResultRoute,
+  SolutionsHospitalRoute: SolutionsHospitalRoute,
+  SolutionsLawRoute: SolutionsLawRoute,
+  SolutionsPlatformRoute: SolutionsPlatformRoute,
+  SolutionsRealestateRoute: SolutionsRealestateRoute,
+  SolutionsSubsidyRoute: SolutionsSubsidyRoute,
+  SolutionsTelecomRoute: SolutionsTelecomRoute,
   USlugRoute: USlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicWebhooksLemonsqueezyRoute: ApiPublicWebhooksLemonsqueezyRoute,
@@ -535,3 +661,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

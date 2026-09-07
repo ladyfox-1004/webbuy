@@ -51,13 +51,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+  TossMiniAppCardBody,
+  TossMiniAppCaseLink,
+  TossMiniAppQrDialogContent,
+} from "@/components/TossMiniApp";
+import {
+  portfolioSites,
+  portfolioByName,
+  shot,
+  KAKAO_OPENCHAT_URL,
+  TOSS_MINIAPP_URL,
+} from "@/lib/portfolio";
+import { solutions, solutionNavLabels } from "@/lib/solutions";
 import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg";
 import auctionBg from "@/assets/card-bg/auction-bg.jpg";
 import cryptoBg from "@/assets/card-bg/crypto-bg.jpg";
@@ -67,8 +74,6 @@ import marketplaceBg from "@/assets/card-bg/marketplace-bg.jpg";
 import shortsBg from "@/assets/card-bg/shorts-bg.jpg";
 import blogAutomationBg from "@/assets/card-bg/blog-automation-bg.jpg";
 import snsAutoBg from "@/assets/card-bg/sns-auto-bg.jpg";
-import tossMiniappShot from "@/assets/portfolio/toss-miniapp-kkalkkeum.jpg";
-import tossMiniappQr from "@/assets/portfolio/toss-miniapp-qr.png";
 
 
 export const Route = createFileRoute("/")({
@@ -77,6 +82,10 @@ export const Route = createFileRoute("/")({
   //    덮어써서, 루트의 검색어 중심 제목·설명이 조용히 무시된다. 실제로 그렇게 돼 있었고
   //    og:* 만 새 값이고 title 은 "AISOLUTION" 인 채로 배포됐다.
   //    홈은 사이트 대표 페이지라 루트 메타를 그대로 쓴다.
+  //    canonical 만 여기서 단다 — 루트에 두면 하위 페이지마다 두 개가 되기 때문이다.
+  head: () => ({
+    links: [{ rel: "canonical", href: "https://ai-solution.co.kr" }],
+  }),
 });
 
 type Product = {
@@ -98,6 +107,7 @@ function Index() {
       <Nav />
       <Hero />
       <Portfolio />
+      <SolutionLinks />
       <Develop />
       <Projects />
       <Capabilities />
@@ -108,97 +118,43 @@ function Index() {
   );
 }
 
-const portfolioSites = [
-  { title: "모발이식 상담 랜딩 · AISOLUTION", tag: "의료", url: "https://radiant-marzipan-765729.netlify.app/" },
-  { title: "정부지원 신청 랜딩 · AISOLUTION", tag: "신청/폼", url: "https://apply.xn--zf4b9pu4hbqu.com/" },
-  { title: "장기렌트 견적 랜딩 · AISOLUTION", tag: "견적", url: "https://funcar-rentcar.netlify.app/" },
-  { title: "법무법인 상담 랜딩 · AISOLUTION", tag: "법률", url: "https://van-pos-legal.netlify.app/" },
-  { title: "기사 일정 관리 SaaS · AISOLUTION", tag: "플랫폼", url: "https://ilzik.com/" },
-  { title: "마켓 운영대행 소개 · AISOLUTION", tag: "서비스", url: "https://psm-vip-marketing.netlify.app/" },
-  { title: "안과 시력교정 랜딩 · AISOLUTION", tag: "의료", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
-  { title: "형사전문 법무법인 랜딩 · AISOLUTION", tag: "법률", url: "https://mjcrime.netlify.app/" },
-  { title: "식당 브랜드 페이지 · AISOLUTION", tag: "요식", url: "https://thunderous-semolina-973f49.netlify.app/" },
-  { title: "오피스텔 분양 방문예약 · AISOLUTION", tag: "분양", url: "https://preeminent-longma-670789.netlify.app/" },
-  { title: "자동매매 서비스 소개 · AISOLUTION", tag: "서비스", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
-  { title: "라미네이트 센터 랜딩 · AISOLUTION", tag: "의료", url: "https://sparkly-smakager-4041fe.netlify.app/" },
-  { title: "아파트 분양 안내 · AISOLUTION", tag: "분양", url: "https://storied-licorice-8bf649.netlify.app/" },
-  { title: "남성의학 센터 랜딩 · AISOLUTION", tag: "의료", url: "https://celadon-puppy-3aca7f.netlify.app/" },
-  { title: "비뇨의학과 랜딩 · AISOLUTION", tag: "의료", url: "https://timely-cascaron-a8447e.netlify.app/" },
-  { title: "인터넷 가입 센터 랜딩 · AISOLUTION", tag: "통신", url: "https://vocal-kangaroo-bd0025.netlify.app/" },
-  { title: "GPA KOREA 브랜드 페이지 · AISOLUTION", tag: "브랜드", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
-];
-
-// 에이아이솔루션 1:1 오픈채팅 (개인 카톡 아이디 대신 영업 창구로 사용)
-const KAKAO_OPENCHAT_URL = "https://open.kakao.com/o/sd29wW8h";
-
-function shot(url: string) {
-  return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800`;
-}
-
-// 토스 미니앱은 토스 앱 컨테이너 안에서만 실행된다.
-// 그래서 이 카드만 shot() 데스크톱 스크린샷을 쓰지 않고 실제 앱 화면을 세로 목업으로 넣는다.
-const TOSS_MINIAPP_URL = "https://minion.toss.im/VlDAkiWn";
-
-// QR 다이얼로그 내용. 포트폴리오 카드와 "이런 것을 만듭니다" 사례 링크가 같이 쓴다.
-function TossMiniAppQrDialogContent() {
+// 업종별 솔루션 페이지로 보내는 링크.
+// 🚨 홈에 링크가 없으면 크롤러도 사람도 이 페이지들을 못 찾는다. 사이트맵만으로는 부족하다.
+function SolutionLinks() {
   return (
-    <DialogContent className="max-w-sm rounded-2xl border-border bg-surface">
-      <DialogTitle className="font-display text-lg font-semibold">
-        깔끔집사 · 토스 미니앱
-      </DialogTitle>
-      <DialogDescription className="text-sm text-muted-foreground">
-        토스 앱 안에서 도는 미니앱이라 PC 브라우저로는 열리지 않습니다. 폰 카메라로 아래 QR을 찍으면
-        토스에서 바로 열립니다.
-      </DialogDescription>
-      <div className="flex flex-col items-center gap-3">
-        <div className="rounded-xl border border-border bg-white p-3">
-          <img src={tossMiniappQr} alt="깔끔집사 토스 미니앱 QR 코드" className="h-64 w-64" />
-        </div>
-        <div className="text-center text-xs break-all text-muted-foreground select-all">
-          {TOSS_MINIAPP_URL}
-        </div>
-      </div>
-    </DialogContent>
-  );
-}
+    <section id="solutions" className="px-4 py-20">
+      <div className="mx-auto max-w-6xl">
+        <div className="mb-3 text-sm font-medium text-primary-glow">— Solutions</div>
+        <h2 className="font-display text-4xl font-bold tracking-tight md:text-5xl">업종별 솔루션</h2>
+        <p className="mt-4 max-w-2xl text-muted-foreground">
+          업종마다 문의가 새는 지점이 다릅니다. 어떤 기능을 달 수 있고 어디까지 확장할 수 있는지
+          업종별로 정리해 뒀습니다.
+        </p>
 
-// 카드 내용은 하나인데 넓은 화면(QR 다이얼로그)과 좁은 화면(직접 링크)에서 감싸는 요소가 다르다.
-function TossMiniAppCardBody({ Icon, action }: { Icon: LucideIcon; action: string }) {
-  return (
-    <>
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-background/40">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/25 via-surface/70 to-primary-glow/20" />
-        <div className="absolute inset-0 grid place-items-center px-3 pt-3 pb-12">
-          {/* 904x1905 원본 비율을 박스에 못박는다. w-auto로 두면 lazy 이미지가 폭 0이라 영영 안 뜬다 */}
-          <div className="aspect-[904/1905] h-full overflow-hidden rounded-xl bg-background shadow-lg ring-1 ring-border/70 transition duration-500 group-hover:scale-[1.03]">
-            <img
-              src={tossMiniappShot}
-              alt="깔끔집사 토스 미니앱 화면"
-              width={904}
-              height={1905}
-              loading="lazy"
-              className="h-full w-full"
-            />
-          </div>
+        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {solutions.map((s) => (
+            <Link
+              key={s.slug}
+              to={s.path}
+              className="glow-hover group flex flex-col rounded-2xl border border-border bg-surface/60 p-6 transition hover:border-primary/40"
+            >
+              <span className="text-xs font-medium text-primary-glow">
+                {solutionNavLabels[s.slug] ?? s.slug}
+              </span>
+              <h3 className="mt-2 font-display text-lg leading-snug font-semibold text-foreground">
+                {s.h1}
+              </h3>
+              <p className="mt-3 line-clamp-2 flex-1 text-sm leading-relaxed text-muted-foreground">
+                {s.intro}
+              </p>
+              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary-glow">
+                기능 보기 <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          ))}
         </div>
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
-        <span className="absolute left-3 top-3 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
-          Toss Mini App
-        </span>
-        <span className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-background/70 text-foreground/80 backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
-          <Icon className="h-3.5 w-3.5" />
-        </span>
-        <span className="absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] whitespace-nowrap text-muted-foreground backdrop-blur">
-          <Smartphone className="h-3 w-3" /> 모바일에서 열립니다
-        </span>
       </div>
-      <div className="flex items-center justify-between gap-3 p-4">
-        <h3 className="min-w-0 truncate font-display text-base font-semibold">
-          깔끔집사 · 청소 기사 매칭
-        </h3>
-        <span className="shrink-0 text-[11px] text-muted-foreground">{action}</span>
-      </div>
-    </>
+    </section>
   );
 }
 
@@ -533,12 +489,6 @@ const pricingGroupLabels: Record<string, string> = {
 // 카테고리를 나열하면 사려는 사람이 자기 문제를 못 찾는다. 그래서 제목은 증상,
 // 내용은 기능 단위로 쪼개고, 사례가 있는 것에는 실제 포트폴리오를 붙인다.
 
-// 사례 링크는 portfolioSites 를 이름으로 찾아 쓴다.
-// 주소를 여기 다시 적으면 두 벌이 되어 한쪽만 고쳐진다.
-const portfolioByName = new Map(
-  portfolioSites.map((s) => [s.title.split(" · ")[0], s] as const),
-);
-
 // 배지에 쓸 수 있는 숫자는 "항목 개수" 가 아니라 "실제로 사례를 걸 수 있는 항목 개수" 다.
 function countLinked(items: Capability[]) {
   return items.filter(
@@ -813,34 +763,6 @@ const integrations = [
   "카카오 오픈채팅 상담 연결",
 ];
 
-// 토스 미니앱 사례 링크. 좁은 화면은 토스로 바로, 넓은 화면은 QR 다이얼로그로.
-// (포트폴리오 카드와 같은 주소·같은 QR을 쓴다)
-function TossMiniAppCaseLink() {
-  return (
-    <>
-      <a
-        href={TOSS_MINIAPP_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary transition hover:bg-primary/10 md:hidden"
-      >
-        깔끔집사 토스 미니앱 <ExternalLink className="h-3 w-3" />
-      </a>
-      <Dialog>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="hidden items-center gap-1 rounded-full border border-primary/20 bg-primary/5 px-2.5 py-1 text-[11px] font-medium text-primary transition hover:bg-primary/10 md:inline-flex"
-          >
-            깔끔집사 토스 미니앱 <QrCode className="h-3 w-3" />
-          </button>
-        </DialogTrigger>
-        <TossMiniAppQrDialogContent />
-      </Dialog>
-    </>
-  );
-}
-
 function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean }) {
   const { openInquiry } = useInquiry();
   const cases = (item.cases ?? []).flatMap((name) => {
@@ -1044,6 +966,7 @@ function Nav() {
           {/* Desktop nav */}
           <div className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             <a href="#portfolio" className="transition hover:text-foreground">포트폴리오</a>
+            <a href="#solutions" className="transition hover:text-foreground">업종별 솔루션</a>
             <a href="#develop" className="transition hover:text-foreground">기획/개발</a>
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
             {isAdmin && <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>}
@@ -1140,6 +1063,7 @@ function Nav() {
           <div className="mt-2 rounded-3xl border border-border bg-surface/95 p-4 shadow-card backdrop-blur md:hidden">
             <div className="flex flex-col gap-1 text-sm">
               <a href="#portfolio" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">포트폴리오</a>
+              <a href="#solutions" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">업종별 솔루션</a>
               <a href="#develop" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">기획/개발</a>
               <a href="#projects" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">Projects</a>
               {isAdmin && <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>}

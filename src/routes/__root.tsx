@@ -102,7 +102,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://ai-solution.co.kr/og.png" },
     ],
     links: [
-      { rel: "canonical", href: "https://ai-solution.co.kr" },
+      // 🚨 canonical 은 여기 두지 마라. 라우트 head 의 links 는 **덮어쓰지 않고 합쳐진다**.
+      //    (meta 는 title/name/property 로 합쳐지지만 link 는 아니다.)
+      //    루트에 canonical 이 있으면 하위 페이지마다 canonical 이 두 개가 되고,
+      //    앞에 오는 루트 값(홈 주소)이 먼저 읽혀 색인이 홈으로 몰린다.
+      //    canonical 은 각 라우트에서 자기 주소로 단다(홈은 아래 index 라우트에서).
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
