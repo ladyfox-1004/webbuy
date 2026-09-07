@@ -145,6 +145,48 @@ export type Database = {
           },
         ]
       }
+      inquiries: {
+        Row: {
+          consent: boolean
+          contact: string
+          created_at: string
+          file_name: string | null
+          file_storage_path: string | null
+          id: string
+          name: string
+          notes: string
+          reference_links: string
+          services: string[]
+          source: string
+        }
+        Insert: {
+          consent?: boolean
+          contact: string
+          created_at?: string
+          file_name?: string | null
+          file_storage_path?: string | null
+          id?: string
+          name: string
+          notes?: string
+          reference_links?: string
+          services?: string[]
+          source?: string
+        }
+        Update: {
+          consent?: boolean
+          contact?: string
+          created_at?: string
+          file_name?: string | null
+          file_storage_path?: string | null
+          id?: string
+          name?: string
+          notes?: string
+          reference_links?: string
+          services?: string[]
+          source?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
