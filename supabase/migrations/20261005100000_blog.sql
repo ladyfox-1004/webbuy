@@ -38,11 +38,17 @@ create index if not exists blog_posts_published_at_idx
 create index if not exists blog_posts_status_approved_idx
   on public.blog_posts (status, approved_at);
 
--- touch_updated_at 은 20260520061039 에서 만든 공용 트리거 함수다.
+-- 🚨 공용 touch_updated_at 에 기대지 않는다. 실서비스 DB(fnvvpfunmpigfyqwoeea)에는
+--    20260520 마이그레이션 일부(products 등)가 없어서 그 함수가 있다고 보장할 수 없다.
+create or replace function public.blog_posts_touch_updated_at()
+returns trigger language plpgsql set search_path = public as $$
+begin new.updated_at = now(); return new; end;
+$$;
+
 drop trigger if exists blog_posts_updated_at on public.blog_posts;
 create trigger blog_posts_updated_at
   before update on public.blog_posts
-  for each row execute function public.touch_updated_at();
+  for each row execute function public.blog_posts_touch_updated_at();
 
 alter table public.blog_posts enable row level security;
 
