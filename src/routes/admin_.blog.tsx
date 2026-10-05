@@ -1,4 +1,4 @@
-// /admin/blog — 블로그 관리자(1단계: 수동 글 편집·발행).
+// /admin/blog — 블로그 관리자(1단계: 수동 글 편집·발행, 2·3단계: 유튜브 대기열·자동화 수동 실행).
 // 🚨 파일 이름이 admin_.blog 인 이유: admin.blog 로 두면 /admin(AdminPage) 의 자식이 되는데
 //    AdminPage 에는 <Outlet/> 이 없어 이 화면이 안 보인다(admin.review 가 그 상태다).
 // 🚨 권한 확인을 beforeLoad 에 두지 않는다. 로그인 세션은 브라우저(localStorage)에만 있어서
@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { ArrowLeft, Loader2, NotebookPen, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PostEditor, type EditorAction } from "@/components/blog/admin/PostEditor";
+import { AutomationPanel } from "@/components/blog/admin/AutomationPanel";
+import { FailedSourceList } from "@/components/blog/admin/FailedSourceList";
 import {
   createPost,
   deletePost,
@@ -37,7 +39,10 @@ export const Route = createFileRoute("/admin_/blog")({
   }),
 });
 
-const TABS: BlogStatus[] = ["review", "note", "scheduled", "published"];
+/** 글 상태 탭 4개 + 유튜브 대기열의 "실패한 영상" 탭 */
+type Tab = BlogStatus | "failed";
+const TABS: Tab[] = ["review", "note", "scheduled", "published", "failed"];
+const TAB_LABELS: Record<Tab, string> = { ...STATUS_LABELS, failed: "실패한 영상" };
 
 /** /admin 의 beforeLoad 와 같은 확인(user_roles.role='admin')을 화면이 뜬 뒤에 한다. */
 function useAdminGate(): boolean {
@@ -80,14 +85,15 @@ function AdminBlogPage() {
 }
 
 function AdminBlog() {
-  const [tab, setTab] = useState<BlogStatus>("review");
+  const [tab, setTab] = useState<Tab>("review");
   const [editing, setEditing] = useState<Editing>(null);
   const [busy, setBusy] = useState<EditorAction | null>(null);
   const qc = useQueryClient();
 
   const list = useQuery({
     queryKey: ["admin-blog", tab],
-    queryFn: () => listPostsByStatus(tab),
+    queryFn: () => listPostsByStatus(tab as BlogStatus),
+    enabled: tab !== "failed",
   });
 
   const mut = useMutation({
@@ -172,6 +178,7 @@ function AdminBlog() {
           />
         ) : (
           <>
+            <AutomationPanel />
             <div className="mb-6 flex gap-1 overflow-x-auto rounded-full border border-border bg-surface/40 p-1">
               {TABS.map((k) => (
                 <button
@@ -184,16 +191,20 @@ function AdminBlog() {
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
-                  {STATUS_LABELS[k]}
+                  {TAB_LABELS[k]}
                 </button>
               ))}
             </div>
-            <PostList
-              loading={list.isLoading}
-              error={list.error}
-              posts={list.data ?? []}
-              onSelect={(p) => setEditing(p)}
-            />
+            {tab === "failed" ? (
+              <FailedSourceList />
+            ) : (
+              <PostList
+                loading={list.isLoading}
+                error={list.error}
+                posts={list.data ?? []}
+                onSelect={(p) => setEditing(p)}
+              />
+            )}
           </>
         )}
       </div>

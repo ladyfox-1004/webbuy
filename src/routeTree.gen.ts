@@ -42,6 +42,7 @@ import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lova
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicWebhooksLemonsqueezyRouteImport } from './routes/api/public/webhooks/lemonsqueezy'
+import { Route as ApiAdminBlogRunRouteImport } from './routes/api/admin/blog/run'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -212,6 +213,11 @@ const ApiPublicWebhooksLemonsqueezyRoute =
     path: '/api/public/webhooks/lemonsqueezy',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAdminBlogRunRoute = ApiAdminBlogRunRouteImport.update({
+  id: '/api/admin/blog/run',
+  path: '/api/admin/blog/run',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -243,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/u/$slug': typeof USlugRoute
   '/blog/': typeof BlogIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -278,6 +285,7 @@ export interface FileRoutesByTo {
   '/u/$slug': typeof USlugRoute
   '/blog': typeof BlogIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/u/$slug': typeof USlugRoute
   '/blog/': typeof BlogIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -351,6 +360,7 @@ export interface FileRouteTypes {
     | '/u/$slug'
     | '/blog/'
     | '/lovable/email/suppression'
+    | '/api/admin/blog/run'
     | '/api/public/webhooks/lemonsqueezy'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/u/$slug'
     | '/blog'
     | '/lovable/email/suppression'
+    | '/api/admin/blog/run'
     | '/api/public/webhooks/lemonsqueezy'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/u/$slug'
     | '/blog/'
     | '/lovable/email/suppression'
+    | '/api/admin/blog/run'
     | '/api/public/webhooks/lemonsqueezy'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -455,6 +467,7 @@ export interface RootRouteChildren {
   USlugRoute: typeof USlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiAdminBlogRunRoute: typeof ApiAdminBlogRunRoute
   ApiPublicWebhooksLemonsqueezyRoute: typeof ApiPublicWebhooksLemonsqueezyRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -694,6 +707,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksLemonsqueezyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/blog/run': {
+      id: '/api/admin/blog/run'
+      path: '/api/admin/blog/run'
+      fullPath: '/api/admin/blog/run'
+      preLoaderRoute: typeof ApiAdminBlogRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -737,6 +757,7 @@ const rootRouteChildren: RootRouteChildren = {
   USlugRoute: USlugRoute,
   BlogIndexRoute: BlogIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiAdminBlogRunRoute: ApiAdminBlogRunRoute,
   ApiPublicWebhooksLemonsqueezyRoute: ApiPublicWebhooksLemonsqueezyRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
