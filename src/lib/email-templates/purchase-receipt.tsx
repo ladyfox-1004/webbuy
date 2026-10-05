@@ -76,7 +76,7 @@ const Email = ({
 
         <Hr style={hr} />
         <Text style={muted}>
-          문의: <Link href="mailto:nancoco0705@gmail.com" style={link}>nancoco0705@gmail.com</Link>
+          문의: <Link href="mailto:contact@ai-solution.co.kr" style={link}>contact@ai-solution.co.kr</Link>
           {' · '}전화: 02-533-1134
         </Text>
         <Text style={muted}>

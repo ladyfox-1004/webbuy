@@ -67,7 +67,7 @@ function RefundPage() {
             <h2 className="font-display text-xl font-semibold text-foreground">6. 고객센터</h2>
             <ul className="mt-2 space-y-1 leading-relaxed">
               <li>전화: 02-533-1134 (평일 10:00~18:00, 주말 및 공휴일 제외)</li>
-              <li>이메일: nancoco0705@gmail.com</li>
+              <li>이메일: contact@ai-solution.co.kr</li>
             </ul>
           </section>
         </div>
