@@ -30,6 +30,7 @@ import { Route as SolutionsRealestateRouteImport } from './routes/solutions/real
 import { Route as SolutionsPlatformRouteImport } from './routes/solutions/platform'
 import { Route as SolutionsLawRouteImport } from './routes/solutions/law'
 import { Route as SolutionsHospitalRouteImport } from './routes/solutions/hospital'
+import { Route as SolutionsAutomationRouteImport } from './routes/solutions/automation'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -149,6 +150,11 @@ const SolutionsHospitalRoute = SolutionsHospitalRouteImport.update({
   path: '/solutions/hospital',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SolutionsAutomationRoute = SolutionsAutomationRouteImport.update({
+  id: '/solutions/automation',
+  path: '/solutions/automation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PaymentResultRoute = PaymentResultRouteImport.update({
   id: '/payment/result',
   path: '/payment/result',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/solutions/automation': typeof SolutionsAutomationRoute
   '/solutions/hospital': typeof SolutionsHospitalRoute
   '/solutions/law': typeof SolutionsLawRoute
   '/solutions/platform': typeof SolutionsPlatformRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/solutions/automation': typeof SolutionsAutomationRoute
   '/solutions/hospital': typeof SolutionsHospitalRoute
   '/solutions/law': typeof SolutionsLawRoute
   '/solutions/platform': typeof SolutionsPlatformRoute
@@ -313,6 +321,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
+  '/solutions/automation': typeof SolutionsAutomationRoute
   '/solutions/hospital': typeof SolutionsHospitalRoute
   '/solutions/law': typeof SolutionsLawRoute
   '/solutions/platform': typeof SolutionsPlatformRoute
@@ -351,6 +360,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
+    | '/solutions/automation'
     | '/solutions/hospital'
     | '/solutions/law'
     | '/solutions/platform'
@@ -387,6 +397,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
+    | '/solutions/automation'
     | '/solutions/hospital'
     | '/solutions/law'
     | '/solutions/platform'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
+    | '/solutions/automation'
     | '/solutions/hospital'
     | '/solutions/law'
     | '/solutions/platform'
@@ -458,6 +470,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PSlugRoute: typeof PSlugRoute
   PaymentResultRoute: typeof PaymentResultRoute
+  SolutionsAutomationRoute: typeof SolutionsAutomationRoute
   SolutionsHospitalRoute: typeof SolutionsHospitalRoute
   SolutionsLawRoute: typeof SolutionsLawRoute
   SolutionsPlatformRoute: typeof SolutionsPlatformRoute
@@ -623,6 +636,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolutionsHospitalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/solutions/automation': {
+      id: '/solutions/automation'
+      path: '/solutions/automation'
+      fullPath: '/solutions/automation'
+      preLoaderRoute: typeof SolutionsAutomationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/payment/result': {
       id: '/payment/result'
       path: '/payment/result'
@@ -748,6 +768,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PSlugRoute: PSlugRoute,
   PaymentResultRoute: PaymentResultRoute,
+  SolutionsAutomationRoute: SolutionsAutomationRoute,
   SolutionsHospitalRoute: SolutionsHospitalRoute,
   SolutionsLawRoute: SolutionsLawRoute,
   SolutionsPlatformRoute: SolutionsPlatformRoute,
