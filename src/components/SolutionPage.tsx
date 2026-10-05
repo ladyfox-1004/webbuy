@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useInquiry } from "@/components/InquiryModal";
+import { SiteFooter } from "@/components/SiteFooter";
 import { TossMiniAppCaseCard } from "@/components/TossMiniApp";
 import { portfolioByName, shot, KAKAO_OPENCHAT_URL } from "@/lib/portfolio";
 import { solutions, solutionNavLabels, type Solution } from "@/lib/solutions";
@@ -30,6 +31,9 @@ function SolutionNav() {
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link to="/" className="hidden transition hover:text-foreground sm:inline">
               홈
+            </Link>
+            <Link to="/blog" className="transition hover:text-foreground">
+              블로그
             </Link>
             <button
               type="button"
@@ -272,19 +276,7 @@ export function SolutionPage({ solution }: { solution: Solution }) {
         </div>
       </section>
 
-      <footer className="border-t border-border/40 px-4 py-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col items-center gap-2 text-center text-xs text-muted-foreground md:flex-row md:justify-between md:text-left">
-            <div className="font-display text-sm font-semibold text-foreground">
-              에이아이솔루션 (AISOLUTION)
-            </div>
-            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-              <span>사업자등록번호 · 215-28-82229</span>
-              <span>contact@ai-solution.co.kr</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

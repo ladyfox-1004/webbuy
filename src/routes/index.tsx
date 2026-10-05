@@ -51,6 +51,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
+import { SiteFooter } from "@/components/SiteFooter";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   TossMiniAppCardBody,
@@ -113,7 +114,7 @@ function Index() {
       <Capabilities />
       <About />
       <Contact />
-      <Footer />
+      <SiteFooter />
     </div>
   );
 }
@@ -969,6 +970,7 @@ function Nav() {
             <a href="#solutions" className="transition hover:text-foreground">업종별 솔루션</a>
             <a href="#develop" className="transition hover:text-foreground">기획/개발</a>
             <a href="#projects" className="transition hover:text-foreground">Projects</a>
+            <Link to="/blog" className="transition hover:text-foreground">블로그</Link>
             {isAdmin && <Link to="/app-dev" className="transition hover:text-foreground">앱 개발</Link>}
             {isAdmin && <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>}
             <button
@@ -1066,6 +1068,7 @@ function Nav() {
               <a href="#solutions" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">업종별 솔루션</a>
               <a href="#develop" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">기획/개발</a>
               <a href="#projects" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">Projects</a>
+              <Link to="/blog" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">블로그</Link>
               {isAdmin && <Link to="/app-dev" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">앱 개발</Link>}
               {isAdmin && <Link to="/sell" onClick={() => setMobileOpen(false)} className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground">판매하기</Link>}
               <button
@@ -1380,20 +1383,3 @@ function Contact() {
     </section>
   );
 }
-
-function Footer() {
-  return (
-    <footer className="border-t border-border/40 px-4 py-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="flex flex-col items-center gap-2 text-center text-xs text-muted-foreground md:flex-row md:justify-between md:text-left">
-          <div className="font-display text-sm font-semibold text-foreground">에이아이솔루션 (AISOLUTION)</div>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-            <span>사업자등록번호 · 215-28-82229</span>
-            <span>contact@ai-solution.co.kr</span>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
-}
-

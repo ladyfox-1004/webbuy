@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as RefundRouteImport } from './routes/refund'
@@ -21,6 +22,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AppDevRouteImport } from './routes/app-dev'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as USlugRouteImport } from './routes/u.$slug'
 import { Route as SolutionsTelecomRouteImport } from './routes/solutions/telecom'
 import { Route as SolutionsSubsidyRouteImport } from './routes/solutions/subsidy'
@@ -31,6 +33,8 @@ import { Route as SolutionsHospitalRouteImport } from './routes/solutions/hospit
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminBlogRouteImport } from './routes/admin_.blog'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminReviewRouteImport } from './routes/admin.review'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -47,6 +51,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -99,6 +108,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const USlugRoute = USlugRouteImport.update({
   id: '/u/$slug',
   path: '/u/$slug',
@@ -147,6 +161,16 @@ const PSlugRoute = PSlugRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBlogRoute = AdminBlogRouteImport.update({
+  id: '/admin_/blog',
+  path: '/admin/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWebhooksRoute = AdminWebhooksRouteImport.update({
@@ -200,10 +224,13 @@ export interface FileRoutesByFullPath {
   '/refund': typeof RefundRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/review': typeof AdminReviewRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
@@ -214,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/solutions/subsidy': typeof SolutionsSubsidyRoute
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -231,10 +259,13 @@ export interface FileRoutesByTo {
   '/refund': typeof RefundRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/review': typeof AdminReviewRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
+  '/admin/blog': typeof AdminBlogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
@@ -245,6 +276,7 @@ export interface FileRoutesByTo {
   '/solutions/subsidy': typeof SolutionsSubsidyRoute
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
+  '/blog': typeof BlogIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -263,10 +295,13 @@ export interface FileRoutesById {
   '/refund': typeof RefundRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/review': typeof AdminReviewRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
+  '/admin_/blog': typeof AdminBlogRoute
+  '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
   '/payment/result': typeof PaymentResultRoute
@@ -277,6 +312,7 @@ export interface FileRoutesById {
   '/solutions/subsidy': typeof SolutionsSubsidyRoute
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -296,10 +332,13 @@ export interface FileRouteTypes {
     | '/refund'
     | '/sell'
     | '/signup'
+    | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
     | '/admin/review'
     | '/admin/webhooks'
+    | '/admin/blog'
+    | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
@@ -310,6 +349,7 @@ export interface FileRouteTypes {
     | '/solutions/subsidy'
     | '/solutions/telecom'
     | '/u/$slug'
+    | '/blog/'
     | '/lovable/email/suppression'
     | '/api/public/webhooks/lemonsqueezy'
     | '/lovable/email/queue/process'
@@ -327,10 +367,13 @@ export interface FileRouteTypes {
     | '/refund'
     | '/sell'
     | '/signup'
+    | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
     | '/admin/review'
     | '/admin/webhooks'
+    | '/admin/blog'
+    | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
@@ -341,6 +384,7 @@ export interface FileRouteTypes {
     | '/solutions/subsidy'
     | '/solutions/telecom'
     | '/u/$slug'
+    | '/blog'
     | '/lovable/email/suppression'
     | '/api/public/webhooks/lemonsqueezy'
     | '/lovable/email/queue/process'
@@ -358,10 +402,13 @@ export interface FileRouteTypes {
     | '/refund'
     | '/sell'
     | '/signup'
+    | '/sitemap.xml'
     | '/terms'
     | '/unsubscribe'
     | '/admin/review'
     | '/admin/webhooks'
+    | '/admin_/blog'
+    | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
     | '/payment/result'
@@ -372,6 +419,7 @@ export interface FileRouteTypes {
     | '/solutions/subsidy'
     | '/solutions/telecom'
     | '/u/$slug'
+    | '/blog/'
     | '/lovable/email/suppression'
     | '/api/public/webhooks/lemonsqueezy'
     | '/lovable/email/queue/process'
@@ -390,8 +438,11 @@ export interface RootRouteChildren {
   RefundRoute: typeof RefundRoute
   SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  AdminBlogRoute: typeof AdminBlogRoute
+  BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PSlugRoute: typeof PSlugRoute
   PaymentResultRoute: typeof PaymentResultRoute
@@ -402,6 +453,7 @@ export interface RootRouteChildren {
   SolutionsSubsidyRoute: typeof SolutionsSubsidyRoute
   SolutionsTelecomRoute: typeof SolutionsTelecomRoute
   USlugRoute: typeof USlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicWebhooksLemonsqueezyRoute: typeof ApiPublicWebhooksLemonsqueezyRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -423,6 +475,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -495,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/u/$slug': {
       id: '/u/$slug'
       path: '/u/$slug'
@@ -563,6 +629,20 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin_/blog': {
+      id: '/admin_/blog'
+      path: '/admin/blog'
+      fullPath: '/admin/blog'
+      preLoaderRoute: typeof AdminBlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/webhooks': {
@@ -640,8 +720,11 @@ const rootRouteChildren: RootRouteChildren = {
   RefundRoute: RefundRoute,
   SellRoute: SellRoute,
   SignupRoute: SignupRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  AdminBlogRoute: AdminBlogRoute,
+  BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PSlugRoute: PSlugRoute,
   PaymentResultRoute: PaymentResultRoute,
@@ -652,6 +735,7 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsSubsidyRoute: SolutionsSubsidyRoute,
   SolutionsTelecomRoute: SolutionsTelecomRoute,
   USlugRoute: USlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicWebhooksLemonsqueezyRoute: ApiPublicWebhooksLemonsqueezyRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,

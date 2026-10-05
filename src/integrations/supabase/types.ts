@@ -14,6 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          ai_reason: string | null
+          ai_recommend: boolean | null
+          approved_at: string | null
+          body_md: string
+          category: string
+          created_at: string
+          description: string
+          id: string
+          my_note: string | null
+          published_at: string | null
+          slug: string
+          source_channel: string | null
+          source_title: string | null
+          source_url: string | null
+          source_video_id: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ai_reason?: string | null
+          ai_recommend?: boolean | null
+          approved_at?: string | null
+          body_md?: string
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          my_note?: string | null
+          published_at?: string | null
+          slug: string
+          source_channel?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          source_video_id?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ai_reason?: string | null
+          ai_recommend?: boolean | null
+          approved_at?: string | null
+          body_md?: string
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          my_note?: string | null
+          published_at?: string | null
+          slug?: string
+          source_channel?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          source_video_id?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      blog_sources: {
+        Row: {
+          attempts: number
+          created_at: string
+          last_error: string | null
+          processed_at: string | null
+          status: string
+          title: string | null
+          video_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          last_error?: string | null
+          processed_at?: string | null
+          status?: string
+          title?: string | null
+          video_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          last_error?: string | null
+          processed_at?: string | null
+          status?: string
+          title?: string | null
+          video_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
