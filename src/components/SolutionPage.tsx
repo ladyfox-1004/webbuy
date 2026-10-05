@@ -1,4 +1,4 @@
-// 업종별 솔루션 페이지의 공용 껍데기. 6개 라우트가 데이터만 바꿔 이 컴포넌트를 쓴다.
+// 업종별 솔루션 페이지의 공용 껍데기. 모든 /solutions/* 라우트가 데이터만 바꿔 이 컴포넌트를 쓴다.
 // 🚨 페이지를 6벌 복사하지 마라. 문구 하나 고치려고 6곳을 고치게 된다.
 
 import { Link } from "@tanstack/react-router";
@@ -14,7 +14,12 @@ import { useInquiry } from "@/components/InquiryModal";
 import { SiteFooter } from "@/components/SiteFooter";
 import { TossMiniAppCaseCard } from "@/components/TossMiniApp";
 import { portfolioByName, shot, KAKAO_OPENCHAT_URL } from "@/lib/portfolio";
-import { solutions, solutionNavLabels, type Solution } from "@/lib/solutions";
+import {
+  solutions,
+  solutionNavLabels,
+  type Product,
+  type Solution,
+} from "@/lib/solutions";
 
 function SolutionNav() {
   const { openInquiry } = useInquiry();
@@ -49,6 +54,66 @@ function SolutionNav() {
   );
 }
 
+// 상품 카드 하나. "이 상품 문의하기"는 상품명을 서비스명으로 문의 모달에 넘긴다.
+function ProductCard({ product }: { product: Product }) {
+  const { openInquiry } = useInquiry();
+  return (
+    <article className="flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md sm:p-6">
+      <div className="flex flex-wrap gap-1.5">
+        {product.audience.map((a) => (
+          <span
+            key={a}
+            className="rounded-full bg-primary/10 px-2.5 py-1 text-[11px] leading-none font-medium text-primary"
+          >
+            {a}
+          </span>
+        ))}
+      </div>
+      <h3 className="mt-3 font-display text-lg leading-snug font-semibold text-slate-900">
+        {product.name}
+      </h3>
+      <p className="mt-2 text-sm leading-relaxed text-slate-600">{product.summary}</p>
+
+      <ul className="mt-4 space-y-2">
+        {product.does.map((d) => (
+          <li key={d} className="flex items-start gap-2 text-sm text-slate-700">
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{d}</span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {product.integrations.map((i) => (
+          <span
+            key={i}
+            className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] leading-none text-slate-600"
+          >
+            {i}
+          </span>
+        ))}
+      </div>
+
+      {product.note && (
+        <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-slate-500">
+          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+          <span>{product.note}</span>
+        </p>
+      )}
+
+      <div className="mt-auto pt-5">
+        <button
+          type="button"
+          onClick={() => openInquiry(product.name)}
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
+        >
+          <MessageCircle className="h-4 w-4" /> 이 상품 문의하기
+        </button>
+      </div>
+    </article>
+  );
+}
+
 export function SolutionPage({ solution }: { solution: Solution }) {
   const { openInquiry } = useInquiry();
 
@@ -58,6 +123,8 @@ export function SolutionPage({ solution }: { solution: Solution }) {
     return site ? [{ name, url: site.url }] : [];
   });
   const others = solutions.filter((s) => s.slug !== solution.slug);
+  const products = solution.products ?? [];
+  const hasProducts = products.length > 0;
 
   return (
     <div className="min-h-screen text-foreground">
@@ -90,14 +157,40 @@ export function SolutionPage({ solution }: { solution: Solution }) {
               <MessageCircle className="h-4 w-4" /> 상담 문의하기
             </button>
             <a
-              href="#features"
+              href={hasProducts ? "#products" : "#features"}
               className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-6 py-3 text-sm font-medium text-foreground transition hover:bg-surface"
             >
-              달 수 있는 기능 보기 <ArrowUpRight className="h-4 w-4" />
+              {hasProducts ? "상품 목록 보기" : "달 수 있는 기능 보기"}{" "}
+              <ArrowUpRight className="h-4 w-4" />
             </a>
           </div>
         </div>
       </section>
+
+      {/* ── 상품 목록 (products 가 있는 페이지만) ───────────────── */}
+      {hasProducts && (
+        <section id="products" className="bg-slate-50 px-4 pt-20 text-slate-900 md:pt-24">
+          <div className="mx-auto max-w-6xl">
+            <div className="text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-medium text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                Products
+              </span>
+              <h2 className="mt-5 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                상품 <span className="text-gradient">목록</span>
+              </h2>
+              <p className="mt-4 text-sm text-slate-600 md:text-base">
+                바로 시작할 수 있게 묶어 둔 자동화입니다. 업무에 맞춰 조정합니다.
+              </p>
+            </div>
+            <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {products.map((p) => (
+                <ProductCard key={p.name} product={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── 본체: 달 수 있는 기능 ────────────────────────────────── */}
       <section id="features" className="bg-slate-50 px-4 py-20 text-slate-900 md:py-24">

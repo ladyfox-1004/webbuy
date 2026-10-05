@@ -20,6 +20,24 @@ export type FeatureGroup = {
   items: string[];
 };
 
+/**
+ * 바로 문의할 수 있는 상품 단위. 지금은 /solutions/automation 에만 있다.
+ * 🚨 금액·기간을 넣지 않는다. 해 본 적 없는 연동을 "된다"고 적지 않는다(제약은 note 에).
+ */
+export type Product = {
+  name: string;
+  /** 한 문장 */
+  summary: string;
+  /** 대상 업종 칩 */
+  audience: string[];
+  /** 하는 일 3~5개 */
+  does: string[];
+  /** 쓰는 API·서비스 칩 */
+  integrations: string[];
+  /** 주의 한 줄. 없으면 렌더하지 않는다 */
+  note?: string;
+};
+
 /** 실제로 존재하는 라우트 경로만 적는다. 라우트를 추가/삭제하면 여기도 같이 고친다. */
 export type SolutionPath =
   | "/solutions/hospital"
@@ -27,7 +45,8 @@ export type SolutionPath =
   | "/solutions/realestate"
   | "/solutions/telecom"
   | "/solutions/subsidy"
-  | "/solutions/platform";
+  | "/solutions/platform"
+  | "/solutions/automation";
 
 export type Solution = {
   /** 라우트 마지막 조각. /solutions/<slug> */
@@ -44,6 +63,8 @@ export type Solution = {
   eyebrow: string;
   /** 도입 2~3문장 — 그 업종에서 문의가 새는 지점 */
   intro: string;
+  /** 상품 목록. 있으면 featureGroups 위에 카드로 렌더한다 */
+  products?: Product[];
   /** 이 페이지의 본체 */
   featureGroups: FeatureGroup[];
   /** 랜딩에서 시스템으로 넘어가는 경로 */
@@ -446,11 +467,123 @@ export const solutions: Solution[] = [
       "엑셀·단톡방·전화 중 어디에서 막히는지 말씀해 주시면, 어느 범위까지 시스템으로 옮길지 정리해 드립니다.",
     inquirySubject: "예약·매칭 플랫폼 개발",
   },
+  {
+    slug: "automation",
+    path: "/solutions/automation",
+    h1: "AI 자동화·API 연동 개발",
+    metaTitle: "AI 자동화·API 연동 개발 | 에이아이솔루션",
+    metaDescription:
+      "문의 분류와 카카오 알림톡 연동, 예약 알림, 유튜브·뉴스 요약 블로그 자동화, 리뷰 답글 초안까지. 이미 쓰는 서비스의 API를 엮어 반복 업무를 자동으로 돌게 만드는 AI 자동화·업무 자동화 개발입니다.",
+    eyebrow: "AI 자동화 · API 연동",
+    intro:
+      "문의 확인과 분류, 알림 발송, 블로그 글쓰기, 리뷰 확인. 매일 반복되는 일이 아직 사람 손에 묶여 있습니다. 이미 쓰고 계신 서비스들의 API를 엮어, 이런 일이 사람 없이도 돌게 만듭니다.",
+    products: [
+      {
+        name: "유튜브·뉴스 자동 요약 블로그",
+        summary: "지정한 영상과 기사를 AI가 요약해 블로그 초안을 만들고, 승인하면 예약 발행합니다.",
+        audience: ["병원", "법무법인", "부동산", "전문직"],
+        does: [
+          "지정한 유튜브 재생목록·뉴스 링크를 AI가 요약해 블로그 초안 작성",
+          "담당자 승인 후 예약 발행",
+          "검색 노출 정보·사이트맵 자동 반영",
+          "출처 표기",
+        ],
+        integrations: ["YouTube", "Gemini 등 AI", "홈페이지 DB"],
+        note: "원문 번역 전재가 아니라 요약·해설 형식으로 작성하며, 발행 전 사람이 확인합니다.",
+      },
+      {
+        name: "문의 자동 분류 + 카카오 알림",
+        summary: "들어온 문의를 AI가 분류하고, 담당자에게 바로 알립니다.",
+        audience: ["모든 업종"],
+        does: [
+          "홈페이지·랜딩 문의를 AI가 유형·긴급도로 분류",
+          "담당자에게 카카오 알림톡·이메일 즉시 알림",
+          "문의 기록 한곳에 저장",
+        ],
+        integrations: ["AI", "카카오 알림톡", "이메일"],
+        note: "카카오 알림톡은 카카오 비즈니스 채널과 발송 대행사 계약이 필요합니다(발주처 명의).",
+      },
+      {
+        name: "예약·노쇼 방지 자동 알림",
+        summary: "예약이 잡히면 확정부터 당일까지 알림이 알아서 나갑니다.",
+        audience: ["병원", "미용", "상담업"],
+        does: [
+          "예약 확정·전날·당일 알림 자동 발송",
+          "알림 안에 변경·취소 링크",
+          "재방문 리마인드",
+        ],
+        integrations: ["문자", "카카오 알림톡", "예약 DB"],
+      },
+      {
+        name: "매물·상품 소개글 자동 작성",
+        summary: "기본 정보만 넣으면 AI가 소개글 초안을 채널별로 만들어 둡니다.",
+        audience: ["부동산", "쇼핑몰"],
+        does: [
+          "면적·가격·특징 등 기본 정보로 소개글·검색용 요약·태그 초안 작성",
+          "채널별 길이에 맞춘 버전 생성",
+          "담당자 검토 후 게시",
+        ],
+        integrations: ["AI", "홈페이지·관리자 DB"],
+        note: "가격·면적 등 사실 정보는 담당자가 최종 확인합니다.",
+      },
+      {
+        name: "리뷰 모니터링·답글 초안",
+        summary: "새 리뷰를 모아 알리고, 답글 초안까지 준비해 둡니다.",
+        audience: ["병원", "식당", "매장"],
+        does: [
+          "새 리뷰 수집·알림",
+          "부정 리뷰 우선 표시",
+          "AI 답글 초안 작성 후 담당자 승인",
+        ],
+        integrations: ["공식 API 제공 플랫폼(구글 비즈니스 프로필 등)", "AI"],
+        note: "공식 API가 없는 플랫폼은 자동 수집 범위가 제한될 수 있어 상담 때 확인합니다.",
+      },
+    ],
+    featureGroups: [
+      {
+        title: "AI 연동",
+        items: ["요약", "분류", "초안 작성", "이미지·영상 분석", "태그·키워드 추출"],
+      },
+      {
+        title: "메시지·알림",
+        items: ["카카오 알림톡", "문자", "이메일", "슬랙"],
+      },
+      {
+        title: "데이터 연동",
+        items: ["홈페이지 DB", "구글 시트", "외부 서비스 API", "웹훅"],
+      },
+      {
+        title: "자동 실행",
+        items: ["예약 실행", "대기열·재시도", "실패 알림"],
+      },
+      {
+        title: "운영·보안",
+        items: [
+          "발주처 명의 계정·키",
+          "비밀값 서버 보관",
+          "사용량 한도 설정",
+          "운영 로그",
+        ],
+      },
+    ],
+    nextSteps: [
+      "반복 업무 하나를 골라 자동화",
+      "사람 승인 단계를 두고 안정화",
+      "다른 업무로 확장",
+    ],
+    nextStepsNote:
+      "처음부터 전부 자동으로 돌리지 않습니다. 업무 하나를 골라 사람이 확인하는 단계를 두고 돌려 본 뒤 넓혀 갑니다. 구축 후 월 운영 관리로 오류·API 변경·한도에 대응하며, API 사용료는 발주처 명의 계정에서 실비로 결제됩니다.",
+    cases: [],
+    ctaTitle: "어떤 일부터 자동으로 돌릴까요?",
+    ctaBody:
+      "매일 손이 가는 일과 지금 쓰고 계신 서비스를 알려주시면, 어디까지 자동으로 묶을 수 있는지 정리해 드립니다.",
+    inquirySubject: "AI 자동화·API 연동",
+  },
 ];
 
 export const solutionBySlug = new Map(solutions.map((s) => [s.slug, s] as const));
 
-/** 홈에서 6개 페이지로 보내는 링크에 쓸 짧은 이름 */
+/** 홈에서 솔루션 페이지로 보내는 링크에 쓸 짧은 이름 */
 export const solutionNavLabels: Record<string, string> = {
   hospital: "병원·의료",
   law: "법무법인",
@@ -458,4 +591,5 @@ export const solutionNavLabels: Record<string, string> = {
   telecom: "통신·렌트",
   subsidy: "정부지원 신청",
   platform: "예약·매칭 플랫폼",
+  automation: "AI 자동화",
 };

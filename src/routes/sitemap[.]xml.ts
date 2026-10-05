@@ -17,6 +17,7 @@ const STATIC_ENTRIES: Entry[] = [
   { loc: `${SITE_URL}/solutions/telecom`, changefreq: "monthly", priority: "0.8" },
   { loc: `${SITE_URL}/solutions/subsidy`, changefreq: "monthly", priority: "0.8" },
   { loc: `${SITE_URL}/solutions/platform`, changefreq: "monthly", priority: "0.8" },
+  { loc: `${SITE_URL}/solutions/automation`, changefreq: "monthly", priority: "0.8" },
   { loc: `${SITE_URL}/privacy`, changefreq: "yearly", priority: "0.3" },
   { loc: `${SITE_URL}/refund`, changefreq: "yearly", priority: "0.3" },
 ];
