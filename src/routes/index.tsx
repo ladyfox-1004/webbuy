@@ -238,7 +238,7 @@ function Portfolio() {
         <div className="mt-10 flex flex-col items-center gap-3 rounded-3xl border border-border bg-surface/40 p-8 text-center md:flex-row md:justify-between md:text-left">
           <div>
             <div className="font-display text-lg font-semibold">이런 스타일로 내 사이트가 필요하신가요?</div>
-            <div className="text-sm text-muted-foreground">아래 컬렉션에서 즉시 결제하거나, 맞춤 제작을 문의하세요.</div>
+            <div className="text-sm text-muted-foreground">아래 컬렉션에서 마음에 드는 스타일을 고르고, 맞춤 제작을 문의하세요.</div>
           </div>
           <div className="flex gap-2">
             <a href="#projects" className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-2.5 text-sm font-medium text-primary-foreground">
