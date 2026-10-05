@@ -49,7 +49,7 @@ function RefundPage() {
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">4. 환불 절차</h2>
             <ol className="mt-2 list-decimal space-y-1 pl-6 leading-relaxed">
-              <li>고객센터(02-533-1134) 또는 이메일로 환불 요청</li>
+              <li>이메일(contact@ai-solution.co.kr)로 환불 요청</li>
               <li>결제 정보 및 환불 사유 확인</li>
               <li>승인 후 영업일 기준 3~5일 이내 결제 수단으로 환불</li>
             </ol>
@@ -66,7 +66,6 @@ function RefundPage() {
           <section>
             <h2 className="font-display text-xl font-semibold text-foreground">6. 고객센터</h2>
             <ul className="mt-2 space-y-1 leading-relaxed">
-              <li>전화: 02-533-1134 (평일 10:00~18:00, 주말 및 공휴일 제외)</li>
               <li>이메일: contact@ai-solution.co.kr</li>
             </ul>
           </section>

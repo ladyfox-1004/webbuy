@@ -255,7 +255,6 @@ function AppDevPage() {
             <p className="mt-4 text-muted-foreground">1일 이내 견적 안내. 계약금 50%로 프로젝트 시작.</p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Link to="/" className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">견적 문의하기</Link>
-              <a href="tel:02-533-1134" className="rounded-full border border-border bg-surface/40 px-6 py-3 text-sm transition hover:bg-surface">02-533-1134</a>
             </div>
           </div>
         </div>

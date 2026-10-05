@@ -80,7 +80,6 @@ function PrivacyPage() {
             <h2 className="font-display text-xl font-semibold text-foreground">6. 개인정보 보호책임자</h2>
             <ul className="mt-2 space-y-1 leading-relaxed">
               <li>책임자: 이서연 (대표)</li>
-              <li>연락처: 02-533-1134</li>
               <li>이메일: contact@ai-solution.co.kr</li>
             </ul>
           </section>
