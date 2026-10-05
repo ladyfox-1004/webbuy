@@ -1360,10 +1360,10 @@ function Contact() {
                 <MessageCircle className="h-4 w-4" /> 문의하기
               </button>
               <a
-                href="mailto:contact@ai-solution.space"
+                href="mailto:contact@ai-solution.co.kr"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/60 px-6 py-3 font-medium text-foreground transition hover:bg-surface"
               >
-                <Mail className="h-4 w-4 text-primary-glow" /><span>contact@ai-solution.space</span>
+                <Mail className="h-4 w-4 text-primary-glow" /><span>contact@ai-solution.co.kr</span>
               </a>
               <a
                 href={KAKAO_OPENCHAT_URL}
@@ -1389,7 +1389,7 @@ function Footer() {
           <div className="font-display text-sm font-semibold text-foreground">에이아이솔루션 (AISOLUTION)</div>
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             <span>사업자등록번호 · 215-28-82229</span>
-            <span>contact@ai-solution.space</span>
+            <span>contact@ai-solution.co.kr</span>
           </div>
         </div>
       </div>

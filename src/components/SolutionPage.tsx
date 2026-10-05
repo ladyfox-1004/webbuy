@@ -280,7 +280,7 @@ export function SolutionPage({ solution }: { solution: Solution }) {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
               <span>사업자등록번호 · 215-28-82229</span>
-              <span>contact@ai-solution.space</span>
+              <span>contact@ai-solution.co.kr</span>
             </div>
           </div>
         </div>
