@@ -1,6 +1,7 @@
 // 실제 납품 사례 블록. 데이터는 src/lib/solutions.ts 의 caseStudy 에 있다.
 // 🚨 고객사는 익명이다. 실제 대시보드 스크린샷·상품 사진·상품명을 넣지 마라.
-//    화면 예시는 아래 DashboardMockup 처럼 코드로 그린 도식만 쓴다(글자 대신 회색 막대).
+//    화면 예시는 아래 DashboardMockup 처럼 코드로 그린 도식만 쓴다.
+//    상품명 대신 "아우터 · 단품" 같은 일반 분류 라벨, 사진 대신 아이콘 타일을 쓴다(빈 회색 막대는 미완성처럼 보인다).
 // 홈 대표 카드(CaseStudyFeatureCard)와 /solutions/automation 사례 블록(CaseStudySection)이 같이 쓴다.
 
 import { Link } from "@tanstack/react-router";
@@ -12,6 +13,7 @@ import {
   DownloadCloud,
   Info,
   RefreshCw,
+  Shirt,
   ShieldCheck,
   Store,
   UserCheck,
@@ -100,13 +102,30 @@ function StepFlow({ steps }: { steps: CaseStudyStep[] }) {
 }
 
 // ── 승인 화면 도식 ──────────────────────────────────────────────
-// 실제 화면이 아니다. 상품명·사진 자리는 회색 막대와 빈 상자로만 그린다.
+// 실제 화면이 아니다. 상품명은 일반 분류 라벨로, 사진은 아이콘 타일로만 그린다.
+// 🚨 브랜드명·실제 상품명·가격을 넣지 마라.
+const mockRows = [
+  {
+    label: "아우터 · 단품",
+    sub: "사이즈 4종 · 이미지 5장",
+    season: "FW 시즌",
+    tile: "from-primary/25 to-primary-glow/40 text-primary",
+  },
+  {
+    label: "니트 · 색상 묶음",
+    sub: "색상 3종 · 사이즈 3종",
+    season: "FW 시즌",
+    bundle: ["text-rose-400", "text-slate-500", "text-amber-500"],
+  },
+  {
+    label: "티셔츠 · 단품",
+    sub: "사이즈 5종 · 이미지 4장",
+    season: "간절기",
+    tile: "from-sky-100 to-sky-200 text-sky-600",
+  },
+];
+
 function DashboardMockup() {
-  const rows = [
-    { kind: "단품", w: "w-3/5" },
-    { kind: "색상 묶음", w: "w-1/2", bundle: true },
-    { kind: "단품", w: "w-2/3" },
-  ];
   return (
     <div
       className="overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xl"
@@ -115,37 +134,52 @@ function DashboardMockup() {
     >
       {/* 창 상단 */}
       <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-        <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-        <span className="ml-2 text-[11px] font-medium text-slate-500">승인 대기</span>
+        <span className="h-2.5 w-2.5 rounded-full bg-rose-300" />
+        <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
+        <span className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
+        <span className="ml-2 text-[11px] font-medium text-slate-600">
+          승인 대기 <span className="text-primary">{mockRows.length}건</span>
+        </span>
         <span className="ml-auto rounded-full bg-slate-200 px-2 py-0.5 text-[10px] text-slate-500">
           구성 예시
         </span>
       </div>
 
       <div className="space-y-2.5 p-4">
-        {rows.map((r, i) => (
-          <div key={i} className="flex items-center gap-3 rounded-xl border border-slate-200 p-2.5">
-            {/* 사진 자리 */}
+        {mockRows.map((r) => (
+          <div
+            key={r.label}
+            className="flex items-center gap-3 rounded-xl border border-slate-200 p-2.5"
+          >
+            {/* 사진 자리: 아이콘 타일 */}
             {r.bundle ? (
-              <div className="grid h-12 w-12 shrink-0 grid-cols-2 gap-0.5 overflow-hidden rounded-lg">
-                <span className="bg-slate-300" />
-                <span className="bg-slate-200" />
-                <span className="bg-slate-200" />
-                <span className="bg-slate-300" />
+              <div className="grid h-12 w-12 shrink-0 grid-cols-2 gap-0.5 overflow-hidden rounded-lg bg-slate-100 p-0.5">
+                {r.bundle.map((c) => (
+                  <span key={c} className="grid place-items-center rounded-[4px] bg-white">
+                    <Shirt className={`h-3.5 w-3.5 ${c}`} />
+                  </span>
+                ))}
+                <span className="grid place-items-center rounded-[4px] bg-white text-[9px] font-semibold text-slate-400">
+                  +
+                </span>
               </div>
             ) : (
-              <div className="h-12 w-12 shrink-0 rounded-lg bg-slate-200" />
+              <div
+                className={`grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-gradient-to-br ${r.tile}`}
+              >
+                <Shirt className="h-6 w-6" />
+              </div>
             )}
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <div className={`h-2.5 rounded-full bg-slate-300 ${r.w}`} />
-              <div className="flex flex-wrap gap-1">
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-[13px] leading-tight font-semibold text-slate-800">
+                {r.label}
+              </div>
+              <div className="mt-0.5 truncate text-[10.5px] leading-tight text-slate-500">
+                {r.sub}
+              </div>
+              <div className="mt-1.5 flex flex-wrap gap-1">
                 <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] leading-none text-primary">
-                  {r.kind}
-                </span>
-                <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] leading-none text-slate-500">
-                  시즌 판정
+                  {r.season}
                 </span>
                 <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] leading-none text-emerald-700">
                   <Check className="h-2.5 w-2.5" /> 검수 통과

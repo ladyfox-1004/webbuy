@@ -308,46 +308,267 @@ function PillarCard({ p, wide }: { p: Pillar; wide?: boolean }) {
   );
 }
 
-// DOOH 카드의 도식. 실제 화면이 아니라 "여러 스크린을 한 곳에서 편성한다"는 구조만 그린다.
+// DOOH 카드의 도식. 실제 운영 화면이 아니라 "여러 스크린을 한 곳에서 편성한다"는 구조를 그린 예시다.
+// 🚨 실제 브랜드·고객사 이름, 가격, 실적 숫자를 넣지 마라. 칩의 숫자는 이 그림 안의 개수(스크린 6면,
+//    송출 중 4면, 편성 3개)와 맞춘다. 문구는 "NEW SEASON" 같은 일반 카피만 쓴다.
+type ScreenTile = {
+  loc: string;
+  status: "live" | "idle" | "check";
+  /** live 일 때 현재 소재 진행률(%) */
+  progress?: number;
+  meta?: string;
+};
+
+const signageScreens: ScreenTile[] = [
+  { loc: "외벽 미디어파사드", status: "live", progress: 62 },
+  { loc: "로비 사이니지", status: "live", progress: 28 },
+  { loc: "엘리베이터", status: "live", progress: 85 },
+  { loc: "주차장 입구", status: "idle", meta: "15:00 시작" },
+  { loc: "1F 리테일", status: "live", progress: 44 },
+  { loc: "옥상 LED", status: "check", meta: "원격 점검" },
+];
+
+// 타일 안 "광고 소재 미리보기". 그라데이션 위 도형 + 짧은 일반 카피.
+function ScreenCreative({ i }: { i: number }) {
+  switch (i) {
+    case 0:
+      return (
+        <div className="absolute inset-0 bg-gradient-to-br from-primary to-primary-glow">
+          <span className="absolute -top-5 -right-4 h-16 w-16 rounded-full bg-white/25" />
+          <span className="absolute top-2 right-2.5 h-5 w-5 rounded-full border-2 border-white/50" />
+          <div className="absolute bottom-1.5 left-2 leading-none text-white">
+            <div className="text-[8px] tracking-[0.18em] opacity-80">FW COLLECTION</div>
+            <div className="mt-0.5 font-display text-[12px] font-extrabold tracking-tight">
+              NEW SEASON
+            </div>
+          </div>
+        </div>
+      );
+    case 1:
+      return (
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-primary/70">
+          <span className="absolute top-0 right-0 h-full w-1/3 bg-gradient-to-b from-primary-glow/60 to-transparent" />
+          <div className="absolute bottom-1.5 left-2 leading-none text-white">
+            <div className="text-[8px] tracking-[0.18em] opacity-70">WELCOME</div>
+            <div className="mt-0.5 font-display text-[12px] font-extrabold">OPEN 10:00</div>
+          </div>
+        </div>
+      );
+    case 2:
+      return (
+        <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/80 to-primary/80">
+          <span className="absolute -bottom-6 -left-3 h-14 w-24 rotate-[-18deg] bg-white/15" />
+          <span className="absolute top-1 right-1 grid h-5 w-5 place-items-center rounded-md bg-white/90 text-[9px] font-bold text-primary">
+            2F
+          </span>
+          <div className="absolute bottom-1.5 left-2 leading-none text-white">
+            <div className="text-[8px] tracking-[0.14em] opacity-80">THIS WEEKEND</div>
+            <div className="mt-0.5 font-display text-[12px] font-extrabold tracking-tight">
+              EVENT
+            </div>
+          </div>
+        </div>
+      );
+    case 3:
+      return (
+        <div className="absolute inset-0 bg-surface">
+          <div className="absolute inset-0 grid place-items-center pt-2">
+            <div className="text-center leading-none">
+              <div className="font-display text-[11px] font-bold text-foreground/50">PARKING</div>
+              <div className="mt-1 text-[8px] text-muted-foreground">다음 편성 대기</div>
+            </div>
+          </div>
+        </div>
+      );
+    case 4:
+      return (
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-400/70 to-primary/70">
+          <div className="absolute top-1.5 right-1.5 grid grid-cols-2 gap-0.5">
+            <span className="h-2.5 w-2.5 rounded-sm bg-white/70" />
+            <span className="h-2.5 w-2.5 rounded-sm bg-white/30" />
+            <span className="h-2.5 w-2.5 rounded-sm bg-white/30" />
+            <span className="h-2.5 w-2.5 rounded-sm bg-white/70" />
+          </div>
+          <div className="absolute bottom-1.5 left-2 leading-none text-white">
+            <div className="text-[8px] tracking-[0.18em] opacity-80">1F STORE</div>
+            <div className="mt-0.5 font-display text-[12px] font-extrabold tracking-tight">
+              NEW ARRIVAL
+            </div>
+          </div>
+        </div>
+      );
+    default:
+      return (
+        <div className="absolute inset-0 bg-[repeating-linear-gradient(135deg,oklch(0.3_0.06_70/0.5)_0_6px,oklch(0.18_0.03_280)_6px_12px)]">
+          <div className="absolute inset-0 grid place-items-center pt-2">
+            <span className="inline-flex items-center gap-1 rounded bg-background/85 px-1.5 py-0.5 text-[9px] font-medium text-amber-200">
+              <Wrench className="h-2.5 w-2.5" /> 점검 중
+            </span>
+          </div>
+        </div>
+      );
+  }
+}
+
+const statusChip = {
+  live: {
+    label: "송출 중",
+    cls: "text-emerald-300",
+    dot: "bg-emerald-400 motion-safe:animate-pulse",
+  },
+  idle: { label: "대기", cls: "text-slate-300", dot: "bg-slate-400" },
+  check: { label: "점검", cls: "text-amber-200", dot: "bg-amber-400" },
+} as const;
+
+// 편성 타임라인. 범위 05~23시(18시간), 그림 속 현재 시각은 13:20 으로 고정한다.
+const TL_START = 5;
+const TL_SPAN = 18;
+const TL_TICKS = [6, 9, 12, 15, 18, 21];
+const tlPos = (h: number) => `${((h - TL_START) / TL_SPAN) * 100}%`;
+const TL_NOW = 13 + 20 / 60;
+const timeline = [
+  { name: "캠페인 A · 아침 편성", from: 7, to: 11, state: "done" },
+  { name: "캠페인 B · 낮 편성", from: 11, to: 15, state: "live" },
+  { name: "캠페인 C · 저녁 편성", from: 17, to: 22, state: "next" },
+] as const;
+const timelineState = {
+  done: { label: "완료", text: "text-muted-foreground", bar: "bg-primary/40" },
+  live: {
+    label: "송출 중",
+    text: "text-emerald-300",
+    bar: "bg-gradient-to-r from-primary to-primary-glow shadow-[0_0_12px_-2px_var(--primary-glow)]",
+  },
+  next: {
+    label: "예약",
+    text: "text-primary-glow",
+    bar: "border border-dashed border-primary-glow/70 bg-primary/15",
+  },
+};
+
 function SignageIllustration() {
-  const screens = [
-    "from-primary/70 to-primary-glow/40",
-    "from-primary-glow/50 to-primary/20",
-    "from-primary/40 to-transparent",
-    "from-primary-glow/60 to-primary/30",
-    "from-primary/30 to-primary-glow/20",
-    "from-primary-glow/40 to-transparent",
-  ];
+  const liveCount = signageScreens.filter((s) => s.status === "live").length;
   return (
     <div aria-hidden className="relative mt-10 lg:mt-0">
-      <div className="rounded-2xl border border-border bg-background/70 p-4 md:p-5">
-        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1.5 font-medium text-foreground">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+      <div className="rounded-2xl border border-border bg-background/80 p-3 shadow-xl sm:p-4 md:p-5">
+        {/* 상단 바 */}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 motion-safe:animate-pulse" />
             통합 송출 콘솔
           </span>
-          <span>스크린 · 편성 · 스케줄</span>
+          <div className="flex flex-wrap gap-1 text-[10px] leading-none">
+            <span className="rounded-full border border-border bg-surface/80 px-2 py-1 text-foreground/80">
+              스크린 {signageScreens.length}
+            </span>
+            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-emerald-300">
+              송출 중 {liveCount}
+            </span>
+            <span className="rounded-full border border-border bg-surface/80 px-2 py-1 text-foreground/80">
+              오늘 편성 {timeline.length}
+            </span>
+          </div>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-2.5">
-          {screens.map((g, i) => (
-            <div
-              key={i}
-              className={`aspect-[16/10] rounded-lg border border-border/70 bg-gradient-to-br ${g}`}
-            />
-          ))}
+
+        {/* 스크린 타일: 좁은 화면 2열, 넓은 화면 3열 */}
+        <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-2.5">
+          {signageScreens.map((s, i) => {
+            const chip = statusChip[s.status];
+            return (
+              <div key={s.loc} className="rounded-lg border border-border/80 bg-surface/50 p-1.5">
+                <div className="relative aspect-[16/9] overflow-hidden rounded-md">
+                  <ScreenCreative i={i} />
+                  <span
+                    className={`absolute top-1 left-1 inline-flex items-center gap-1 rounded bg-background/75 px-1 py-0.5 text-[9px] leading-none font-medium backdrop-blur ${chip.cls}`}
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full ${chip.dot}`} />
+                    {chip.label}
+                  </span>
+                </div>
+                <div className="mt-1.5 truncate px-0.5 text-[10.5px] leading-tight font-medium text-foreground/90">
+                  {s.loc}
+                </div>
+                <div className="mt-1 flex h-2.5 items-center px-0.5">
+                  {s.status === "live" ? (
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-border">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-primary to-primary-glow"
+                        style={{ width: `${s.progress}%` }}
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-[9.5px] leading-none text-muted-foreground">
+                      {s.meta}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
-        <div className="mt-4 space-y-2">
-          {[
-            ["w-[46%]", "ml-[4%]"],
-            ["w-[30%]", "ml-[30%]"],
-            ["w-[38%]", "ml-[56%]"],
-          ].map(([w, ml], i) => (
-            <div key={i} className="h-2.5 rounded-full bg-surface">
-              <div
-                className={`h-2.5 rounded-full bg-gradient-to-r from-primary to-primary-glow ${w} ${ml}`}
-              />
+
+        {/* 편성 타임라인 */}
+        <div className="mt-3 rounded-xl border border-border/70 bg-surface/40 px-3 pt-2.5 pb-3">
+          <div className="flex items-center justify-between text-[10.5px] leading-none">
+            <span className="font-semibold text-foreground/90">오늘 편성</span>
+            <span className="inline-flex items-center gap-1 text-rose-300">
+              <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
+              현재 13:20
+            </span>
+          </div>
+          <div className="relative mt-2.5">
+            {/* 시간 눈금 */}
+            <div className="relative h-3 text-[9.5px] leading-none text-muted-foreground tabular-nums">
+              {TL_TICKS.map((h) => (
+                <span
+                  key={h}
+                  className="absolute top-0 -translate-x-1/2"
+                  style={{ left: tlPos(h) }}
+                >
+                  {String(h).padStart(2, "0")}
+                </span>
+              ))}
             </div>
-          ))}
+            <div className="relative space-y-2 pt-1.5">
+              {TL_TICKS.map((h) => (
+                <span
+                  key={h}
+                  className="absolute top-0 bottom-0 w-px bg-border/60"
+                  style={{ left: tlPos(h) }}
+                />
+              ))}
+              {timeline.map((t) => {
+                const st = timelineState[t.state];
+                return (
+                  <div key={t.name} className="relative">
+                    <div className="flex items-center justify-between gap-2 text-[10.5px] leading-none">
+                      <span className="truncate rounded bg-background/70 pr-1 text-foreground/85">
+                        {t.name}
+                      </span>
+                      <span className={`shrink-0 rounded bg-background/70 pl-1 ${st.text}`}>
+                        {st.label}
+                      </span>
+                    </div>
+                    <div className="relative mt-1 h-2 rounded-full bg-background/60">
+                      <span
+                        className={`absolute top-0 h-2 rounded-full ${st.bar}`}
+                        style={{
+                          left: tlPos(t.from),
+                          width: `${((t.to - t.from) / TL_SPAN) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+              {/* 현재 시각 표시선 */}
+              <span
+                className="absolute top-0 -bottom-1 w-px bg-rose-400"
+                style={{ left: tlPos(TL_NOW) }}
+              >
+                <span className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-rose-400 motion-safe:animate-pulse" />
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -560,11 +781,8 @@ function Portfolio() {
 // 카테고리를 나열하면 사려는 사람이 자기 문제를 못 찾는다. 그래서 제목은 증상,
 // 내용은 기능 단위로 쪼개고, 사례가 있는 것에는 실제 포트폴리오를 붙인다.
 
-// 배지에 쓸 수 있는 숫자는 "항목 개수" 가 아니라 "실제로 사례를 걸 수 있는 항목 개수" 다.
-function countLinked(items: Capability[]) {
-  return items.filter((c) => (c.cases ?? []).some((n) => portfolioByName.has(n)) || c.tossMiniApp)
-    .length;
-}
+// 🚨 사례 개수·유무를 강조하는 배지나 문구는 달지 않는다(사장님 결정).
+//    사이트가 안 붙은 항목이 오히려 이력 없어 보인다. 카드 안의 개별 사례 칩만 둔다.
 
 type Capability = {
   icon: LucideIcon;
@@ -869,7 +1087,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
 
       {consult || !showCases ? (
         <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
-          <span className="text-[11px] text-slate-400">공개 사례 준비 중</span>
+          <span className="text-[11px] text-slate-400">요구사항에 맞춰 설계</span>
           <button
             type="button"
             onClick={() => openInquiry(item.title)}
@@ -937,27 +1155,14 @@ function Capabilities() {
             이런 것을 <span className="text-gradient">만듭니다</span>
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-slate-400">
-            분야 이름 대신 해결하는 문제로 정리했습니다. 실제 납품 사이트가 있는 항목에는 사례를
-            연결해 두었습니다.
+            분야 이름 대신, 해결하는 문제로 정리했습니다.
           </p>
         </div>
 
         {/* A. 만들어 본 것 — 플랫폼·SaaS 가 앞, 전환 페이지가 뒤 */}
         <div className="mt-14">
-          <GroupTitle
-            title="웹·앱으로 만드는 것"
-            badge={
-              <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2.5 py-1 text-[11px] font-medium text-primary-glow">
-                <ExternalLink className="h-3 w-3" /> 실제 사이트를 붙인 항목{" "}
-                {countLinked(provenCapabilities)}개
-              </span>
-            }
-          />
-          <p className="mb-5 text-sm text-slate-400">
-            사례가 있는 항목은 눌러서 바로 확인하실 수 있습니다. 아직 공개하지 못하는 항목은
-            상담에서 범위부터 정리합니다.
-          </p>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <GroupTitle title="웹·앱으로 만드는 것" />
+          <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {provenCapabilities.map((item) => (
               <CapabilityCard key={item.title} item={item} />
             ))}
@@ -975,8 +1180,7 @@ function Capabilities() {
             }
           />
           <p className="mb-5 text-sm text-slate-400">
-            공개할 수 있는 사례가 아직 없는 영역입니다. 요구사항을 들은 뒤 범위와 일정을
-            제안드립니다.
+            요구사항을 들은 뒤 범위와 일정을 맞춰 제안드립니다.
           </p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {consultCapabilities.map((item) => (
