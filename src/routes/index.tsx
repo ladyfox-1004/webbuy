@@ -65,7 +65,8 @@ import {
   KAKAO_OPENCHAT_URL,
   TOSS_MINIAPP_URL,
 } from "@/lib/portfolio";
-import { solutions, solutionNavLabels } from "@/lib/solutions";
+import { solutions, solutionNavLabels, solutionBySlug } from "@/lib/solutions";
+import { CaseStudyFeatureCard } from "@/components/CaseStudy";
 import realEstateBg from "@/assets/card-bg/real-estate-bg.jpg";
 import auctionBg from "@/assets/card-bg/auction-bg.jpg";
 import cryptoBg from "@/assets/card-bg/crypto-bg.jpg";
@@ -159,6 +160,9 @@ function SolutionLinks() {
   );
 }
 
+// 홈 포트폴리오 맨 위에 거는 운영 시스템 사례. 데이터는 /solutions/automation 의 caseStudy 하나뿐이다.
+const featuredCase = solutionBySlug.get("automation")?.caseStudy;
+
 function Portfolio() {
   return (
     <section id="portfolio" className="px-4 py-20">
@@ -177,6 +181,8 @@ function Portfolio() {
             컬렉션 보기 <ArrowUpRight className="h-4 w-4" />
           </a>
         </div>
+
+        {featuredCase && <CaseStudyFeatureCard caseStudy={featuredCase} />}
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {portfolioSites.map((s) => (

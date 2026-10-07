@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Sparkles,
 } from "lucide-react";
+import { CaseStudySection } from "@/components/CaseStudy";
 import { useInquiry } from "@/components/InquiryModal";
 import { SiteFooter } from "@/components/SiteFooter";
 import { TossMiniAppCaseCard } from "@/components/TossMiniApp";
@@ -163,9 +164,20 @@ export function SolutionPage({ solution }: { solution: Solution }) {
               {hasProducts ? "상품 목록 보기" : "달 수 있는 기능 보기"}{" "}
               <ArrowUpRight className="h-4 w-4" />
             </a>
+            {solution.caseStudy && (
+              <a
+                href={`#${solution.caseStudy.anchor}`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-6 py-3 text-sm font-medium text-foreground transition hover:bg-primary/20"
+              >
+                납품 사례 보기 <ArrowUpRight className="h-4 w-4" />
+              </a>
+            )}
           </div>
         </div>
       </section>
+
+      {/* ── 실제 납품 사례 (caseStudy 가 있는 페이지만) ─────────── */}
+      {solution.caseStudy && <CaseStudySection caseStudy={solution.caseStudy} />}
 
       {/* ── 상품 목록 (products 가 있는 페이지만) ───────────────── */}
       {hasProducts && (
