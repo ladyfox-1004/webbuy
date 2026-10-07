@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   Building2,
   CalendarCheck,
+  Clapperboard,
   ClipboardList,
   Compass,
   CreditCard,
@@ -18,6 +19,7 @@ import {
   Link2,
   LogOut,
   Mail,
+  Megaphone,
   Menu,
   MessageCircle,
   MonitorPlay,
@@ -25,6 +27,9 @@ import {
   Package,
   Plus,
   QrCode,
+  Radar,
+  Repeat2,
+  Send,
   ShieldCheck,
   ShoppingBag,
   Smartphone,
@@ -238,6 +243,7 @@ const pillars: Pillar[] = [
       "픽셀·전환 추적 설정과 성과 리포트",
       "CRM 고객 데이터 통합과 세그먼트 관리",
       "문의·상담 리드 자동 수집과 후속 관리",
+      "숏폼·SNS 콘텐츠 자동 제작·발행",
     ],
   },
   {
@@ -879,6 +885,10 @@ const provenCapabilities: Capability[] = [
       "웹훅 발신과 재시도",
       "API 키 발급·회수",
       "연동 장애 알림",
+      "매일 운영 리포트",
+      "인증 토큰 자동 갱신",
+      "멈춘 자동화 감지 알림",
+      "영업 리드 정리·제안 메일 자동화(사람 승인 후 발송·수신거부 준수)",
     ],
     // "VIP 마케팅"·"서비스 소개" 는 연동 사례가 아니라 서비스 소개 랜딩이었다.
   },
@@ -970,6 +980,75 @@ const provenCapabilities: Capability[] = [
   },
 ];
 
+// A-2. 콘텐츠·마케팅 자동화
+// 근거는 회사가 직접 만들어 운영 중인 콘텐츠 자동화 시스템이다(납품 사례가 아니라 cases 는 비운다).
+// 수요 키워드(숏폼 대량 제작·유튜브 쇼츠 자동 업로드·크롤링)는 드러내되, 위험한 "방식" 표현만 피한다.
+// 🚨 남의 채널·플랫폼 영상을 내려받아 재업로드·재사용, 봇 차단 우회, 로그인 재사용, 이미지 스크래핑처럼
+//    읽힐 말을 쓰지 않는다. 소재는 "라이선스 스톡·고객 촬영본·AI 생성 소재", 수집은 "공개 데이터·공식 API·
+//    허가된 범위에서" 로만 말한다. 대량 제작에는 "검수" 를 꼭 붙인다.
+// 🚨 채널명·계정·성과 수치·제휴 수익 활동·"알림톡"·금액·기간은 적지 않는다.
+const contentCapabilities: Capability[] = [
+  {
+    icon: Clapperboard,
+    title: "숏폼을 매일 올려야 한다",
+    features: [
+      "숏폼 대량 제작 파이프라인(템플릿 기반 하루 수십 편, 검수 후 자동 발행)",
+      "템플릿 렌더(자막·BGM·음성)",
+      "소재 자동 수집·편집(라이선스 스톡·고객 촬영본·AI 생성 소재)",
+      "유튜브 쇼츠·릴스·틱톡 자동 업로드(공식 API)",
+      "예약 시간 발행·제목·해시태그 자동 생성",
+      "업로드 실패 재시도",
+      "프로필 링크 페이지 자동 갱신",
+      "광고·AI 사용 고지 자동 삽입",
+    ],
+  },
+  {
+    icon: Megaphone,
+    title: "상품마다 광고 영상이 필요하다",
+    features: [
+      "홈페이지 주소로 문구·컬러·이미지 수집",
+      "과장·근거 없는 문구 자동 경고",
+      "AI 기획안·샷리스트",
+      "AI 영상과 실사 스틸 혼합",
+      "나레이션·자막 동기화",
+      "15~30초 세로 광고",
+    ],
+  },
+  {
+    icon: Send,
+    title: "상품 소개를 SNS에 꾸준히 내보내고 싶다",
+    features: [
+      "상품 정보·후기 기반 카피",
+      "스레드 글·인스타 카드뉴스 예약 게시",
+      "발행 다음 날 성과를 재서 카피 개선",
+      "제휴·광고 고지 자동 삽입",
+    ],
+  },
+  {
+    icon: Repeat2,
+    title: "가진 영상을 더 많이 쓰고 싶다",
+    features: [
+      "보유 롱폼 전사 후 강한 구간 선정",
+      "세로 재구성·자막",
+      "다국어 대본·음성",
+      "예약 공개와 사람 검수",
+    ],
+  },
+  {
+    icon: Radar,
+    title: "흩어진 데이터를 매일 모으고 싶다",
+    features: [
+      "웹 데이터 수집·크롤링 자동화",
+      "경쟁사 가격·상품 정보 수집",
+      "리뷰·키워드 모니터링",
+      "정해진 주기로 자동 수집",
+      "시트·대시보드로 정리",
+      "바뀌면 바로 알림",
+      "공개 데이터·공식 API·허가된 범위에서",
+    ],
+  },
+];
+
 // B. 아직 공개할 사례가 없는 것 — 링크 대신 상담으로 연결한다
 const consultCapabilities: Capability[] = [
   {
@@ -1018,7 +1097,9 @@ const consultCapabilities: Capability[] = [
   },
 ];
 
-// 🚨 이 리포에 실제 흔적이 있는 것만 적는다.
+// 🚨 실제로 붙여 본 흔적이 있는 것만 적는다. 근거는 (1) 이 리포, (2) 회사가 직접 운영 중인
+//    자체 콘텐츠 자동화 시스템(숏폼 렌더·SNS 발행·운영 알림) 두 가지뿐이다.
+//    (1) 이 리포
 //    포트원 = @portone/browser-sdk + src/lib/portone-config.ts
 //    토스페이 = portone-config 의 간편결제 채널키
 //    토스 미니앱 = 깔끔집사(TOSS_MINIAPP_URL)
@@ -1027,15 +1108,29 @@ const consultCapabilities: Capability[] = [
 //    웹훅 = src/routes/api/public/webhooks/lemonsqueezy.ts + /admin/webhooks 로그
 //    메일 = src/routes/lovable/email/* + 수신거부(suppressed_emails)
 //    카카오 오픈채팅 = KAKAO_OPENCHAT_URL
+//    (2) 자체 콘텐츠 자동화 시스템
+//    YouTube Data API(업로드·댓글), Instagram Graph API(릴스·캐러셀), Threads API, TikTok 업로드,
+//    Gmail API, Google Sheets·Drive, 카카오톡 메시지(나에게 보내기 — 알림톡이 아니다),
+//    Remotion·FFmpeg 렌더, 음성합성(TTS), Claude·Gemini, Supabase, Cloudflare Pages
 const integrations = [
   "포트원(PortOne) 결제",
   "토스페이 간편결제",
   "토스 미니앱",
   "Supabase · DB/인증/파일 스토리지",
-  "Cloudflare Workers 배포",
+  "Cloudflare Workers · Pages 배포",
   "웹훅 수신 · 중복 처리 · 로그",
   "트랜잭션 메일 발송 · 수신거부 처리",
   "카카오 오픈채팅 상담 연결",
+  "YouTube Data API · 업로드/댓글",
+  "Instagram Graph API · 릴스/캐러셀",
+  "Threads API 게시",
+  "TikTok 업로드",
+  "Gmail API 발송",
+  "Google Sheets · Drive",
+  "카카오톡 메시지 API · 운영 알림",
+  "Remotion · FFmpeg 영상 렌더",
+  "음성합성(TTS)",
+  "Claude · Gemini API",
 ];
 
 // D. 그 밖에 기획·개발하는 분야 (예전 "기획/개발" 카드 섹션을 칩으로 합쳤다)
@@ -1049,9 +1144,9 @@ const developFields = [
   "제휴 마케팅(어필리에이트) 플랫폼 개발",
   "위치 기반 매칭 앱",
   "지역 기반 중고거래 플랫폼",
-  "AI 제품 광고 숏폼 생성기",
+  // "AI 제품 광고 숏폼 생성기"·"SNS 멀티채널 자동 업로드 도구" 는 콘텐츠·마케팅 자동화 카드로 올라갔다.
+  // 블로그 자동화는 이 사이트의 블로그 자동화(유튜브 재생목록·Gemini 초안·예약 발행)가 근거라 남긴다.
   "블로그 콘텐츠 자동화 도구",
-  "SNS 멀티채널 자동 업로드 도구",
 ];
 
 function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean }) {
@@ -1169,6 +1264,20 @@ function Capabilities() {
           </div>
         </div>
 
+        {/* A-2. 콘텐츠·마케팅 자동화 — 직접 운영 중인 시스템이 근거, 사례 링크는 없다 */}
+        <div className="mt-14">
+          <GroupTitle title="콘텐츠·마케팅 자동화" />
+          <p className="mb-5 text-sm text-slate-400">
+            직접 만들어 운영 중인 콘텐츠 자동화를 바탕으로 만듭니다. 공식 API와 고객 제공 정보,
+            라이선스 스톡·고객 촬영본·AI 생성 소재만 씁니다.
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {contentCapabilities.map((item) => (
+              <CapabilityCard key={item.title} item={item} />
+            ))}
+          </div>
+        </div>
+
         {/* B. 아직 공개할 사례가 없는 것 */}
         <div className="mt-14">
           <GroupTitle
@@ -1216,7 +1325,8 @@ function Capabilities() {
             badge={<Link2 className="h-4 w-4 text-primary-glow" />}
           />
           <p className="text-sm text-slate-400">
-            이 사이트와 납품 프로젝트에서 실제로 붙여 본 것만 적었습니다.
+            이 사이트와 납품 프로젝트, 직접 운영 중인 콘텐츠 자동화 시스템에서 실제로 붙여 본 것만
+            적었습니다.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {integrations.map((name) => (
