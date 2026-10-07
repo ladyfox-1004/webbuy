@@ -105,7 +105,6 @@ function SellerStorePage() {
                 <div className="p-4">
                   <div className="mb-1 text-[11px] text-muted-foreground">{p.tag}</div>
                   <div className="truncate font-display text-base font-semibold">{p.title}</div>
-                  <div className="mt-2 text-sm">₩{p.amount.toLocaleString("ko-KR")}</div>
                 </div>
               </Link>
             ))}

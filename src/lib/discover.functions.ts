@@ -4,9 +4,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const PUBLIC_COLS =
-  "id, slug, title, tag, description, amount, currency, thumbnail_url, category, tags, created_at, seller_id, sort_order";
+  "id, slug, title, tag, description, thumbnail_url, category, tags, created_at, seller_id, sort_order";
 
-// --- Search (public) -------------------------------------------------------
+// --- Search (public) --- 공개 응답(PUBLIC_COLS)에는 가격(amount, currency)을 싣지 않는다. 가격 비공개·맞춤 견적 정책
 export const searchProducts = createServerFn({ method: "GET" })
   .inputValidator((input) =>
     z

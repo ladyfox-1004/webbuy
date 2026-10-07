@@ -1,6 +1,7 @@
 // 납품 사이트 목록. 🚨 주소는 여기 한 곳에만 적는다.
 // 홈(src/routes/index.tsx)과 업종별 솔루션 페이지(src/components/SolutionPage.tsx)가
 // 같은 배열을 읽는다. 주소를 두 벌로 적으면 한쪽만 고쳐진다.
+// 썸네일은 public/thumbs/ 에 미리 캡처해 둔 파일이다. 사이트를 추가하면 썸네일도 추가한다(아래 shot 참고).
 
 export type PortfolioSite = {
   title: string;
@@ -39,6 +40,15 @@ export const KAKAO_OPENCHAT_URL = "https://open.kakao.com/o/sd29wW8h";
 // 토스 미니앱은 토스 앱 컨테이너 안에서만 실행된다. PC 브라우저로는 열리지 않는다.
 export const TOSS_MINIAPP_URL = "https://minion.toss.im/VlDAkiWn";
 
+// 썸네일은 미리 캡처해 둔 로컬 파일(public/thumbs/<key>.webp)을 쓴다.
+// 외부 스크린샷 API는 무료 한도(하루 요청 수)가 낮아 썸네일이 깨지므로 쓰지 않는다.
+// key = 주소의 호스트명을 소문자로 바꾸고 "."을 모두 "-"로 바꾼 것 (예: ilzik.com → ilzik-com).
+// 🚨 portfolioSites 에 사이트를 추가하면 썸네일도 같이 만든다:
+//    python scripts/capture-thumbs.py <key>  → public/thumbs/<key>.webp 생성 후 이미지를 눈으로 확인.
+export function thumbKey(url: string) {
+  return new URL(url).hostname.toLowerCase().replaceAll(".", "-");
+}
+
 export function shot(url: string) {
-  return `https://api.microlink.io/?url=${encodeURIComponent(url)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800`;
+  return `/thumbs/${thumbKey(url)}.webp`;
 }

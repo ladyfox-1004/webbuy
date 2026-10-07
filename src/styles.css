@@ -97,6 +97,9 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-body);
+    /* 한국어는 어절 단위로 줄바꿈한다(단어 중간에서 끊기지 않게). 긴 URL 은 넘치지 않게 끊는다. */
+    word-break: keep-all;
+    overflow-wrap: break-word;
     background-image:
       radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklab, var(--primary) 35%, transparent), transparent),
       radial-gradient(ellipse 60% 40% at 80% 100%, color-mix(in oklab, var(--primary-glow) 20%, transparent), transparent);

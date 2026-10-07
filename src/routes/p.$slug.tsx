@@ -1,13 +1,9 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { ArrowLeft, ArrowUpRight, CreditCard, Loader2, MessageCircle, Smartphone, Store, ShoppingBag } from "lucide-react";
-import { getProductBySlug, verifyPayment } from "@/lib/payments.functions";
-import { PORTONE_CONFIG } from "@/lib/portone-config";
-import { supabase } from "@/integrations/supabase/client";
-import { InquiryModal } from "@/components/InquiryModal";
+import { ArrowLeft, ArrowUpRight, Loader2, MessageCircle, Store } from "lucide-react";
+import { getProductBySlug } from "@/lib/payments.functions";
+import { useInquiry } from "@/components/InquiryModal";
 
 export const Route = createFileRoute("/p/$slug")({
   component: ProductDetailPage,
@@ -54,13 +50,14 @@ function ProductDetailPage() {
 type Product = NonNullable<Awaited<ReturnType<typeof getProductBySlug>>>;
 
 function Detail({ product }: { product: Product }) {
-  const [inquiryOpen, setInquiryOpen] = useState(false);
+  // 문의는 전역 문의 모달(InquiryProvider)로 연다. 주제는 제품명으로 미리 채운다.
+  const { openInquiry } = useInquiry();
 
   return (
     <div className="min-h-screen px-4 py-16">
       <div className="mx-auto max-w-5xl">
         <Link to="/" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> 모든 제품
+          <ArrowLeft className="h-4 w-4" /> 홈으로
         </Link>
 
         <div className="grid gap-8 md:grid-cols-5">
@@ -93,7 +90,7 @@ function Detail({ product }: { product: Product }) {
                 </div>
               </div>
               <button
-                onClick={() => setInquiryOpen(true)}
+                onClick={() => openInquiry(product.title)}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
               >
                 <MessageCircle className="h-4 w-4" /> 문의하기
@@ -141,7 +138,6 @@ function Detail({ product }: { product: Product }) {
           </aside>
         </div>
       </div>
-      <InquiryModal open={inquiryOpen} onOpenChange={setInquiryOpen} defaultService={product.title} />
     </div>
   );
 }

@@ -219,14 +219,14 @@ export const getProductFileUrl = createServerFn({ method: "POST" })
     return { url: signed.signedUrl };
   });
 
-// Public product detail by slug. Two-step (no FK between products and seller_profiles).
+// Public product detail by slug. Two-step (no FK between products and seller_profiles). 가격(amount, currency)은 공개 응답에 싣지 않는다(가격 비공개 정책).
 export const getProductBySlug = createServerFn({ method: "GET" })
   .inputValidator((input) => z.object({ slug: z.string().min(1).max(200) }).parse(input))
   .handler(async ({ data }) => {
     const { data: product, error } = await supabaseAdmin
       .from("products")
       .select(
-        "id, slug, title, tag, description, amount, currency, thumbnail_url, product_type, status, active, created_at, seller_id, ls_store_slug, ls_variant_id"
+        "id, slug, title, tag, description, thumbnail_url, product_type, status, active, created_at, seller_id, ls_store_slug, ls_variant_id"
       )
       .eq("slug", data.slug)
       .maybeSingle();

@@ -3,15 +3,19 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export const listProducts = createServerFn({ method: "GET" }).handler(async () => {
-  const { data, error } = await supabaseAdmin
-    .from("products")
-    .select("*")
-    .eq("active", true)
-    .order("sort_order", { ascending: true });
-  if (error) throw new Error(error.message);
-  return data ?? [];
-});
+// 관리자 전용(가격 amount 포함 전체 컬럼). 가격 비공개 정책상 비로그인 호출을 막는다.
+export const listProducts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertAdmin(context.userId);
+    const { data, error } = await supabaseAdmin
+      .from("products")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order", { ascending: true });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
 
 const productSchema = z.object({
   id: z.string().uuid().optional(),
@@ -27,7 +31,11 @@ const productSchema = z.object({
 
 async function assertAdmin(userId: string) {
   const { data } = await supabaseAdmin
-    .from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "admin")
+    .maybeSingle();
   if (!data) throw new Error("Forbidden");
 }
 
