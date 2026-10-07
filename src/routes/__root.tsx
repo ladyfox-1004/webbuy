@@ -69,24 +69,37 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+// 사이트 기본 검색·공유 문구. 검색 결과용(title·description)과 공유 카드용(og·twitter)을 나눈다.
+// title 은 60자 안팎, description 은 120~155자 안팎(검색 결과에서 잘리지 않는 길이).
+const SITE_TITLE =
+  "AI 기반 웹·앱 플랫폼 구축 · CRM·메타 광고 · 전광판 DOOH 디지털 사이니지 | 에이아이솔루션";
+const SITE_DESCRIPTION =
+  "AI 기반 데이터 분석과 통합 미디어 솔루션으로 비즈니스의 스케일을 확장합니다. 웹·앱 개발과 플랫폼 구축, CRM·메타 광고 통합 마케팅, 건물 전광판(DOOH) 디지털 사이니지 운영, AI 자동화까지 한 팀이 설계하고 운영합니다.";
+const SHARE_TITLE = "AI 데이터 분석 × 통합 미디어 솔루션 — 비즈니스의 스케일을 확장합니다";
+const SHARE_DESCRIPTION =
+  "웹·앱 플랫폼 구축, CRM·메타 광고 통합 마케팅, 디지털 사이니지(DOOH) 운영까지. 온라인과 오프라인의 고객 접점을 하나의 데이터 흐름으로 묶어 비즈니스의 스케일을 확장합니다.";
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       // 🚨 제목·설명은 **검색어**가 들어가야 한다. 예전엔 "AISOLUTION" 뿐이라
-      //    브랜드명을 아는 사람만 찾을 수 있었다 — 사려는 사람은 "랜딩페이지 제작",
-      //    "예약 시스템 개발" 을 친다.
-      { title: "랜딩페이지 제작 · 예약 플랫폼 개발 | 에이아이솔루션" },
-      { name: "description", content: "병원·법무법인·분양·통신 등 업종 12곳의 상담 랜딩을 만들어 왔고, 예약·매칭·일정 플랫폼까지 직접 개발합니다. 필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다." },
+      //    브랜드명을 아는 사람만 찾을 수 있었다. 사려는 사람은 "웹·앱 개발",
+      //    "메타 광고", "디지털 사이니지" 를 친다.
+      // 🚨 홈 히어로("AI 기반 데이터 분석 × 통합 미디어 솔루션", 세 축)와 같은 말을 쓴다.
+      //    직원 수·고객 수·매출 같은 숫자, 금액·기간은 넣지 않는다(검증 못 하는 약속이 된다).
+      //    업종 페이지 제목은 src/lib/solutions.ts 의 metaTitle 이 따로 맡는다.
+      { title: SITE_TITLE },
+      { name: "description", content: SITE_DESCRIPTION },
       { name: "author", content: "에이아이솔루션" },
       { name: "robots", content: "index, follow" },
 
       // 카톡·카페·문자로 링크를 붙였을 때 뜨는 카드.
       // 🚨 og:image 는 **우리 도메인**이어야 한다. 예전엔 러버블 미리보기 서버를
       //    가리켜, 우리가 통제하지 못하는 주소가 대표 이미지였다.
-      { property: "og:title", content: "상담이 들어오는 페이지, 운영까지 되는 시스템" },
-      { property: "og:description", content: "병원·법무법인·분양·통신 등 업종 12곳의 상담 랜딩을 만들어 왔고, 예약·매칭·일정 플랫폼까지 직접 개발합니다. 필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다." },
+      { property: "og:title", content: SHARE_TITLE },
+      { property: "og:description", content: SHARE_DESCRIPTION },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "에이아이솔루션" },
       { property: "og:locale", content: "ko_KR" },
@@ -97,8 +110,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
       // summary 는 작은 썸네일이다. 큰 카드가 클릭률이 훨씬 낫다.
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "상담이 들어오는 페이지, 운영까지 되는 시스템" },
-      { name: "twitter:description", content: "병원·법무법인·분양·통신 등 업종 12곳의 상담 랜딩을 만들어 왔고, 예약·매칭·일정 플랫폼까지 직접 개발합니다. 필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다." },
+      { name: "twitter:title", content: SHARE_TITLE },
+      { name: "twitter:description", content: SHARE_DESCRIPTION },
       { name: "twitter:image", content: "https://ai-solution.co.kr/og.png" },
     ],
     links: [
@@ -127,7 +140,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <head>
         <HeadContent />
       </head>
