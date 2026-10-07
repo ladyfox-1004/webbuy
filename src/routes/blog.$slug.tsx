@@ -153,7 +153,7 @@ function BlogPostPage() {
 
         <section className="mt-14 rounded-3xl border border-border bg-surface/40 p-8 text-center">
           <p className="font-display text-xl font-semibold break-keep">
-            이런 걸 우리 회사에도 만들고 싶다면
+            같은 시스템을 우리 회사에 도입하려면
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
             필요한 범위를 알려주시면 30분 상담 후 확정 견적을 드립니다.

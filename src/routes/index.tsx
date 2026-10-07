@@ -783,20 +783,23 @@ function Portfolio() {
   );
 }
 
-// ── "이런 것을 만듭니다" 섹션 ───────────────────────────────────────────────
-// 카테고리를 나열하면 사려는 사람이 자기 문제를 못 찾는다. 그래서 제목은 증상,
-// 내용은 기능 단위로 쪼개고, 사례가 있는 것에는 실제 포트폴리오를 붙인다.
+// ── "제공 서비스" 섹션 ───────────────────────────────────────────────────────
+// 예전 제목은 "예약을 받고 싶다" 같은 고객 증상이었는데 주먹구구로 보인다는 지적을 받았다.
+// 그래서 제목은 업계 서비스명(ERP 구축·CRM 구축처럼), 그 아래 한 줄 부제로 고객 관점 설명을 둔다.
+// 내용은 기능 단위 칩으로 쪼개고, 사례가 있는 것에는 실제 포트폴리오를 붙인다.
 
 // 🚨 사례 개수·유무를 강조하는 배지나 문구는 달지 않는다(사장님 결정).
 //    사이트가 안 붙은 항목이 오히려 이력 없어 보인다. 카드 안의 개별 사례 칩만 둔다.
 
 type Capability = {
   icon: LucideIcon;
-  /** 사장님이 말하는 증상 그대로 */
+  /** 업계 서비스명. 상담 문의 주제로도 그대로 넘어간다 */
   title: string;
+  /** 제목 아래 한 줄 부제. "~합니다" 톤 */
+  summary: string;
   /** 스캔되게 칩으로 뿌린다 */
   features: string[];
-  /** portfolioSites 의 이름 (예: "기사 일정 관리 SaaS"). 없으면 카드가 상담 문의로 바뀐다 */
+  /** portfolioSites 의 이름 (예: "기사 일정 관리 SaaS"). 없으면 사례 줄 없이 상담 문의 버튼만 둔다 */
   cases?: string[];
   /** 토스 미니앱 사례. PC 에서는 링크가 막다른 길이라 QR 다이얼로그를 연다 */
   tossMiniApp?: boolean;
@@ -805,12 +808,13 @@ type Capability = {
 // A. 만들어 본 것
 // 순서는 사장님 방향(랜딩은 충분히 했다, 이제 플랫폼으로 확장한다)을 그대로 따른다.
 // 1) 플랫폼·SaaS → 2) 업무 시스템 → 3) 전환 페이지.
-// cases 는 "정말 그 기능을 만든 사이트"만 적는다. 없으면 비워 두면 카드가 알아서 상담 문의로 바뀐다.
+// cases 는 "정말 그 기능을 만든 사이트"만 적는다. 없으면 비워 둔다(사례 줄만 빠지고 상담 문의 버튼은 모든 카드에 같다).
 const provenCapabilities: Capability[] = [
   // ── 1. 플랫폼·SaaS ────────────────────────────────────────────────
   {
     icon: CalendarCheck,
-    title: "예약을 받고 싶다",
+    title: "예약·스케줄링 시스템 구축",
+    summary: "시간대별 정원·선결제·알림을 갖춘 온라인 예약 시스템을 구축합니다.",
     features: [
       "시간대별 정원 관리",
       "노쇼 방지 선결제",
@@ -826,7 +830,8 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: Store,
-    title: "매장·현장 업무를 시스템으로",
+    title: "POS·현장 업무 시스템 구축",
+    summary: "주문·정산·재고·인력 배정을 하나의 현장 업무 시스템으로 묶습니다.",
     features: [
       "주문·결제 단말 연동",
       "일 마감 정산",
@@ -841,13 +846,15 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: Smartphone,
-    title: "앱처럼 쓰이게 하고 싶다",
+    title: "모바일 웹앱(PWA)·토스 미니앱 개발",
+    summary: "설치 없이 앱처럼 쓰이는 웹앱과 토스 미니앱을 개발합니다.",
     features: ["토스 미니앱", "모바일 웹앱(PWA)", "홈 화면 추가", "푸시 알림", "오프라인 대응"],
     tossMiniApp: true,
   },
   {
     icon: CreditCard,
-    title: "결제를 붙이고 싶다",
+    title: "PG 결제·정산 시스템 연동",
+    summary: "PG 심사부터 결제·환불·정산까지 결제 흐름 전체를 연동합니다.",
     features: [
       "PG 심사 대응(사업자 서류·약관)",
       "카드·간편결제",
@@ -863,7 +870,8 @@ const provenCapabilities: Capability[] = [
   // ── 2. 업무 시스템 ────────────────────────────────────────────────
   {
     icon: Inbox,
-    title: "문의가 여기저기 흩어진다",
+    title: "리드·문의 통합 관리(CRM) 구축",
+    summary: "채널별로 흩어진 문의를 한 곳에 모아 배정·이력·통계로 관리합니다.",
     features: [
       "폼·전화·카톡 문의를 한 곳에",
       "담당자 자동 배정",
@@ -877,7 +885,8 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: Workflow,
-    title: "시스템끼리 연결하고 싶다",
+    title: "API 연동·업무 자동화",
+    summary: "사내 시스템과 외부 서비스를 API로 연결하고 반복 업무를 자동화합니다.",
     features: [
       "리드 수신 API",
       "시트·CRM 연동",
@@ -894,7 +903,8 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: Newspaper,
-    title: "콘텐츠를 계속 올려야 한다",
+    title: "CMS(콘텐츠 관리 시스템) 구축",
+    summary: "글·공지를 직접 작성하고 예약 발행하는 관리 시스템을 구축합니다.",
     features: [
       "글·공지 관리 화면",
       "이미지 업로드",
@@ -907,7 +917,8 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: Users,
-    title: "사람들이 모이는 공간이 필요하다",
+    title: "커뮤니티 플랫폼 개발",
+    summary: "게시판·회원 등급·신고 관리를 갖춘 커뮤니티를 개발합니다.",
     features: [
       "게시판·댓글·대댓글",
       "신고와 차단",
@@ -921,7 +932,8 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: ShoppingBag,
-    title: "물건을 팔고 싶다",
+    title: "쇼핑몰·커머스 플랫폼 구축",
+    summary: "상품·주문·배송·정산을 관리하는 자사 쇼핑몰을 구축합니다.",
     features: [
       "상품·옵션·재고",
       "장바구니",
@@ -937,7 +949,8 @@ const provenCapabilities: Capability[] = [
   // ── 3. 전환 페이지 ────────────────────────────────────────────────
   {
     icon: Globe,
-    title: "브랜드를 보여줄 페이지가 필요하다",
+    title: "홈페이지·랜딩페이지 제작",
+    summary: "문의 전환과 검색 노출을 고려한 반응형 페이지를 제작합니다.",
     features: [
       "반응형 1~5페이지",
       "문의 폼",
@@ -967,7 +980,8 @@ const provenCapabilities: Capability[] = [
   },
   {
     icon: ClipboardList,
-    title: "신청·설문을 받고 싶다",
+    title: "신청·설문 폼 시스템 구축",
+    summary: "조건부 문항과 자동 집계를 갖춘 신청·설문 시스템을 구축합니다.",
     features: [
       "조건부 문항 분기",
       "파일 첨부",
@@ -990,7 +1004,8 @@ const provenCapabilities: Capability[] = [
 const contentCapabilities: Capability[] = [
   {
     icon: Clapperboard,
-    title: "숏폼을 매일 올려야 한다",
+    title: "숏폼 제작·멀티채널 자동 발행",
+    summary: "템플릿으로 숏폼을 대량 제작하고 검수 후 채널별로 자동 발행합니다.",
     features: [
       "숏폼 대량 제작 파이프라인(템플릿 기반 하루 수십 편, 검수 후 자동 발행)",
       "템플릿 렌더(자막·BGM·음성)",
@@ -1004,7 +1019,8 @@ const contentCapabilities: Capability[] = [
   },
   {
     icon: Megaphone,
-    title: "상품마다 광고 영상이 필요하다",
+    title: "AI 광고 영상 제작",
+    summary: "상품 정보를 바탕으로 15~30초 세로 광고 영상을 제작합니다.",
     features: [
       "홈페이지 주소로 문구·컬러·이미지 수집",
       "과장·근거 없는 문구 자동 경고",
@@ -1016,7 +1032,8 @@ const contentCapabilities: Capability[] = [
   },
   {
     icon: Send,
-    title: "상품 소개를 SNS에 꾸준히 내보내고 싶다",
+    title: "SNS 콘텐츠 자동 운영",
+    summary: "상품 소개 콘텐츠를 정기 게시하고 성과를 보며 카피를 개선합니다.",
     features: [
       "상품 정보·후기 기반 카피",
       "스레드 글·인스타 카드뉴스 예약 게시",
@@ -1026,7 +1043,8 @@ const contentCapabilities: Capability[] = [
   },
   {
     icon: Repeat2,
-    title: "가진 영상을 더 많이 쓰고 싶다",
+    title: "영상 재편집·다국어 현지화",
+    summary: "보유 롱폼을 숏폼으로 재구성하고 다국어 버전으로 현지화합니다.",
     features: [
       "보유 롱폼 전사 후 강한 구간 선정",
       "세로 재구성·자막",
@@ -1036,9 +1054,9 @@ const contentCapabilities: Capability[] = [
   },
   {
     icon: Radar,
-    title: "흩어진 데이터를 매일 모으고 싶다",
+    title: "웹 데이터 수집·크롤링 자동화",
+    summary: "공개 데이터를 정해진 주기로 수집해 시트·대시보드로 정리합니다.",
     features: [
-      "웹 데이터 수집·크롤링 자동화",
       "경쟁사 가격·상품 정보 수집",
       "리뷰·키워드 모니터링",
       "정해진 주기로 자동 수집",
@@ -1053,9 +1071,9 @@ const contentCapabilities: Capability[] = [
 const consultCapabilities: Capability[] = [
   {
     icon: Building2,
-    title: "회계·재고·인사를 한 시스템으로",
+    title: "ERP 시스템 구축",
+    summary: "회계·재고·인사를 하나의 시스템으로 통합합니다.",
     features: [
-      "맞춤형 ERP",
       "기존 시스템 연동",
       "회계·재무",
       "인사·급여",
@@ -1066,9 +1084,9 @@ const consultCapabilities: Capability[] = [
   },
   {
     icon: Warehouse,
-    title: "창고·재고를 정확히",
+    title: "WMS(창고 관리 시스템) 구축",
+    summary: "입출고·로케이션·실사 재고를 정확하게 관리합니다.",
     features: [
-      "WMS",
       "입출고",
       "로케이션 관리",
       "바코드·QR 스캔",
@@ -1079,21 +1097,15 @@ const consultCapabilities: Capability[] = [
   },
   {
     icon: GraduationCap,
-    title: "교육을 온라인으로",
-    features: [
-      "LMS",
-      "강의 업로드",
-      "수강 진도",
-      "퀴즈·평가",
-      "수료증 발급",
-      "기수 관리",
-      "진도 통계",
-    ],
+    title: "LMS(학습 관리 시스템) 구축",
+    summary: "강의·진도·평가·수료를 관리하는 온라인 교육 시스템을 구축합니다.",
+    features: ["강의 업로드", "수강 진도", "퀴즈·평가", "수료증 발급", "기수 관리", "진도 통계"],
   },
   {
     icon: UserCheck,
-    title: "인사평가를 체계적으로",
-    features: ["HR", "목표·성과 관리", "다면 평가", "연봉 계약", "결재선", "평가 이력"],
+    title: "HR 성과관리 시스템 구축",
+    summary: "목표 설정부터 다면 평가·연봉 계약까지 인사평가를 체계화합니다.",
+    features: ["목표·성과 관리", "다면 평가", "연봉 계약", "결재선", "평가 이력"],
   },
 ];
 
@@ -1136,7 +1148,7 @@ const integrations = [
 // D. 그 밖에 기획·개발하는 분야 (예전 "기획/개발" 카드 섹션을 칩으로 합쳤다)
 // 🚨 금액을 다시 붙이지 마라(가격은 전면 비공개, 맞춤 견적).
 const developFields = [
-  "API 연동 · 업무 자동화",
+  // "API 연동 · 업무 자동화" 는 같은 이름의 카드가 생겨 칩에서 뺐다.
   "유지보수 · 운영 지원",
   "부동산 매물 플랫폼",
   "부동산 경매 정보 플랫폼",
@@ -1156,7 +1168,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
     return site ? [{ name, url: site.url }] : [];
   });
   // 걸 사례가 없으면 "사례" 라벨만 덩그러니 남는다. 그건 없는 걸 있는 척하는 자리다.
-  const showCases = cases.length > 0 || item.tossMiniApp;
+  const hasCases = !consult && (cases.length > 0 || !!item.tossMiniApp);
 
   return (
     <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-primary/50 hover:bg-white/[0.05]">
@@ -1164,9 +1176,12 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow">
           <item.icon className="h-4 w-4" />
         </span>
-        <h4 className="mt-1 font-display text-base leading-snug font-semibold text-foreground">
-          {item.title}
-        </h4>
+        <div className="min-w-0">
+          <h4 className="mt-1 font-display text-base leading-snug font-semibold break-keep text-foreground">
+            {item.title}
+          </h4>
+          <p className="mt-1 text-xs leading-relaxed break-keep text-slate-400">{item.summary}</p>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-1 flex-wrap content-start gap-1.5">
@@ -1180,41 +1195,37 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
         ))}
       </div>
 
-      {consult || !showCases ? (
-        <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
-          <span className="text-[11px] text-slate-400">요구사항에 맞춰 설계</span>
+      {/* 버튼은 모든 카드에서 같은 모양이다. 사례 칩은 위 줄, 버튼은 아래 줄 오른쪽에 둬서
+          좁은 폭(300px 안팎)에서도 겹치지 않는다. */}
+      <div className="mt-4 border-t border-white/10 pt-3">
+        {hasCases && (
+          <div className="mb-3 flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] text-slate-400">사례</span>
+            {cases.map((c) => (
+              <a
+                key={c.url}
+                href={c.url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 rounded-full border border-primary-glow/30 bg-primary/15 px-2.5 py-1 text-[11px] font-medium text-primary-glow transition hover:bg-primary/25"
+              >
+                {c.name} <ExternalLink className="h-3 w-3" />
+              </a>
+            ))}
+            {item.tossMiniApp && <TossMiniAppCaseLink />}
+          </div>
+        )}
+        <div className="flex items-center justify-between gap-2">
+          {!hasCases && <span className="text-[11px] text-slate-400">요구사항에 맞춰 설계</span>}
           <button
             type="button"
             onClick={() => openInquiry(item.title)}
-            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3.5 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
+            className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-3.5 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
           >
             <MessageCircle className="h-3.5 w-3.5" /> 상담 문의
           </button>
         </div>
-      ) : (
-        <div className="mt-4 flex flex-wrap items-center gap-1.5 border-t border-white/10 pt-3">
-          <span className="text-[11px] text-slate-400">사례</span>
-          {cases.map((c) => (
-            <a
-              key={c.url}
-              href={c.url}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 rounded-full border border-primary-glow/30 bg-primary/15 px-2.5 py-1 text-[11px] font-medium text-primary-glow transition hover:bg-primary/25"
-            >
-              {c.name} <ExternalLink className="h-3 w-3" />
-            </a>
-          ))}
-          {item.tossMiniApp && <TossMiniAppCaseLink />}
-          <button
-            type="button"
-            onClick={() => openInquiry(item.title)}
-            className="ml-auto inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium text-slate-400 transition hover:text-primary-glow"
-          >
-            <MessageCircle className="h-3 w-3" /> 문의
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -1247,10 +1258,10 @@ function Capabilities() {
             What We Build
           </span>
           <h2 className="mt-5 font-display text-3xl font-bold tracking-tight md:text-5xl">
-            이런 것을 <span className="text-gradient">만듭니다</span>
+            제공 <span className="text-gradient">서비스</span>
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl text-slate-400">
-            분야 이름 대신, 해결하는 문제로 정리했습니다.
+          <p className="mx-auto mt-5 max-w-2xl break-keep text-slate-400">
+            구축부터 운영까지, 비즈니스에 필요한 시스템을 만듭니다.
           </p>
         </div>
 

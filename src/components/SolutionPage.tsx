@@ -2,25 +2,13 @@
 // 🚨 페이지를 6벌 복사하지 마라. 문구 하나 고치려고 6곳을 고치게 된다.
 
 import { Link } from "@tanstack/react-router";
-import {
-  ArrowUpRight,
-  Check,
-  ExternalLink,
-  Info,
-  MessageCircle,
-  Sparkles,
-} from "lucide-react";
+import { ArrowUpRight, Check, ExternalLink, Info, MessageCircle, Sparkles } from "lucide-react";
 import { CaseStudySection } from "@/components/CaseStudy";
 import { useInquiry } from "@/components/InquiryModal";
 import { SiteFooter } from "@/components/SiteFooter";
 import { TossMiniAppCaseCard } from "@/components/TossMiniApp";
 import { portfolioByName, shot, KAKAO_OPENCHAT_URL } from "@/lib/portfolio";
-import {
-  solutions,
-  solutionNavLabels,
-  type Product,
-  type Solution,
-} from "@/lib/solutions";
+import { solutions, solutionNavLabels, type Product, type Solution } from "@/lib/solutions";
 
 function SolutionNav() {
   const { openInquiry } = useInquiry();
@@ -136,13 +124,12 @@ export function SolutionPage({ solution }: { solution: Solution }) {
         <div className="pointer-events-none absolute -top-32 -right-24 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary-glow/15 blur-3xl" />
         <div className="relative mx-auto max-w-4xl">
-          <Link
-            to="/"
-            className="text-sm text-muted-foreground transition hover:text-foreground"
-          >
+          <Link to="/" className="text-sm text-muted-foreground transition hover:text-foreground">
             ← 홈으로
           </Link>
-          <div className="mt-6 mb-3 text-sm font-medium text-primary-glow">— {solution.eyebrow}</div>
+          <div className="mt-6 mb-3 text-sm font-medium text-primary-glow">
+            — {solution.eyebrow}
+          </div>
           <h1 className="font-display text-3xl leading-tight font-bold tracking-tight sm:text-4xl md:text-5xl">
             {solution.h1}
           </h1>
@@ -216,8 +203,8 @@ export function SolutionPage({ solution }: { solution: Solution }) {
               달 수 있는 <span className="text-gradient">기능</span>
             </h2>
             <p className="mt-4 text-sm text-slate-600 md:text-base">
-              필요한 것만 골라 붙입니다. 훑어보시다 &ldquo;이거 우리한테 필요한데&rdquo; 싶은 항목을
-              말씀해 주세요.
+              필요한 기능만 골라 구성합니다. 원하시는 항목을 상담 시 말씀해 주시면 범위에 맞춰
+              제안드립니다.
             </p>
           </div>
 
