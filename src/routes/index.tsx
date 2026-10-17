@@ -692,17 +692,19 @@ function Portfolio() {
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {portfolioSites.map((s) => (
-            <a
-              key={s.url}
-              href={s.url}
-              target="_blank"
-              rel="noreferrer"
+          {portfolioSites.map((s) => {
+            // 주소가 없는 사이트(개인 도구)는 링크 없이 캡처만 보여준다.
+            const Card = s.url ? "a" : "div";
+            const linkProps = s.url ? { href: s.url, target: "_blank", rel: "noreferrer" } : {};
+            return (
+            <Card
+              key={s.title}
+              {...linkProps}
               className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-background/40">
                 <img
-                  src={shot(s.url)}
+                  src={s.url ? shot(s.url) : s.thumb}
                   alt={displayTitle(s.title)}
                   loading="lazy"
                   width={800}
@@ -716,9 +718,11 @@ function Portfolio() {
                 <span className="absolute top-3 left-3 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
                   {s.tag}
                 </span>
-                <span className="absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full bg-background/70 text-foreground/80 backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </span>
+                {s.url && (
+                  <span className="absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full bg-background/70 text-foreground/80 backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </span>
+                )}
               </div>
               <div className="flex items-center justify-between gap-3 p-4">
                 <h3
@@ -727,10 +731,13 @@ function Portfolio() {
                 >
                   {displayTitle(s.title)}
                 </h3>
-                <span className="shrink-0 text-[11px] text-muted-foreground">라이브 보기</span>
+                <span className="shrink-0 text-[11px] text-muted-foreground">
+                  {s.url ? "라이브 보기" : "화면 캡처"}
+                </span>
               </div>
-            </a>
-          ))}
+            </Card>
+            );
+          })}
 
           {/* 좁은 화면: QR은 쓸모없으니 토스로 바로 보낸다 */}
           <a

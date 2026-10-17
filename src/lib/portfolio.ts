@@ -6,7 +6,10 @@
 export type PortfolioSite = {
   title: string;
   tag: string;
-  url: string;
+  /** 없으면 링크 없이 캡처만 보여주는 카드가 된다(개인 도구처럼 주소를 공개하지 않을 것). */
+  url?: string;
+  /** url 이 없는 카드의 캡처 파일(public/thumbs/). url 이 있으면 shot(url) 을 쓴다. */
+  thumb?: string;
 };
 
 export const portfolioSites: PortfolioSite[] = [
@@ -15,6 +18,8 @@ export const portfolioSites: PortfolioSite[] = [
   { title: "장기렌트 견적 랜딩 · AISOLUTION", tag: "견적", url: "https://funcar-rentcar.netlify.app/" },
   { title: "법무법인 상담 랜딩 · AISOLUTION", tag: "법률", url: "https://van-pos-legal.netlify.app/" },
   { title: "기사 일정 관리 SaaS · AISOLUTION", tag: "플랫폼", url: "https://ilzik.com/" },
+  // 개인 운영 도구라 주소를 걸지 않는다. 캡처는 /simple 화면을 demo 로그인 흉내로 찍은 것(개인 링크·광고주 이름 없는 화면).
+  { title: "AI 쇼츠 자동 생성기 · AISOLUTION", tag: "자동화", thumb: "/thumbs/shortsmaker.webp" },
   { title: "마켓 운영대행 소개 · AISOLUTION", tag: "서비스", url: "https://psm-vip-marketing.netlify.app/" },
   { title: "안과 시력교정 랜딩 · AISOLUTION", tag: "의료", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
   { title: "형사전문 법무법인 랜딩 · AISOLUTION", tag: "법률", url: "https://mjcrime.netlify.app/" },
@@ -30,9 +35,11 @@ export const portfolioSites: PortfolioSite[] = [
   { title: "GPA KOREA 브랜드 페이지 · AISOLUTION", tag: "브랜드", url: "https://tangerine-gumdrop-104c7a.netlify.app/" },
 ];
 
-// 사례 링크는 이름(" · " 앞부분)으로 찾아 쓴다.
+// 사례 링크는 이름(" · " 앞부분)으로 찾아 쓴다. 링크가 없는 사이트는 사례로 걸 수 없으니 뺀다.
 export const portfolioByName = new Map(
-  portfolioSites.map((s) => [s.title.split(" · ")[0], s] as const),
+  portfolioSites.flatMap((s) =>
+    s.url ? [[s.title.split(" · ")[0], { ...s, url: s.url }] as const] : [],
+  ),
 );
 
 // 에이아이솔루션 1:1 오픈채팅 (개인 카톡 아이디 대신 영업 창구로 사용)
