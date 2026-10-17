@@ -18,6 +18,7 @@ export const portfolioSites: PortfolioSite[] = [
   { title: "마켓 운영대행 소개 · AISOLUTION", tag: "서비스", url: "https://psm-vip-marketing.netlify.app/" },
   { title: "안과 시력교정 랜딩 · AISOLUTION", tag: "의료", url: "https://lambent-salmiakki-a9100e.netlify.app/" },
   { title: "형사전문 법무법인 랜딩 · AISOLUTION", tag: "법률", url: "https://mjcrime.netlify.app/" },
+  { title: "음주운전 전문 법무법인 랜딩 · AISOLUTION", tag: "법률", url: "https://chowon-dui.netlify.app/" },
   { title: "식당 브랜드 페이지 · AISOLUTION", tag: "요식", url: "https://thunderous-semolina-973f49.netlify.app/" },
   { title: "오피스텔 분양 방문예약 · AISOLUTION", tag: "분양", url: "https://preeminent-longma-670789.netlify.app/" },
   { title: "자동매매 서비스 소개 · AISOLUTION", tag: "서비스", url: "https://stellular-zabaione-a4c7f8.netlify.app/" },
