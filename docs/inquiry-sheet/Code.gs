@@ -126,6 +126,7 @@ function buildDraft_(body, services) {
   lines.push("");
   lines.push("에이아이솔루션 드림");
   lines.push("contact@ai-solution.co.kr");
+  lines.push("카카오톡 상담: https://open.kakao.com/o/sd29wW8h");
   lines.push("https://ai-solution.co.kr");
   return {
     subject: "[에이아이솔루션] " + name + "님 문의 잘 받았습니다",
