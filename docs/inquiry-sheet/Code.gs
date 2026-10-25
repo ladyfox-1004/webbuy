@@ -8,6 +8,9 @@
  *   "문의" 시트에 한 줄을 추가하고 시트 주인에게 메일을 보낸다.
  * - 원본 데이터는 홈페이지 DB(Supabase inquiries)다. 이 시트는 알림용 사본이다.
  * - 토큰은 코드에 적지 않는다. [프로젝트 설정] → [스크립트 속성]의 TOKEN 에 넣는다.
+ * - 연락처가 이메일이면 고객에게 보낼 답장 "초안"을 Gmail 임시보관함에 만든다.
+ *   이 스크립트는 고객에게 메일을 절대 보내지 않는다. 확인 후 사장님이 직접 보낸다.
+ *   스크립트 속성 DRAFT_REPLY 를 off 로 두면 초안 기능이 꺼진다(기본은 켜짐).
  */
 
 var SHEET_NAME = "문의";
@@ -61,6 +64,75 @@ function getSheet_() {
   return sheet;
 }
 
+/** 고객 입력을 메일 본문에 넣을 때 길이를 자른다(넘치면 … 표시). */
+function clip_(v, max) {
+  var s = str_(v).trim();
+  if (s.length > max) return s.slice(0, max) + "…";
+  return s;
+}
+
+/** 제목처럼 한 줄이어야 하는 곳에 쓸 글자: 줄바꿈을 공백으로 바꾸고 자른다. */
+function oneLine_(v, max) {
+  return clip_(str_(v).replace(/[\r\n]+/g, " "), max);
+}
+
+/** 연락처가 이메일 형식인지 본다. 맞으면 주소를, 아니면 빈 문자열을 돌려준다. */
+function emailOf_(contact) {
+  var s = str_(contact).trim();
+  if (s.length > 254) return "";
+  if (/^[^\s@<>(),;:"\[\]]+@[^\s@<>(),;:"\[\]]+\.[A-Za-z]{2,}$/.test(s)) return s;
+  return "";
+}
+
+/** 초안 기능이 켜져 있는지(스크립트 속성 DRAFT_REPLY 가 off 가 아니면 켜짐). */
+function draftEnabled_() {
+  var v = PropertiesService.getScriptProperties().getProperty("DRAFT_REPLY");
+  return str_(v).trim().toLowerCase() !== "off";
+}
+
+/**
+ * 고객에게 보낼 답장 초안의 제목·본문을 만든다(일반 텍스트).
+ * 고객 입력은 꾸미지 않고 그대로 인용한다. 가격·기간·성과·회신 시한은 약속하지 않는다.
+ */
+function buildDraft_(body, services) {
+  var name = oneLine_(body.name, 50) || "고객";
+  var lines = [
+    name + "님, 안녕하세요.",
+    "에이아이솔루션입니다.",
+    "",
+    "홈페이지로 보내주신 문의를 잘 받았습니다.",
+    "남겨주신 내용은 아래와 같습니다.",
+    "",
+  ];
+  var summary = [];
+  if (services) summary.push("- 필요 솔루션: " + clip_(services, 200));
+  var budget = clip_(body.budget, 100);
+  if (budget && budget !== "미입력") summary.push("- 예산: " + budget);
+  if (clip_(body.launchDate, 100)) summary.push("- 희망 론칭일: " + clip_(body.launchDate, 100));
+  if (clip_(body.topic, 100)) summary.push("- 문의 주제: " + clip_(body.topic, 100));
+  if (clip_(body.notes, 300)) summary.push("- 내용: " + clip_(body.notes, 300));
+  if (summary.length === 0) summary.push("- (적어주신 내용 없음)");
+  lines = lines.concat(summary);
+  lines.push("");
+  if (body.attachmentFailed) {
+    lines.push("첨부하신 파일이 업로드되지 않았습니다. 이 메일에 회신으로 다시 보내주세요.");
+    lines.push("");
+  }
+  lines.push("내용을 검토한 뒤 상세 상담 일정을 잡고 싶습니다.");
+  lines.push("편하신 시간대를 2~3개 회신해 주시면 맞춰 보겠습니다.");
+  lines.push("참고하실 자료가 있으면 회신에 첨부해 주셔도 좋습니다.");
+  lines.push("");
+  lines.push("감사합니다.");
+  lines.push("");
+  lines.push("에이아이솔루션 드림");
+  lines.push("contact@ai-solution.co.kr");
+  lines.push("https://ai-solution.co.kr");
+  return {
+    subject: "[에이아이솔루션] " + name + "님 문의 잘 받았습니다",
+    body: lines.join("\n"),
+  };
+}
+
 /** 첨부 여부 칸 글자 */
 function attachmentLabel_(body) {
   var fileName = str_(body.fileName);
@@ -110,10 +182,35 @@ function doPost(e) {
     lock.releaseLock();
   }
 
-  // 3) 메일 알림 — 실패해도 시트 기록은 이미 끝났으므로 ok 로 답한다.
+  // 3) 고객 답장 초안 — 만들기만 하고 보내지 않는다. 실패해도 시트·알림은 그대로 간다.
+  //    테스트 실행(source=test)에서는 고객 주소 대신 스크립트 주인 주소로 초안을 만든다.
+  var customerEmail = emailOf_(body.contact);
+  var notice = []; // 알림 메일 맨 위에 붙일 안내
+  if (!customerEmail) {
+    notice.push("전화로 연락이 필요한 문의입니다(연락처가 이메일이 아님).");
+    notice.push("1) 접수 확인 인사 후 적어주신 내용을 짧게 확인합니다.");
+    notice.push("2) 상세 상담 일정을 잡기 위해 편한 시간대를 여쭙니다.");
+    notice.push("3) 가격·기간은 상담 후 안내드린다고만 말씀드립니다(약속하지 않기).");
+  } else {
+    try {
+      if (draftEnabled_()) {
+        var to = body.source === "test" ? Session.getEffectiveUser().getEmail() : customerEmail;
+        var draft = buildDraft_(body, services);
+        GmailApp.createDraft(to, draft.subject, draft.body);
+        notice.push("Gmail 임시보관함에 답장 초안을 만들어 두었습니다. 확인 후 직접 보내주세요.");
+      }
+    } catch (err) {
+      console.error("답장 초안 만들기 실패: " + err);
+      notice.push("답장 초안 만들기 실패 — 고객에게 직접 답장을 써 주세요.");
+    }
+  }
+
+  // 4) 메일 알림 — 실패해도 시트 기록은 이미 끝났으므로 ok 로 답한다.
+  //    받는 사람은 스크립트 주인(사장님) 한 명뿐이다.
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var lines = [
+    var lines = notice.length ? notice.concat([""]) : [];
+    lines = lines.concat([
       "홈페이지로 새 문의가 들어왔습니다.",
       "",
       "접수 시각: " + receivedAt,
@@ -122,7 +219,7 @@ function doPost(e) {
       "예산: " + str_(body.budget),
       "희망 론칭일: " + str_(body.launchDate),
       "필요 솔루션: " + (services || "선택 안 함"),
-    ];
+    ]);
     if (str_(body.topic)) lines.push("문의 주제: " + str_(body.topic));
     lines.push("첨부: " + attachment);
     lines.push("");
@@ -157,6 +254,7 @@ function doGet() {
  * 편집기에서 직접 실행하는 테스트.
  * 처음 한 번 실행하면 시트·메일 권한을 승인하는 창이 뜬다.
  * 실행 후 "문의" 시트에 예시 한 줄이 생기고, 내 메일함에 알림 메일이 오면 성공이다.
+ * 답장 초안은 예시 주소(test@example.com)가 아니라 내 주소로 임시보관함에 만들어진다.
  */
 function testDoPost() {
   var token = PropertiesService.getScriptProperties().getProperty("TOKEN");
@@ -167,7 +265,7 @@ function testDoPost() {
     token: token,
     receivedAt: new Date().toISOString(),
     name: "테스트 / 예시 회사",
-    contact: "010-0000-0000",
+    contact: "test@example.com",
     budget: "3,000만 원",
     launchDate: "미정",
     services: ["Web/App 플랫폼 구축", "AI 업무 자동화"],
