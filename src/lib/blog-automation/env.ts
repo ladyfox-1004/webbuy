@@ -10,7 +10,13 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../integrations/supabase/types";
-import { DEFAULT_GEMINI_MODEL, isAiBinding, type AiBindingLike } from "./gemini";
+import {
+  DEFAULT_GEMINI_MODEL,
+  isAiBinding,
+  isFetcher,
+  type AiBindingLike,
+  type FetcherLike,
+} from "./gemini";
 
 export type AutomationEnv = {
   SUPABASE_URL?: string;
@@ -23,6 +29,8 @@ export type AutomationEnv = {
   AI_GATEWAY_ID?: string;
   /** Workers AI 바인딩(wrangler.jsonc "ai": { "binding": "AI" }). 문자열이 아니라 객체라 따로 고른다. */
   AI?: AiBindingLike;
+  /** Gemini 중계 워커(aisolution-gemini) 서비스 바인딩(wrangler.jsonc "services"). 있으면 이것을 먼저 쓴다. */
+  GEMINI_PROXY?: FetcherLike;
 };
 
 type Bag = Record<string, unknown>;
@@ -46,7 +54,7 @@ function pickStrings(src: Bag | undefined): Record<string, string> {
 }
 
 /** 뒤에 오는 값이 앞을 덮는다. cfEnv(바인딩)를 가장 우선한다.
- *  AI 바인딩은 process.env 에는 없다(문자열만 들어감). 예약 실행은 cfEnv, 서버 라우트는
+ *  AI·GEMINI_PROXY 바인딩은 process.env 에는 없다(문자열만 들어감). 예약 실행은 cfEnv, 서버 라우트는
  *  nitro cloudflare 처리기가 fetch·scheduled 마다 넣는 globalThis.__env__ 에서 얻는다. */
 export function readAutomationEnv(cfEnv?: unknown): AutomationEnv {
   const proc = typeof process !== "undefined" ? (process.env as Bag) : undefined;
@@ -59,6 +67,8 @@ export function readAutomationEnv(cfEnv?: unknown): AutomationEnv {
   };
   const ai = [cf?.AI, nitroEnv?.AI].find(isAiBinding);
   if (ai) out.AI = ai;
+  const proxy = [cf?.GEMINI_PROXY, nitroEnv?.GEMINI_PROXY].find(isFetcher);
+  if (proxy) out.GEMINI_PROXY = proxy;
   return out;
 }
 

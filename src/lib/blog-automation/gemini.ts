@@ -175,13 +175,33 @@ export function isAiBinding(v: unknown): v is AiBindingLike {
   return !!v && typeof v === "object" && typeof (v as { gateway?: unknown }).gateway === "function";
 }
 
+// ── Gemini 중계 워커(aisolution-gemini) 경유 ────────────────────────────────
+// AI Gateway 경유도 같은 400(User location is not supported)으로 막혔다(10/25).
+// 그래서 실행 위치를 미국에 고정한(placement.region) 작은 워커 workers/gemini-proxy 를 서비스 바인딩
+// GEMINI_PROXY 로 부른다. 그 워커는 { model, body } 와 x-goog-api-key 헤더를 받아 구글에 그대로 중계하고,
+// 응답 헤더 x-proxy-colo 에 실행 데이터센터를 넣어 준다(진단용).
+// 서비스 바인딩 fetch 의 URL 호스트는 아무 값이나 되지만 완전한 URL 이어야 한다:
+//   https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/http/
+export type FetcherLike = { fetch(input: string, init?: RequestInit): Promise<Response> };
+export const GEMINI_PROXY_URL = "https://gemini-proxy/generate";
+
+export function isFetcher(v: unknown): v is FetcherLike {
+  // 서비스 바인딩(Fetcher)은 RPC 지원 때문에 프록시 객체일 수 있어 typeof 가 "function" 이어도 받는다.
+  return (
+    !!v &&
+    (typeof v === "object" || typeof v === "function") &&
+    typeof (v as { fetch?: unknown }).fetch === "function"
+  );
+}
+
 /** 실제 호출. 429 는 GeminiQuotaError, 그 밖의 실패는 Error.
- *  ai 바인딩과 gatewayId 가 둘 다 있으면 AI Gateway 경유, 아니면 구글로 직접(로컬 개발·시험용 대체 경로). */
+ *  우선순위: proxy(GEMINI_PROXY 서비스 바인딩) → ai 바인딩+gatewayId(AI Gateway) → 구글 직접(로컬 개발·시험용). */
 export async function generateDraft(opts: {
   apiKey: string;
   model: string;
   videoUrl: string;
   meta: { title: string | null; channel: string | null };
+  proxy?: FetcherLike | null;
   ai?: AiBindingLike | null;
   gatewayId?: string | null;
 }): Promise<BlogDraft> {
@@ -190,7 +210,21 @@ export async function generateDraft(opts: {
   const gatewayId = opts.gatewayId?.trim();
 
   let res: Response;
-  if (opts.ai && isAiBinding(opts.ai) && gatewayId) {
+  // 중계 워커 경유일 때만 붙는 진단 꼬리표. 예: " (colo=IAD)"
+  let where = "";
+  if (opts.proxy && isFetcher(opts.proxy)) {
+    try {
+      res = await opts.proxy.fetch(GEMINI_PROXY_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-goog-api-key": opts.apiKey },
+        body: JSON.stringify({ model: opts.model, body }),
+      });
+    } catch (e) {
+      // 바인딩 자체가 던진 오류(중계 워커 미배포 등). 키는 메시지에 들어가지 않는다.
+      throw new Error(`Gemini(중계 워커) 호출 실패: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    where = ` (colo=${res.headers.get("x-proxy-colo") || "?"})`;
+  } else if (opts.ai && isAiBinding(opts.ai) && gatewayId) {
     try {
       res = await opts.ai.gateway(gatewayId).run({
         provider: "google-ai-studio",
@@ -213,13 +247,15 @@ export async function generateDraft(opts: {
   }
 
   if (res.status === 429) {
-    throw new GeminiQuotaError(`Gemini 한도 초과(429): ${(await safeText(res)).slice(0, 300)}`);
+    throw new GeminiQuotaError(
+      `Gemini 한도 초과(429): ${(await safeText(res)).slice(0, 300)}${where}`,
+    );
   }
   if (!res.ok) {
-    throw new Error(`Gemini HTTP ${res.status}: ${(await safeText(res)).slice(0, 300)}`);
+    throw new Error(`Gemini HTTP ${res.status}: ${(await safeText(res)).slice(0, 300)}${where}`);
   }
   const result = parseGeminiResponse(await res.json());
-  if (!result.ok) throw new Error(`Gemini 응답 검증 실패: ${result.error}`);
+  if (!result.ok) throw new Error(`Gemini 응답 검증 실패: ${result.error}${where}`);
   return result.draft;
 }
 
