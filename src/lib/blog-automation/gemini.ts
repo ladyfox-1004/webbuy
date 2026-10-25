@@ -152,19 +152,66 @@ export function parseGeminiResponse(json: unknown): ValidationResult {
   return validateDraft(parsed);
 }
 
-/** 실제 호출. 429 는 GeminiQuotaError, 그 밖의 실패는 Error. */
+// ── Cloudflare AI Gateway 경유 ──────────────────────────────────────────────
+// 워커에서 generativelanguage.googleapis.com 을 직접 부르면 워커 실행 지역에 따라
+// "User location is not supported for the API use"(400)로 막힌다. 그래서 운영에서는
+// Workers AI 바인딩(env.AI)의 gateway(id).run() 으로 AI Gateway 를 거쳐 부른다.
+// 근거:
+//   https://developers.cloudflare.com/ai-gateway/usage/universal/   ("Workers Binding example": env.AI.gateway(id).run({provider, endpoint, headers, query}))
+//   https://developers.cloudflare.com/ai-gateway/configuration/authentication/  (바인딩 요청은 pre-authenticated → cf-aig-authorization 불필요)
+//   https://developers.cloudflare.com/ai-gateway/usage/providers/google-ai-studio/  (provider "google-ai-studio", 그 뒤에 구글 REST 경로)
+//   @cloudflare/workers-types: AiGateway.run(data: AIGatewayUniversalRequest | ..., options?) => Promise<Response>
+// 이 프로젝트에는 workers-types 가 없어서 쓰는 부분만 구조 타입으로 적는다.
+export type AiGatewayUniversalRequest = {
+  provider: string;
+  endpoint: string;
+  headers: Record<string, string>;
+  query: unknown;
+};
+export type AiGatewayLike = { run(data: AiGatewayUniversalRequest): Promise<Response> };
+export type AiBindingLike = { gateway(id: string): AiGatewayLike };
+
+export function isAiBinding(v: unknown): v is AiBindingLike {
+  return !!v && typeof v === "object" && typeof (v as { gateway?: unknown }).gateway === "function";
+}
+
+/** 실제 호출. 429 는 GeminiQuotaError, 그 밖의 실패는 Error.
+ *  ai 바인딩과 gatewayId 가 둘 다 있으면 AI Gateway 경유, 아니면 구글로 직접(로컬 개발·시험용 대체 경로). */
 export async function generateDraft(opts: {
   apiKey: string;
   model: string;
   videoUrl: string;
   meta: { title: string | null; channel: string | null };
+  ai?: AiBindingLike | null;
+  gatewayId?: string | null;
 }): Promise<BlogDraft> {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(opts.model)}:generateContent`;
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": opts.apiKey },
-    body: JSON.stringify(buildGeminiRequest(opts.videoUrl, opts.meta)),
-  });
+  const body = buildGeminiRequest(opts.videoUrl, opts.meta);
+  const path = `v1beta/models/${encodeURIComponent(opts.model)}:generateContent`;
+  const gatewayId = opts.gatewayId?.trim();
+
+  let res: Response;
+  if (opts.ai && isAiBinding(opts.ai) && gatewayId) {
+    try {
+      res = await opts.ai.gateway(gatewayId).run({
+        provider: "google-ai-studio",
+        endpoint: path,
+        headers: { "Content-Type": "application/json", "x-goog-api-key": opts.apiKey },
+        query: body,
+      });
+    } catch (e) {
+      // 바인딩 자체가 던진 오류(게이트웨이 없음 등). 키는 메시지에 들어가지 않는다.
+      throw new Error(
+        `Gemini(AI Gateway) 호출 실패: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  } else {
+    res = await fetch(`https://generativelanguage.googleapis.com/${path}`, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": opts.apiKey },
+      body: JSON.stringify(body),
+    });
+  }
+
   if (res.status === 429) {
     throw new GeminiQuotaError(`Gemini 한도 초과(429): ${(await safeText(res)).slice(0, 300)}`);
   }

@@ -167,6 +167,9 @@ async function draftPending(db: ServiceClient, env: AutomationEnv, result: Colle
         model: geminiModel(env),
         videoUrl,
         meta: { title: meta.title ?? src.title, channel: meta.channel },
+        // 운영: AI Gateway 경유(구글 위치 차단 회피). 바인딩·ID 가 없으면 구글로 직접.
+        ai: env.AI,
+        gatewayId: env.AI_GATEWAY_ID,
       });
 
       // story(개인 성공담·동기부여)는 원칙적으로 공부 노트로만 남긴다(설계 문서).

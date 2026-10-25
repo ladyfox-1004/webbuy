@@ -10,7 +10,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../../integrations/supabase/types";
-import { DEFAULT_GEMINI_MODEL } from "./gemini";
+import { DEFAULT_GEMINI_MODEL, isAiBinding, type AiBindingLike } from "./gemini";
 
 export type AutomationEnv = {
   SUPABASE_URL?: string;
@@ -19,11 +19,15 @@ export type AutomationEnv = {
   GEMINI_MODEL?: string;
   BLOG_PLAYLIST_ID?: string;
   BLOG_DAILY_LIMIT?: string;
+  /** AI Gateway 이름(공개 값, wrangler.jsonc vars). 비어 있으면 구글로 직접 부른다. */
+  AI_GATEWAY_ID?: string;
+  /** Workers AI 바인딩(wrangler.jsonc "ai": { "binding": "AI" }). 문자열이 아니라 객체라 따로 고른다. */
+  AI?: AiBindingLike;
 };
 
 type Bag = Record<string, unknown>;
 
-function pickStrings(src: Bag | undefined): AutomationEnv {
+function pickStrings(src: Bag | undefined): Record<string, string> {
   const out: Record<string, string> = {};
   if (!src) return out;
   for (const k of [
@@ -33,6 +37,7 @@ function pickStrings(src: Bag | undefined): AutomationEnv {
     "GEMINI_MODEL",
     "BLOG_PLAYLIST_ID",
     "BLOG_DAILY_LIMIT",
+    "AI_GATEWAY_ID",
   ]) {
     const v = src[k];
     if (typeof v === "string" && v.trim()) out[k] = v.trim();
@@ -40,15 +45,21 @@ function pickStrings(src: Bag | undefined): AutomationEnv {
   return out;
 }
 
-/** 뒤에 오는 값이 앞을 덮는다. cfEnv(바인딩)를 가장 우선한다. */
+/** 뒤에 오는 값이 앞을 덮는다. cfEnv(바인딩)를 가장 우선한다.
+ *  AI 바인딩은 process.env 에는 없다(문자열만 들어감). 예약 실행은 cfEnv, 서버 라우트는
+ *  nitro cloudflare 처리기가 fetch·scheduled 마다 넣는 globalThis.__env__ 에서 얻는다. */
 export function readAutomationEnv(cfEnv?: unknown): AutomationEnv {
   const proc = typeof process !== "undefined" ? (process.env as Bag) : undefined;
   const nitroEnv = (globalThis as { __env__?: Bag }).__env__;
-  return {
+  const cf = cfEnv as Bag | undefined;
+  const out: AutomationEnv = {
     ...pickStrings(proc),
     ...pickStrings(nitroEnv),
-    ...pickStrings(cfEnv as Bag | undefined),
+    ...pickStrings(cf),
   };
+  const ai = [cf?.AI, nitroEnv?.AI].find(isAiBinding);
+  if (ai) out.AI = ai;
+  return out;
 }
 
 export type ServiceClient = ReturnType<typeof createClient<Database>>;
