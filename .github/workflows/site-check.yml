@@ -1,0 +1,24 @@
+# 에이아이솔루션 홈페이지 매일 점검. 실패하면 잡이 실패해 GitHub이 메일을 보낸다.
+# 설명: docs/ops/site-check.md
+name: site-check
+
+on:
+  schedule:
+    - cron: "30 22 * * *" # 매일 07:30 KST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: 홈페이지 점검
+        run: bash scripts/site-check.sh
