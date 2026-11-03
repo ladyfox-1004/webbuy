@@ -232,7 +232,7 @@ const howWeWork: { icon: LucideIcon; title: string; short: string; desc: string 
 // 🚨 모바일(390px)에서 폼이 화면 폭을 거의 다 쓰게(바깥 여백 16px) 카드 테두리·안쪽 여백은 sm 이상에서만 준다.
 function QuickContact() {
   return (
-    <section id="quick-contact" className="scroll-mt-24 px-4 pb-16 md:pb-24">
+    <section id="quick-contact" className="px-4 pb-16 md:pb-24">
       <div className="mx-auto max-w-3xl">
         <div className="sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:p-10 sm:shadow-[var(--shadow-card)]">
           <div className="mb-8">
@@ -673,7 +673,7 @@ function Services() {
   return (
     <section
       id="services"
-      className="scroll-mt-24 border-y border-border bg-surface px-4 py-20 md:py-28"
+      className="border-y border-border bg-surface px-4 py-20 md:py-28"
     >
       <div className="mx-auto max-w-6xl">
         <SectionHeading
@@ -741,7 +741,7 @@ function Services() {
 
         <div
           id="solutions"
-          className="mt-14 scroll-mt-24 rounded-3xl border border-border bg-card p-6 md:p-8"
+          className="mt-14 rounded-3xl border border-border bg-card p-6 md:p-8"
         >
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
@@ -785,7 +785,7 @@ function Services() {
 function Pillars() {
   const [open, setOpen] = useState(false);
   return (
-    <section id="pillars" className="scroll-mt-24 px-4 py-20 md:py-24">
+    <section id="pillars" className="px-4 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           eyebrow="Beyond"
@@ -845,7 +845,7 @@ const featuredCase = solutionBySlug.get("automation")?.caseStudy;
 function FeaturedCase() {
   if (!featuredCase) return null;
   return (
-    <section id="case" className="scroll-mt-24 px-4 py-20">
+    <section id="case" className="px-4 py-20">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           eyebrow="Case Study"
@@ -876,7 +876,7 @@ const portfolioLandingFirst = [
 
 function Portfolio() {
   return (
-    <section id="portfolio" className="scroll-mt-24 px-4 py-20 md:py-24">
+    <section id="portfolio" className="px-4 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <SectionHeading
@@ -1457,7 +1457,7 @@ function Capabilities() {
   return (
     <section
       id="capabilities"
-      className="scroll-mt-24 border-y border-border bg-surface px-4 py-24 md:py-32"
+      className="border-y border-border bg-surface px-4 py-24 md:py-32"
     >
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
@@ -1860,7 +1860,7 @@ const workSteps = [
 
 function About() {
   return (
-    <section id="about" className="scroll-mt-24 px-4 py-24 md:py-32">
+    <section id="about" className="px-4 py-24 md:py-32">
       <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div>
           <SectionHeading
@@ -1909,7 +1909,7 @@ function About() {
 // 폼 본체는 InquiryForm 하나다. 다른 페이지의 "문의하기" 버튼이 여는 모달도 같은 폼을 쓴다.
 function Contact() {
   return (
-    <section id="contact" className="scroll-mt-24 px-4 py-24 md:py-32">
+    <section id="contact" className="px-4 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
         {/* 🚨 모바일(390px)에서는 바깥 상자·안쪽 상자의 테두리·여백을 모두 빼서 폼이 화면 폭(좌우 16px 여백)을
             거의 다 쓰게 한다. 예전에는 p-6 + p-5 가 겹쳐 입력칸이 270px 안팎으로 좁았다. */}

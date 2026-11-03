@@ -96,6 +96,10 @@
 
   html {
     scroll-behavior: smooth;
+    /* 고정 메뉴(바깥 위 여백 16px + 높이 약 62px) 밑으로 포커스된 입력칸이 숨지 않게 한다.
+       키보드 「다음」·Tab 으로 칸을 옮기거나 칸에 포커스가 갈 때 브라우저가 이만큼 띄워서 보여 준다.
+       #quick-contact 같은 앵커 이동도 이 여백을 쓴다(섹션마다 scroll-mt 를 따로 주면 두 배가 된다). */
+    scroll-padding-top: 6rem;
   }
 
   body {

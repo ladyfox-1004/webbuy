@@ -215,8 +215,8 @@ function DashboardMockup() {
 // ── /solutions/automation 사례 블록 ──────────────────────────────
 export function CaseStudySection({ caseStudy }: { caseStudy: CaseStudy }) {
   return (
-    // scroll-mt: 고정 헤더에 제목이 가리지 않게 한다(홈 카드가 #case 로 보낸다)
-    <section id={caseStudy.anchor} className="scroll-mt-24 px-4 pb-20 break-keep md:pb-24">
+    // 고정 헤더에 제목이 가리지 않게 하는 여백은 styles.css 의 html scroll-padding-top 이 맡는다(홈 카드가 #case 로 보낸다)
+    <section id={caseStudy.anchor} className="px-4 pb-20 break-keep md:pb-24">
       <div className="mx-auto max-w-6xl">
         <div className="relative overflow-hidden rounded-3xl border border-border bg-surface/40 p-5 sm:p-8 md:p-10">
           <div className="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />

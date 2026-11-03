@@ -281,7 +281,7 @@ export function InquiryForm({
               autoComplete="email"
               aria-invalid={!!errors.contact}
               className={`${inputCls} ${errors.contact ? errBorder : okBorder}`}
-              placeholder="010-0000-0000 또는 name@company.com"
+              placeholder="010-0000-0000 또는 이메일 주소"
             />
           </Field>
         </div>

@@ -3,8 +3,10 @@
 사용: (개발 서버를 5240 에 띄운 뒤) python scripts/capture-dangn.py [기준주소]
 결과: screenshots-dangn/*.png, 콘솔에 가로 넘침·대비 부족·폼 폭·접수 요청 내용 출력.
 
-🚨 상담 접수는 실제로 보내지 않는다. 서버 함수 요청(/_serverFn/)과 Supabase 저장소 업로드를
-   가로채 막고(abort), 브라우저가 보내려던 본문만 확인한다(운영 DB·시트·카톡으로 가면 안 된다).
+🚨 상담 접수는 실제로 보내지 않는다. GET/HEAD 가 아닌 모든 요청(서버 함수 /_serverFn/, Supabase
+   REST·저장소 업로드 등)과 카카오·구글 스크립트로 가는 요청은 전부 가로채 막고(abort),
+   브라우저가 보내려던 본문만 확인한다(운영 DB·시트·카톡으로 가면 안 된다).
+   개발 서버도 SUPABASE_URL 을 죽은 주소로 바꿔 띄우는 것을 권한다(이어서_작업메모.md 참고).
 """
 import json
 import os
@@ -86,16 +88,74 @@ def form_widths(page, label):
     print(f"[{label}] 폼 크기(위·아래): {w}")
 
 
+HEADER_JS = r"""
+() => {
+  const nav = document.querySelector('header nav').getBoundingClientRect();
+  const sec = document.querySelector('#quick-contact');
+  const h2 = sec.querySelector('h2').getBoundingClientRect();
+  const inputs = [...sec.querySelectorAll('input:not([type=checkbox]):not([type=file]):not([tabindex="-1"]), textarea')]
+    .map(i => { const r = i.getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom) }; });
+  const a = document.activeElement; const ar = a ? a.getBoundingClientRect() : null;
+  return { headerBottom: Math.round(nav.bottom), h2Top: Math.round(h2.top), scrollY: Math.round(scrollY),
+           firstInputTop: inputs[0] && inputs[0].top,
+           active: a && a.tagName, activeTop: ar && Math.round(ar.top), activeBottom: ar && Math.round(ar.bottom) };
+}
+"""
+
+
+def header_overlap(page, label):
+    """고정 메뉴가 상담폼을 가리는지: 메뉴 「상담 신청」 이동, 히어로 버튼 이동, 메뉴 밑에 있는 칸을 눌렀을 때."""
+    page.evaluate("() => window.scrollTo(0, 0)")
+    page.wait_for_timeout(300)
+    page.click("header button[aria-label='메뉴 열기']")
+    page.wait_for_timeout(300)
+    page.locator("header a[href='#quick-contact']").last.click()
+    page.wait_for_timeout(900)
+    m = page.evaluate(HEADER_JS)
+    print(f"[{label}] 메뉴 「상담 신청」 이동 뒤: {m}  → 제목 가림 {'있음' if m['h2Top'] < m['headerBottom'] else '없음'}")
+    page.screenshot(path=f"{OUT}/{label}-10-menu-cta-jump.png")
+
+    page.evaluate("() => window.scrollTo(0, 0)")
+    page.wait_for_timeout(300)
+    page.locator("a[href='#quick-contact']:not(header a)").first.click()
+    page.wait_for_timeout(900)
+    m = page.evaluate(HEADER_JS)
+    print(f"[{label}] 히어로 「상담 신청」 이동 뒤: {m}  → 제목 가림 {'있음' if m['h2Top'] < m['headerBottom'] else '없음'}")
+
+    # 손으로 스크롤해서 「연락처」 칸이 메뉴 바로 밑(가려진 자리)에 있을 때 그 칸을 누르면?
+    contact = page.locator("#quick-contact [data-testid=inquiry-form] input").nth(2)
+    page.evaluate(
+        """(el) => { const r = el.getBoundingClientRect(); window.scrollBy(0, r.top - 30); }""",
+        contact.element_handle(),
+    )
+    page.wait_for_timeout(400)
+    page.screenshot(path=f"{OUT}/{label}-11-input-under-header.png")
+    before = page.evaluate(HEADER_JS)
+    contact.focus()
+    page.wait_for_timeout(600)
+    m = page.evaluate(HEADER_JS)
+    hidden = m["activeTop"] is not None and m["activeTop"] < m["headerBottom"]
+    print(f"[{label}] 메뉴 밑 칸 포커스: 전 {before} / 후 {m}  → 포커스 칸 가림 {'있음' if hidden else '없음'}")
+    page.screenshot(path=f"{OUT}/{label}-12-input-focused.png")
+    contact.blur()
+    page.evaluate("() => window.scrollTo(0, 0)")
+    page.wait_for_timeout(300)
+
+
 def main():
     with sync_playwright() as p:
         browser = p.chromium.launch()
         sent = []
 
-        def block(route):
+        def guard(route):
             req = route.request
-            if req.method == "POST":
-                sent.append({"url": req.url[:80], "body": req.post_data})
-            route.abort()
+            host = req.url.split("/")[2] if "://" in req.url else ""
+            outside = any(h in host for h in ("kakao.com", "script.google", "googleusercontent"))
+            if req.method not in ("GET", "HEAD") or outside or "/_serverFn/" in req.url:
+                sent.append({"method": req.method, "url": req.url[:80], "body": req.post_data})
+                route.abort()
+            else:
+                route.continue_()
 
         for name, vw, vh, mobile in [("390", 390, 844, True), ("1280", 1280, 800, False)]:
             ctx = browser.new_context(
@@ -103,8 +163,7 @@ def main():
                 is_mobile=mobile, has_touch=mobile, locale="ko-KR",
             )
             page = ctx.new_page()
-            page.route("**/_serverFn/**", block)
-            page.route("**/storage/v1/**", block)
+            page.route("**/*", guard)
             page.goto(BASE + "/", wait_until="networkidle")
             # 하이드레이션(React 이벤트 연결)이 끝나야 클릭이 먹는다. 안 기다리면 폼이 브라우저 기본 제출로 새로고침된다.
             page.wait_for_function(
@@ -117,6 +176,9 @@ def main():
             page.screenshot(path=f"{OUT}/{name}-00-full.png", full_page=True)
             check_page(page, name)
             form_widths(page, name)
+
+            if mobile:
+                header_overlap(page, name)
 
             page.locator("#quick-contact").scroll_into_view_if_needed()
             page.locator("#quick-contact").screenshot(path=f"{OUT}/{name}-02-quick-contact.png")

@@ -6,6 +6,7 @@ import { sendKakaoNotice } from "./kakao";
 import { postToSheet } from "./sheet";
 import { createNotifyServiceClient, supabaseTokenStore, type ServiceDb } from "./token-store";
 import type { FetchLike, InquiryNotice, NotifyStatus } from "./types";
+import { errorReason } from "./types";
 
 export type NotifyResult = { sheet: NotifyStatus; kakao: NotifyStatus };
 
@@ -14,12 +15,20 @@ export async function runInquiryNotifications(
   deps: { env?: NotifyEnv; db?: ServiceDb | null; fetchFn?: FetchLike } = {},
 ): Promise<NotifyResult> {
   const env = deps.env ?? readNotifyEnv();
-  const db = deps.db !== undefined ? deps.db : createNotifyServiceClient(env);
+  let db: ServiceDb | null = null;
+  try {
+    db = deps.db !== undefined ? deps.db : createNotifyServiceClient(env);
+  } catch (err) {
+    console.error(`inquiry notify db client failed: ${errorReason(err)}`);
+  }
   const fetchFn = deps.fetchFn ?? fetch;
+  // 각 갈래는 원래 던지지 않지만, 혹시 던져도 다른 갈래와 결과 기록은 계속한다.
+  const guard = (p: Promise<NotifyStatus>) =>
+    p.catch((err): NotifyStatus => `failed:${errorReason(err)}`);
 
   const [sheet, kakao] = await Promise.all([
-    postToSheet(n, { url: env.INQUIRY_SHEET_WEBHOOK_URL, token: env.INQUIRY_SHEET_TOKEN }, fetchFn),
-    sendKakaoNotice(
+    guard(postToSheet(n, { url: env.INQUIRY_SHEET_WEBHOOK_URL, token: env.INQUIRY_SHEET_TOKEN }, fetchFn)),
+    guard(sendKakaoNotice(
       n,
       {
         restApiKey: env.KAKAO_REST_API_KEY,
@@ -29,20 +38,24 @@ export async function runInquiryNotifications(
       db ? supabaseTokenStore(db) : null,
       ADMIN_INQUIRIES_URL,
       fetchFn,
-    ),
+    )),
   ]);
 
   // 결과 기록 — service_role 이 있어야 한다(anon 에는 수정 권한이 없다). 없거나 칸이 아직 없으면 로그만.
   if (db) {
-    const { error } = await db
-      .from("inquiries")
-      .update({
-        sheet_notify_status: sheet,
-        kakao_notify_status: kakao,
-        notified_at: new Date().toISOString(),
-      })
-      .eq("id", n.id);
-    if (error) console.error(`inquiry notify result save failed [${error.code ?? "?"}]`);
+    try {
+      const { error } = await db
+        .from("inquiries")
+        .update({
+          sheet_notify_status: sheet,
+          kakao_notify_status: kakao,
+          notified_at: new Date().toISOString(),
+        })
+        .eq("id", n.id);
+      if (error) console.error(`inquiry notify result save failed [${error.code ?? "?"}]`);
+    } catch (err) {
+      console.error(`inquiry notify result save crashed: ${errorReason(err)}`);
+    }
   }
   // 상태 문자열에는 토큰·연락처가 없다(오류 종류만).
   if (sheet.startsWith("failed") || kakao.startsWith("failed")) {
