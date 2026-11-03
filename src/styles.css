@@ -39,43 +39,48 @@
   --font-display: "Space Grotesk", system-ui, sans-serif;
   --font-body: "DM Sans", system-ui, sans-serif;
 
-  --shadow-glow: 0 0 60px -10px color-mix(in oklab, var(--primary) 60%, transparent);
-  --shadow-card: 0 20px 50px -20px oklch(0 0 0 / 0.5);
+  --shadow-glow: 0 10px 30px -12px color-mix(in oklab, var(--primary) 45%, transparent);
+  --shadow-card: 0 16px 40px -20px oklch(0.3 0.05 280 / 0.25);
 }
 
 :root {
   --radius: 1rem;
 
-  /* Midnight Indigo palette */
-  --background: oklch(0.13 0.04 280);
-  --foreground: oklch(0.97 0.01 270);
+  /* 흰 바탕 팔레트 (2026-11 당근 광고 전 개편). 강조색 보라(--primary)는 예전 그대로.
+     🚨 대비 기준(WCAG AA, 본문 4.5:1)을 계산해 고른 값이다. 바꾸면 다시 잰다.
+       foreground / 흰 바탕 17.4 · muted-foreground / 흰 바탕 6.9, / surface 6.4
+       primary-glow(강조 글자) / 흰 바탕 6.1 · 흰 글자 / primary 4.6, / primary-glow 6.1
+     작은 강조 글자는 text-primary-glow 를 쓴다(text-primary 는 surface 위에서 4.3 이라 큰 글자·아이콘용). */
+  --background: oklch(0.995 0.003 280);
+  --foreground: oklch(0.22 0.04 280);
 
-  --surface: oklch(0.18 0.05 280);
-  --surface-elevated: oklch(0.22 0.07 280);
+  --surface: oklch(0.975 0.008 280);
+  --surface-elevated: oklch(0.955 0.012 280);
 
-  --card: oklch(0.18 0.05 280);
-  --card-foreground: oklch(0.97 0.01 270);
-  --popover: oklch(0.18 0.05 280);
-  --popover-foreground: oklch(0.97 0.01 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.04 280);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.04 280);
 
   --primary: oklch(0.58 0.22 280);
   --primary-foreground: oklch(0.99 0 0);
-  --primary-glow: oklch(0.72 0.2 285);
+  /* 예전 다크 톤에서는 밝은 보라(0.72)였다. 흰 바탕에서 글자로 읽히게 더 짙게 바꿨다. */
+  --primary-glow: oklch(0.52 0.23 288);
 
-  --secondary: oklch(0.25 0.08 280);
-  --secondary-foreground: oklch(0.97 0.01 270);
+  --secondary: oklch(0.955 0.02 280);
+  --secondary-foreground: oklch(0.22 0.04 280);
 
-  --muted: oklch(0.22 0.05 280);
-  --muted-foreground: oklch(0.68 0.04 270);
+  --muted: oklch(0.965 0.01 280);
+  --muted-foreground: oklch(0.47 0.03 275);
 
-  --accent: oklch(0.65 0.22 285);
-  --accent-foreground: oklch(0.13 0.04 280);
+  --accent: oklch(0.95 0.03 285);
+  --accent-foreground: oklch(0.22 0.04 280);
 
-  --destructive: oklch(0.65 0.25 25);
+  --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
 
-  --border: oklch(0.28 0.07 280);
-  --input: oklch(0.22 0.06 280);
+  --border: oklch(0.9 0.015 280);
+  --input: oklch(0.86 0.02 280);
   --ring: oklch(0.58 0.22 280);
 }
 
@@ -100,10 +105,13 @@
     /* 한국어는 어절 단위로 줄바꿈한다(단어 중간에서 끊기지 않게). 긴 URL 은 넘치지 않게 끊는다. */
     word-break: keep-all;
     overflow-wrap: break-word;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in oklab, var(--primary) 35%, transparent), transparent),
-      radial-gradient(ellipse 60% 40% at 80% 100%, color-mix(in oklab, var(--primary-glow) 20%, transparent), transparent);
-    background-attachment: fixed;
+    /* 흰 바탕 위 맨 위쪽에만 아주 옅은 보라 빛. 본문 대비에는 영향이 없다. */
+    background-image: radial-gradient(
+      ellipse 80% 40% at 50% -10%,
+      color-mix(in oklab, var(--primary) 10%, transparent),
+      transparent
+    );
+    background-repeat: no-repeat;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -117,14 +125,15 @@
   .font-body { font-family: var(--font-body); }
 
   .text-gradient {
-    background: linear-gradient(135deg, var(--foreground), var(--primary-glow));
+    background: linear-gradient(135deg, var(--primary), var(--primary-glow));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
 
   .glass {
-    background: color-mix(in oklab, var(--surface) 60%, transparent);
+    background: color-mix(in oklab, var(--card) 85%, transparent);
+    box-shadow: 0 6px 24px -14px oklch(0.3 0.05 280 / 0.3);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid color-mix(in oklab, var(--border) 80%, transparent);

@@ -246,10 +246,13 @@ export type Database = {
           file_name: string | null
           file_storage_path: string | null
           id: string
+          kakao_notify_status: string | null
           name: string
           notes: string
+          notified_at: string | null
           reference_links: string
           services: string[]
+          sheet_notify_status: string | null
           source: string
         }
         Insert: {
@@ -259,10 +262,13 @@ export type Database = {
           file_name?: string | null
           file_storage_path?: string | null
           id?: string
+          kakao_notify_status?: string | null
           name: string
           notes?: string
+          notified_at?: string | null
           reference_links?: string
           services?: string[]
+          sheet_notify_status?: string | null
           source?: string
         }
         Update: {
@@ -272,11 +278,44 @@ export type Database = {
           file_name?: string | null
           file_storage_path?: string | null
           id?: string
+          kakao_notify_status?: string | null
           name?: string
           notes?: string
+          notified_at?: string | null
           reference_links?: string
           services?: string[]
+          sheet_notify_status?: string | null
           source?: string
+        }
+        Relationships: []
+      }
+      kakao_oauth_tokens: {
+        Row: {
+          connected_at: string | null
+          id: string
+          pending_state: string | null
+          pending_state_expires_at: string | null
+          refresh_token: string | null
+          refresh_token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          connected_at?: string | null
+          id?: string
+          pending_state?: string | null
+          pending_state_expires_at?: string | null
+          refresh_token?: string | null
+          refresh_token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          connected_at?: string | null
+          id?: string
+          pending_state?: string | null
+          pending_state_expires_at?: string | null
+          refresh_token?: string | null
+          refresh_token_expires_at?: string | null
+          updated_at?: string
         }
         Relationships: []
       }

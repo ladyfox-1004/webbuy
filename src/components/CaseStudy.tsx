@@ -61,7 +61,7 @@ function StepFlow({ steps }: { steps: CaseStudyStep[] }) {
                   <div
                     className={
                       step.human
-                        ? "text-[11px] font-medium text-amber-200"
+                        ? "text-[11px] font-medium text-amber-800"
                         : "text-[11px] font-medium text-primary-glow"
                     }
                   >
@@ -159,7 +159,7 @@ function DashboardMockup() {
                     <Shirt className={`h-3.5 w-3.5 ${c}`} />
                   </span>
                 ))}
-                <span className="grid place-items-center rounded-[4px] bg-white text-[9px] font-semibold text-slate-400">
+                <span className="grid place-items-center rounded-[4px] bg-white text-[9px] font-semibold text-muted-foreground">
                   +
                 </span>
               </div>
@@ -295,12 +295,12 @@ export function CaseStudySection({ caseStudy }: { caseStudy: CaseStudy }) {
           <div className="relative mt-12 grid grid-cols-1 gap-4 lg:grid-cols-2">
             <div className="rounded-2xl border border-amber-300/40 bg-amber-300/5 p-5 sm:p-6">
               <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-foreground">
-                <UserCheck className="h-5 w-5 text-amber-200" /> 사람이 하는 일은 판단만
+                <UserCheck className="h-5 w-5 text-amber-800" /> 사람이 하는 일은 판단만
               </h3>
               <ul className="mt-4 space-y-2">
                 {caseStudy.humanItems.map((item) => (
                   <li key={item} className="flex items-start gap-2 text-sm text-foreground/90">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-200" />
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-amber-800" />
                     <span>{item}</span>
                   </li>
                 ))}

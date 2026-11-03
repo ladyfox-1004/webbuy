@@ -71,13 +71,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 // 사이트 기본 검색·공유 문구. 검색 결과용(title·description)과 공유 카드용(og·twitter)을 나눈다.
 // title 은 60자 안팎, description 은 120~155자 안팎(검색 결과에서 잘리지 않는 길이).
+// 2026-11 당근 광고 전 개편: 홈페이지·랜딩페이지 제작과 AI 자동화 위주로 바꿨다(히어로와 같은 말).
 const SITE_TITLE =
-  "AI 기반 웹·앱 플랫폼 구축 · CRM·메타 광고 · 전광판 DOOH 디지털 사이니지 | 에이아이솔루션";
+  "랜딩페이지·홈페이지 제작 · 상담 접수 자동 알림 · AI 업무 자동화 | 에이아이솔루션";
 const SITE_DESCRIPTION =
-  "AI 기반 데이터 분석과 통합 미디어 솔루션으로 비즈니스의 스케일을 확장합니다. 웹·앱 개발과 플랫폼 구축, CRM·메타 광고 통합 마케팅, 건물 전광판(DOOH) 디지털 사이니지 운영, AI 자동화까지 한 팀이 설계하고 운영합니다.";
-const SHARE_TITLE = "AI 데이터 분석 × 통합 미디어 솔루션 — 비즈니스의 스케일을 확장합니다";
+  "병원·학원·법률사무소·쇼핑몰·동네 가게를 위한 랜딩페이지와 홈페이지를 만듭니다. 상담이 들어오면 구글 시트와 카카오톡으로 바로 알리고, 쇼핑몰 상품 등록·재고 관리 같은 반복 업무는 AI 자동화로 줄입니다.";
+const SHARE_TITLE = "문의가 들어오는 홈페이지, 알림까지 자동으로 — 에이아이솔루션";
 const SHARE_DESCRIPTION =
-  "웹·앱 플랫폼 구축, CRM·메타 광고 통합 마케팅, 디지털 사이니지(DOOH) 운영까지. 온라인과 오프라인의 고객 접점을 하나의 데이터 흐름으로 묶어 비즈니스의 스케일을 확장합니다.";
+  "랜딩페이지·홈페이지 제작부터 상담 접수 알림(구글 시트·카카오톡), 쇼핑몰 상품 등록·재고 자동화, AI 업무 자동화까지 한 팀이 만듭니다.";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
@@ -85,9 +86,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       // 🚨 제목·설명은 **검색어**가 들어가야 한다. 예전엔 "AISOLUTION" 뿐이라
-      //    브랜드명을 아는 사람만 찾을 수 있었다. 사려는 사람은 "웹·앱 개발",
-      //    "메타 광고", "디지털 사이니지" 를 친다.
-      // 🚨 홈 히어로("AI 기반 데이터 분석 × 통합 미디어 솔루션", 세 축)와 같은 말을 쓴다.
+      //    브랜드명을 아는 사람만 찾을 수 있었다. 사려는 사람은 "랜딩페이지 제작",
+      //    "홈페이지 제작", "업무 자동화" 를 친다.
+      // 🚨 홈 히어로("랜딩페이지·홈페이지 제작 × AI 업무 자동화")와 같은 말을 쓴다.
       //    직원 수·고객 수·매출 같은 숫자, 금액·기간은 넣지 않는다(검증 못 하는 약속이 된다).
       //    업종 페이지 제목은 src/lib/solutions.ts 의 metaTitle 이 따로 맡는다.
       { title: SITE_TITLE },
@@ -159,7 +160,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <InquiryProvider>
         <Outlet />
-        <Toaster theme="dark" position="top-center" richColors />
+        <Toaster theme="light" position="top-center" richColors />
       </InquiryProvider>
     </QueryClientProvider>
   );

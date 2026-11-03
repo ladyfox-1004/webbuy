@@ -68,14 +68,13 @@ export function InquiryModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] grid place-items-center p-3 sm:p-6"
+      className="fixed inset-0 z-[100] grid place-items-center p-2 sm:p-6"
       onClick={(e) => e.target === e.currentTarget && onOpenChange(false)}
     >
-      {/* 어두운 배경 + 은은한 빛 */}
-      <div className="pointer-events-none absolute inset-0 bg-background/75 backdrop-blur-md" />
+      {/* 뒤 화면을 흐리게 */}
+      <div className="pointer-events-none absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 h-[30rem] w-[30rem] rounded-full bg-primary-glow/15 blur-3xl" />
+        <div className="absolute -left-32 -top-32 h-[28rem] w-[28rem] rounded-full bg-primary/15 blur-3xl" />
       </div>
 
       {/* 그라데이션 테두리 */}
@@ -83,9 +82,9 @@ export function InquiryModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="inquiry-modal-title"
-        className="relative z-10 w-full max-w-2xl rounded-[28px] bg-gradient-to-br from-primary-glow/50 via-border to-primary/40 p-px shadow-2xl shadow-black/60"
+        className="relative z-10 w-full max-w-2xl rounded-[28px] bg-gradient-to-br from-primary-glow/50 via-border to-primary/40 p-px shadow-2xl shadow-black/25"
       >
-        <div className="iqm-scroll relative max-h-[90vh] overflow-y-auto overscroll-contain rounded-[27px] bg-surface px-5 pb-7 pt-6 sm:px-9 sm:pb-9 sm:pt-8">
+        <div className="iqm-scroll relative max-h-[90vh] overflow-y-auto overscroll-contain rounded-[27px] bg-card px-4 pb-7 pt-6 sm:px-9 sm:pb-9 sm:pt-8">
           <button
             ref={closeBtnRef}
             type="button"

@@ -131,7 +131,7 @@ export function TossMiniAppCaseCard() {
         <span className="min-w-0 truncate text-xs font-medium text-slate-700">
           깔끔집사 토스 미니앱
         </span>
-        <QrCode className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+        <QrCode className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
       </div>
     </>
   );

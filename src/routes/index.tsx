@@ -4,8 +4,10 @@ import {
   AppWindow,
   ArrowRight,
   ArrowUpRight,
+  BellRing,
   Building2,
   CalendarCheck,
+  ChevronDown,
   Clapperboard,
   ClipboardList,
   Compass,
@@ -45,6 +47,7 @@ import {
   Workflow,
   Wrench,
   X,
+  Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,21 +84,24 @@ export const Route = createFileRoute("/")({
   }),
 });
 
-// 섹션 순서 (2026-10 B2B 개편)
-// 약속(히어로) → 무엇을 하는가(세 축) → 증명(대표 사례) → 폭(포트폴리오)
-// → 깊이(할 수 있는 일) → 신뢰(회사 소개) → 행동(상담 신청).
+// 섹션 순서 (2026-11 당근 광고 전 개편 — 흰 바탕, 홈페이지·AI 자동화 위주)
+// 약속(히어로) → 바로 상담(폼) → 증명(랜딩·홈페이지 작업 사례) → 무엇을 하는가(서비스·대상·방식)
+// → 대표 사례(쇼핑몰 자동화) → 제공 서비스 상세 → 회사 소개 → 더 큰 프로젝트(세 축, 접힘) → 상담 신청.
+// 🚨 광고로 들어온 손님이 스크롤 없이 폼을 만나게 상담 폼을 히어로 바로 아래에 둔다(맨 아래 폼도 유지).
+// 🚨 "세 개의 축"(플랫폼·CRM/메타·DOOH)은 지금 바로 받는 일이 아니라 아래로 내리고 접어 두었다.
 // 🚨 예전 "컬렉션(#projects)" 섹션은 products 테이블이 없어 빈 화면만 보여서 뺐다.
-//    "기획/개발(#develop)" 카드는 "할 수 있는 일" 안의 분야 칩으로 합쳤다.
 function Index() {
   return (
     <div className="min-h-screen text-foreground">
       <Nav />
       <Hero />
+      <QuickContact />
+      <Portfolio />
       <Services />
       <FeaturedCase />
-      <Portfolio />
       <Capabilities />
       <About />
+      <Pillars />
       <Contact />
       <SiteFooter />
     </div>
@@ -104,10 +110,9 @@ function Index() {
 
 // 홈 앵커 메뉴. 데스크톱·모바일 메뉴가 같이 쓴다.
 const navItems = [
+  { href: "#portfolio", label: "작업 사례" },
   { href: "#services", label: "서비스" },
-  { href: "#case", label: "대표 사례" },
-  { href: "#portfolio", label: "포트폴리오" },
-  { href: "#capabilities", label: "역량" },
+  { href: "#case", label: "자동화 사례" },
   { href: "#about", label: "회사 소개" },
 ];
 
@@ -139,74 +144,117 @@ function SectionHeading({
 }
 
 // ── 히어로 ─────────────────────────────────────────────────────────
-// 🚨 숫자·실적을 넣지 마라(검증 가능한 것만 쓴다). 약속은 "제작"이 아니라 "확장"이다.
+// 🚨 숫자·실적·기간("3일 완성" 같은)을 넣지 마라. 근거는 포트폴리오(랜딩·홈페이지),
+//    대표 사례(쇼핑몰 상품 등록·재고 자동화), 이 사이트의 상담 접수 알림(시트·카톡)뿐이다.
+// 🚨 "학원" 등은 대상 손님을 말하는 것이지 납품 실적이 아니다. 실적처럼 쓰지 마라.
 function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden px-4 pt-36 pb-24 md:pt-48 md:pb-32">
+    <section id="top" className="relative overflow-hidden px-4 pt-32 pb-14 md:pt-44 md:pb-20">
       {/* 은은한 격자 배경 */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,black,transparent)]"
+        className="pointer-events-none absolute inset-0 opacity-60 [background-image:linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,black,transparent)]"
       />
       <div className="relative mx-auto max-w-6xl">
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-border/70 bg-surface/50 px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.18em] text-muted-foreground backdrop-blur">
+        <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-[11px] font-semibold tracking-[0.16em] text-muted-foreground shadow-sm">
           <span className="h-1.5 w-1.5 rounded-full bg-primary-glow" />
-          AISOLUTION · GROWTH PARTNER
+          AISOLUTION · 홈페이지 · AI 자동화
         </div>
-        <p className="font-display text-base font-medium text-primary-glow md:text-xl">
-          AI 기반 데이터 분석 × 통합 미디어 솔루션
+        <p className="font-display text-base font-semibold text-primary-glow md:text-xl">
+          랜딩페이지·홈페이지 제작 × AI 업무 자동화
         </p>
-        <h1 className="mt-4 max-w-5xl font-display text-[2.6rem] leading-[1.12] font-bold tracking-tight md:text-7xl md:leading-[1.08]">
-          비즈니스의 <span className="text-gradient">스케일</span>을
+        <h1 className="mt-4 max-w-4xl font-display text-[2.3rem] leading-[1.18] font-bold tracking-tight md:text-6xl md:leading-[1.12]">
+          문의가 들어오는 홈페이지,
           <br />
-          확장합니다
+          <span className="text-gradient">알림까지 자동으로</span>
         </h1>
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-          웹·앱 플랫폼, CRM·Meta 광고, 건물 전광판(DOOH)까지. 고객이 브랜드를 만나는 온라인과
-          오프라인의 접점을 하나의 데이터 흐름으로 묶어, 매출이 커지는 구조를 설계하고 운영합니다.
+        <p className="mt-7 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+          병원·학원·법률사무소·쇼핑몰·동네 가게를 위한 랜딩페이지와 홈페이지를 만듭니다. 상담이
+          접수되면 구글 시트에 쌓이고 카카오톡으로 바로 알려 드립니다. 쇼핑몰 상품 등록·재고 관리처럼
+          매일 반복하는 일은 AI 자동화로 줄입니다.
         </p>
-        <div className="mt-10 flex flex-wrap gap-3">
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row">
           <a
-            href="#contact"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-6 py-3.5 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
+            href="#quick-contact"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-br from-primary to-primary-glow px-7 py-3.5 font-semibold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
           >
             상담 신청 <ArrowRight className="h-4 w-4" />
           </a>
           <a
             href="#portfolio"
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/40 px-6 py-3.5 font-medium text-foreground backdrop-blur transition hover:bg-surface"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-border bg-card px-7 py-3.5 font-medium text-foreground shadow-sm transition hover:bg-surface"
           >
-            사례 보기 <ArrowUpRight className="h-4 w-4" />
+            작업 사례 보기 <ArrowUpRight className="h-4 w-4" />
           </a>
         </div>
 
-        <div className="mt-16 grid max-w-4xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/70 bg-border/50 sm:grid-cols-3">
-          {[
-            { icon: AppWindow, k: "Platform", v: "Web/App 플랫폼 구축" },
-            { icon: Target, k: "Marketing", v: "CRM · Meta Ads 통합 마케팅" },
-            { icon: MonitorPlay, k: "DOOH", v: "디지털 사이니지 통합 운영" },
-          ].map(({ icon: Icon, k, v }) => (
-            <a
-              key={k}
-              href="#services"
-              className="group flex items-center gap-3 bg-background/80 px-5 py-4 transition hover:bg-surface"
-            >
+        <ul className="mt-12 grid max-w-4xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
+          {howWeWork.map(({ icon: Icon, title, short }) => (
+            <li key={title} className="flex items-center gap-3 bg-card px-5 py-4">
               <Icon className="h-4 w-4 shrink-0 text-primary-glow" />
               <div className="min-w-0">
-                <div className="text-[10px] font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-                  {k}
-                </div>
-                <div className="text-sm font-medium text-foreground">{v}</div>
+                <div className="text-sm font-semibold text-foreground">{title}</div>
+                <div className="text-[13px] text-muted-foreground">{short}</div>
               </div>
-            </a>
+            </li>
           ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+// 어떻게 만드는가. 히어로 칩(short)과 서비스 섹션(desc)이 같이 쓴다.
+// 🚨 기간·숫자 약속을 넣지 마라. "광고 연결"은 서비스 범위 설명이지 성과 약속이 아니다.
+const howWeWork: { icon: LucideIcon; title: string; short: string; desc: string }[] = [
+  {
+    icon: Zap,
+    title: "빠른 제작",
+    short: "필요한 것만 골라 바로 시작",
+    desc: "처음부터 큰 사이트를 만들지 않습니다. 지금 필요한 페이지와 기능만 골라 빠르게 열고, 쓰면서 넓혀 갑니다.",
+  },
+  {
+    icon: Smartphone,
+    title: "모바일 최적화",
+    short: "휴대폰에서 먼저 보기 좋게",
+    desc: "휴대폰으로 보는 손님을 먼저 생각합니다. 작은 화면에서 읽기 쉽고, 상담 버튼과 입력칸은 누르기 쉽게 만듭니다.",
+  },
+  {
+    icon: Megaphone,
+    title: "광고 연결",
+    short: "광고로 온 손님이 바로 문의",
+    desc: "당근·네이버·메타 광고에서 들어온 손님이 바로 상담을 남기도록 페이지를 짜고, 광고 전환 추적 코드 설치도 함께 챙깁니다.",
+  },
+];
+
+// ── 바로 상담(히어로 아래) ───────────────────────────────────────────
+// 맨 아래 Contact 와 같은 InquiryForm 을 쓴다. 폼을 두 벌로 만들지 마라.
+// 🚨 모바일(390px)에서 폼이 화면 폭을 거의 다 쓰게(바깥 여백 16px) 카드 테두리·안쪽 여백은 sm 이상에서만 준다.
+function QuickContact() {
+  return (
+    <section id="quick-contact" className="scroll-mt-24 px-4 pb-16 md:pb-24">
+      <div className="mx-auto max-w-3xl">
+        <div className="sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:p-10 sm:shadow-[var(--shadow-card)]">
+          <div className="mb-8">
+            <div className="mb-3 font-display text-xs font-semibold tracking-[0.2em] text-primary-glow uppercase">
+              Contact
+            </div>
+            <h2 className="font-display text-2xl font-bold tracking-tight md:text-3xl">
+              상담 신청
+            </h2>
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+              이름과 연락처만 남겨 주셔도 됩니다. 담당자가 확인하고 연락드립니다. 예산·일정이 아직
+              정해지지 않아도 괜찮습니다.
+            </p>
+          </div>
+          <InquiryForm variant="section" />
         </div>
       </div>
     </section>
   );
 }
 
-// ── 서비스 세 축 ───────────────────────────────────────────────────
+// ── 더 큰 프로젝트: 세 개의 축 (아래쪽, 접힘) ───────────────────────────
 // 🚨 DOOH 는 공개할 사례가 없다. 사례·숫자를 지어내지 말고 서비스 범위만 적는다.
 // 🚨 해 본 적 없는 연동을 "된다"고 쓰지 않는다(src/lib/solutions.ts 머리 주석과 같은 원칙).
 type Pillar = {
@@ -265,7 +313,7 @@ function PillarCard({ p, wide }: { p: Pillar; wide?: boolean }) {
   return (
     <div
       className={
-        "group relative flex flex-col overflow-hidden rounded-3xl border bg-surface/50 p-7 transition md:p-9 " +
+        "group relative flex flex-col overflow-hidden rounded-3xl border bg-card p-7 transition md:p-9 " +
         (wide
           ? "border-primary/40 shadow-[var(--shadow-glow)] lg:col-span-2 lg:grid lg:grid-cols-[1.2fr_1fr] lg:items-center lg:gap-12"
           : "border-border hover:border-primary/40")
@@ -407,7 +455,7 @@ function ScreenCreative({ i }: { i: number }) {
       return (
         <div className="absolute inset-0 bg-[repeating-linear-gradient(135deg,oklch(0.3_0.06_70/0.5)_0_6px,oklch(0.18_0.03_280)_6px_12px)]">
           <div className="absolute inset-0 grid place-items-center pt-2">
-            <span className="inline-flex items-center gap-1 rounded bg-background/85 px-1.5 py-0.5 text-[9px] font-medium text-amber-200">
+            <span className="inline-flex items-center gap-1 rounded bg-background/85 px-1.5 py-0.5 text-[9px] font-medium text-amber-800">
               <Wrench className="h-2.5 w-2.5" /> 점검 중
             </span>
           </div>
@@ -419,11 +467,11 @@ function ScreenCreative({ i }: { i: number }) {
 const statusChip = {
   live: {
     label: "송출 중",
-    cls: "text-emerald-300",
+    cls: "text-emerald-700",
     dot: "bg-emerald-400 motion-safe:animate-pulse",
   },
-  idle: { label: "대기", cls: "text-slate-300", dot: "bg-slate-400" },
-  check: { label: "점검", cls: "text-amber-200", dot: "bg-amber-400" },
+  idle: { label: "대기", cls: "text-foreground/80", dot: "bg-slate-400" },
+  check: { label: "점검", cls: "text-amber-800", dot: "bg-amber-400" },
 } as const;
 
 // 편성 타임라인. 범위 05~23시(18시간), 그림 속 현재 시각은 13:20 으로 고정한다.
@@ -441,7 +489,7 @@ const timelineState = {
   done: { label: "완료", text: "text-muted-foreground", bar: "bg-primary/40" },
   live: {
     label: "송출 중",
-    text: "text-emerald-300",
+    text: "text-emerald-700",
     bar: "bg-gradient-to-r from-primary to-primary-glow shadow-[0_0_12px_-2px_var(--primary-glow)]",
   },
   next: {
@@ -466,7 +514,7 @@ function SignageIllustration() {
             <span className="rounded-full border border-border bg-surface/80 px-2 py-1 text-foreground/80">
               스크린 {signageScreens.length}
             </span>
-            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-emerald-300">
+            <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-emerald-700">
               송출 중 {liveCount}
             </span>
             <span className="rounded-full border border-border bg-surface/80 px-2 py-1 text-foreground/80">
@@ -516,7 +564,7 @@ function SignageIllustration() {
         <div className="mt-3 rounded-xl border border-border/70 bg-surface/40 px-3 pt-2.5 pb-3">
           <div className="flex items-center justify-between text-[10.5px] leading-none">
             <span className="font-semibold text-foreground/90">오늘 편성</span>
-            <span className="inline-flex items-center gap-1 text-rose-300">
+            <span className="inline-flex items-center gap-1 text-rose-700">
               <span className="h-1.5 w-1.5 rounded-full bg-rose-400" />
               현재 13:20
             </span>
@@ -581,32 +629,119 @@ function SignageIllustration() {
   );
 }
 
-// 업종별 솔루션 페이지로 보내는 링크는 이 섹션 아래에 둔다.
+// ── 서비스: 무엇을 · 누구를 위해 · 어떻게 ─────────────────────────────
+// 🚨 카드마다 근거가 있다. 랜딩·홈페이지 = 포트폴리오, 상담 접수 알림 = 이 사이트의 접수 흐름
+//    (apps-script/·src/lib/notify/), 쇼핑몰 자동화 = 대표 사례(#case), AI 업무 자동화 = 블로그 자동화·
+//    쇼츠 생성기. 근거 없는 기능·숫자를 덧붙이지 마라.
+// 업종별 솔루션 페이지로 보내는 링크도 이 섹션에 둔다.
 // 🚨 홈에 링크가 없으면 크롤러도 사람도 /solutions/* 페이지를 못 찾는다. 사이트맵만으로는 부족하다.
+const offerings: { icon: LucideIcon; title: string; desc: string; href: string; cta: string }[] = [
+  {
+    icon: Globe,
+    title: "랜딩페이지·홈페이지 제작",
+    desc: "광고용 1페이지 랜딩부터 회사 홈페이지까지 만듭니다. 휴대폰에서 먼저 보기 좋게 만들고, 상담 신청 폼은 눈에 잘 띄는 곳에 둡니다.",
+    href: "#portfolio",
+    cta: "작업 사례 보기",
+  },
+  {
+    icon: BellRing,
+    title: "상담 접수 자동 알림",
+    desc: "홈페이지로 상담이 들어오면 구글 시트에 한 줄씩 쌓이고, 카카오톡으로 바로 알림이 갑니다. 문의를 놓치지 않고 바로 연락할 수 있습니다.",
+    href: "#quick-contact",
+    cta: "상담 신청",
+  },
+  {
+    icon: ShoppingBag,
+    title: "쇼핑몰 상품 등록·재고 자동화",
+    desc: "여러 브랜드 사이트의 신상품을 모아 사진·상품명을 정리하고 자사몰에 올리는 일, 품절·재입고를 맞추는 일을 서버가 매일 대신합니다. 사람은 승인만 합니다.",
+    href: "#case",
+    cta: "자동화 사례 보기",
+  },
+  {
+    icon: Workflow,
+    title: "AI 업무 자동화",
+    desc: "매일 손으로 하는 반복 업무를 AI와 자동화로 줄입니다. 블로그 초안 작성, 숏폼 영상 제작, 자료 정리처럼 정해진 일이 알아서 돌아가게 만듭니다.",
+    href: "#capabilities",
+    cta: "자세히 보기",
+  },
+];
+
+// 대상 손님(실적 목록이 아니다)
+const audiences = ["병원·의원", "학원·교육", "법률사무소", "쇼핑몰", "동네 가게·식당", "분양·부동산"];
+
 function Services() {
   return (
-    <section id="services" className="scroll-mt-24 px-4 py-24 md:py-32">
+    <section
+      id="services"
+      className="scroll-mt-24 border-y border-border bg-surface px-4 py-20 md:py-28"
+    >
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           eyebrow="What We Do"
-          title={
-            <>
-              세 개의 축으로
-              <br className="md:hidden" /> 성장을 설계합니다
-            </>
-          }
-          desc="플랫폼, 마케팅, 오프라인 미디어를 따로 맡기면 데이터가 끊깁니다. 에이아이솔루션은 세 영역을 한 팀이 설계하고 운영해, 고객 접점 전체를 하나의 성장 구조로 만듭니다."
+          title="이런 일을 합니다"
+          desc="홈페이지를 만드는 데서 끝나지 않습니다. 들어온 문의와 매일 반복하는 업무까지 자동으로 돌아가게 만듭니다."
         />
 
-        <div className="mt-14 grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <PillarCard p={pillars[0]} />
-          <PillarCard p={pillars[1]} />
-          <PillarCard p={pillars[2]} wide />
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2">
+          {offerings.map((o) => (
+            <a
+              key={o.title}
+              href={o.href}
+              className="group flex flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition hover:border-primary/40 hover:shadow-[var(--shadow-card)] md:p-7"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow">
+                <o.icon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-5 font-display text-xl font-bold">{o.title}</h3>
+              <p className="mt-2 flex-1 text-[15px] leading-relaxed text-muted-foreground">
+                {o.desc}
+              </p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-glow">
+                {o.cta}
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-14 grid gap-10 lg:grid-cols-2">
+          <div>
+            <h3 className="font-display text-lg font-bold">이런 분들께 맞습니다</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              문의를 받아야 매출이 생기는 곳이라면 업종을 가리지 않습니다.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {audiences.map((a) => (
+                <span
+                  key={a}
+                  className="rounded-full border border-border bg-card px-3.5 py-2 text-sm font-medium text-foreground"
+                >
+                  {a}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="font-display text-lg font-bold">이렇게 만듭니다</h3>
+            <ul className="mt-4 space-y-4">
+              {howWeWork.map(({ icon: Icon, title, desc }) => (
+                <li key={title} className="flex gap-3">
+                  <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary-glow">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <div className="font-semibold text-foreground">{title}</div>
+                    <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <div
           id="solutions"
-          className="mt-14 scroll-mt-24 rounded-3xl border border-border bg-surface/30 p-6 md:p-8"
+          className="mt-14 scroll-mt-24 rounded-3xl border border-border bg-card p-6 md:p-8"
         >
           <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div>
@@ -625,7 +760,7 @@ function Services() {
               <Link
                 key={s.slug}
                 to={s.path}
-                className="group flex items-center justify-between gap-3 rounded-2xl border border-border bg-background/50 px-4 py-3.5 transition hover:border-primary/50 hover:bg-surface"
+                className="group flex items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3.5 transition hover:border-primary/50 hover:bg-card"
               >
                 <span className="min-w-0">
                   <span className="block text-[11px] font-medium text-primary-glow">
@@ -645,6 +780,64 @@ function Services() {
   );
 }
 
+// 세 개의 축 — 지금 바로 받는 일이 아니라서 아래쪽에 두고 처음에는 접어 둔다(「더 보기」로 펼침).
+// 접힌 상태에서도 제목·한 줄 설명은 보여서 무엇을 하는 회사인지는 알 수 있다.
+function Pillars() {
+  const [open, setOpen] = useState(false);
+  return (
+    <section id="pillars" className="scroll-mt-24 px-4 py-20 md:py-24">
+      <div className="mx-auto max-w-6xl">
+        <SectionHeading
+          eyebrow="Beyond"
+          title="더 큰 프로젝트도 상담합니다"
+          desc="웹·앱 플랫폼, CRM·메타 광고, 건물 전광판(DOOH)처럼 규모가 큰 일은 상담으로 범위를 정한 뒤 진행합니다."
+        />
+
+        {!open && (
+          <ul className="mt-10 grid grid-cols-1 gap-3 md:grid-cols-3">
+            {pillars.map((p) => (
+              <li
+                key={p.no}
+                className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5"
+              >
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary-glow">
+                  <p.icon className="h-5 w-5" />
+                </span>
+                <div className="min-w-0">
+                  <div className="font-display font-semibold">{p.title}</div>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{p.value}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {open && (
+          <div id="pillars-detail" className="mt-10 grid grid-cols-1 gap-5 lg:grid-cols-2">
+            <PillarCard p={pillars[0]} />
+            <PillarCard p={pillars[1]} />
+            <PillarCard p={pillars[2]} wide />
+          </div>
+        )}
+
+        <div className="mt-6 flex justify-center">
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls="pillars-detail"
+            onClick={() => setOpen((v) => !v)}
+            data-testid="pillars-toggle"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-5 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface"
+          >
+            {open ? "접기" : "더 보기"}
+            <ChevronDown className={`h-4 w-4 transition ${open ? "rotate-180" : ""}`} />
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── 대표 사례 ──────────────────────────────────────────────────────
 // 데이터는 /solutions/automation 의 caseStudy 하나뿐이다(고객사 익명).
 const featuredCase = solutionBySlug.get("automation")?.caseStudy;
@@ -656,8 +849,8 @@ function FeaturedCase() {
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           eyebrow="Case Study"
-          title="대표 사례 · 운영 자동화"
-          desc="한 번 만들고 끝나는 페이지가 아니라, 매일 돌아가는 운영을 시스템으로 바꾼 사례입니다."
+          title="자동화 사례 · 쇼핑몰 상품 등록·재고"
+          desc="손으로 하던 상품 등록과 재고 맞추기를 서버가 매일 대신 돌리게 바꾼 납품 사례입니다."
         />
         <div className="mt-12">
           <CaseStudyFeatureCard caseStudy={featuredCase} />
@@ -673,26 +866,34 @@ function FeaturedCase() {
 // 화면에서만 떼어 낸다(그대로 두면 카드 제목이 잘린다).
 const displayTitle = (title: string) => title.split(" · ")[0];
 
+// 당근 광고로 들어온 손님은 "랜딩페이지·홈페이지"를 보러 온다. 플랫폼·자동화 도구 카드는 뒤로 보낸다.
+// 순서만 바꾸고 하나도 빼지 않는다. 원본 순서(src/lib/portfolio.ts)는 솔루션 페이지가 그대로 쓴다.
+const NON_LANDING_TAGS = new Set(["플랫폼", "자동화"]);
+const portfolioLandingFirst = [
+  ...portfolioSites.filter((s) => !NON_LANDING_TAGS.has(s.tag)),
+  ...portfolioSites.filter((s) => NON_LANDING_TAGS.has(s.tag)),
+];
+
 function Portfolio() {
   return (
-    <section id="portfolio" className="scroll-mt-24 px-4 py-24">
+    <section id="portfolio" className="scroll-mt-24 px-4 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <SectionHeading
             eyebrow="Portfolio"
-            title="포트폴리오"
-            desc="상담·전환 페이지부터 운영 플랫폼까지, 지금 바로 열어볼 수 있는 납품 사이트입니다."
+            title="랜딩페이지·홈페이지 작업 사례"
+            desc="병원·법률·분양·렌트 견적 등 직접 만든 페이지입니다. 카드를 누르면 실제 사이트가 열립니다."
           />
           <a
-            href="#contact"
-            className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-full border border-border bg-surface/40 px-4 py-2 text-sm font-medium text-foreground transition hover:bg-surface md:self-auto"
+            href="#quick-contact"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 self-start rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface md:self-auto"
           >
-            프로젝트 상담 <ArrowUpRight className="h-4 w-4" />
+            제작 상담 <ArrowUpRight className="h-4 w-4" />
           </a>
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {portfolioSites.map((s) => {
+          {portfolioLandingFirst.map((s) => {
             // 주소가 없는 사이트(개인 도구)는 링크 없이 캡처만 보여준다.
             const Card = s.url ? "a" : "div";
             const linkProps = s.url ? { href: s.url, target: "_blank", rel: "noreferrer" } : {};
@@ -700,9 +901,9 @@ function Portfolio() {
             <Card
               key={s.title}
               {...linkProps}
-              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60"
+              className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
             >
-              <div className="relative aspect-[16/10] w-full overflow-hidden bg-background/40">
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-surface">
                 <img
                   src={s.url ? shot(s.url) : s.thumb}
                   alt={displayTitle(s.title)}
@@ -714,12 +915,12 @@ function Portfolio() {
                     (e.currentTarget as HTMLImageElement).style.display = "none";
                   }}
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" />
-                <span className="absolute top-3 left-3 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground backdrop-blur">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
+                <span className="absolute top-3 left-3 rounded-full border border-border bg-card/95 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
                   {s.tag}
                 </span>
                 {s.url && (
-                  <span className="absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full bg-background/70 text-foreground/80 backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
+                  <span className="absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full bg-card/95 text-foreground/80 shadow-sm backdrop-blur transition group-hover:bg-gradient-to-br group-hover:from-primary group-hover:to-primary-glow group-hover:text-primary-foreground">
                     <ExternalLink className="h-3.5 w-3.5" />
                   </span>
                 )}
@@ -744,7 +945,7 @@ function Portfolio() {
             href={TOSS_MINIAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 md:hidden"
+            className="glow-hover group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm md:hidden"
           >
             <TossMiniAppCardBody Icon={ExternalLink} action="토스에서 열기" />
           </a>
@@ -754,7 +955,7 @@ function Portfolio() {
             <DialogTrigger asChild>
               <button
                 type="button"
-                className="glow-hover group relative hidden cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-surface/60 text-left md:flex"
+                className="glow-hover group relative hidden cursor-pointer flex-col overflow-hidden rounded-2xl border border-border bg-card text-left shadow-sm md:flex"
               >
                 <TossMiniAppCardBody Icon={QrCode} action="QR로 열기" />
               </button>
@@ -764,11 +965,11 @@ function Portfolio() {
 
           {/* 이외 다수 — 공개하지 않은 프로젝트는 상담에서 업종에 맞춰 보여준다 */}
           <a
-            href="#contact"
-            className="group relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border border-dashed border-primary/40 bg-gradient-to-br from-primary/10 via-surface/40 to-transparent p-6 transition hover:border-primary/70 sm:col-span-2 md:flex-row md:items-center md:p-8 lg:col-span-3"
+            href="#quick-contact"
+            className="group relative flex flex-col justify-between gap-6 overflow-hidden rounded-2xl border border-dashed border-primary/40 bg-gradient-to-br from-primary/10 via-surface to-transparent p-6 transition hover:border-primary/70 sm:col-span-2 md:flex-row md:items-center md:p-8 lg:col-span-3"
           >
             <div className="flex items-center gap-4">
-              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/40 bg-background/60 text-primary-glow">
+              <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl border border-primary/40 bg-card text-primary-glow">
                 <Plus className="h-5 w-5" />
               </span>
               <div>
@@ -1178,7 +1379,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
   const hasCases = !consult && (cases.length > 0 || !!item.tossMiniApp);
 
   return (
-    <div className="flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-primary/50 hover:bg-white/[0.05]">
+    <div className="flex flex-col rounded-2xl border border-border bg-card p-5 transition hover:border-primary/50 hover:bg-surface">
       <div className="flex items-start gap-3">
         <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary to-primary-glow text-primary-foreground shadow">
           <item.icon className="h-4 w-4" />
@@ -1187,7 +1388,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
           <h4 className="mt-1 font-display text-base leading-snug font-semibold break-keep text-foreground">
             {item.title}
           </h4>
-          <p className="mt-1 text-xs leading-relaxed break-keep text-slate-400">{item.summary}</p>
+          <p className="mt-1 text-xs leading-relaxed break-keep text-muted-foreground">{item.summary}</p>
         </div>
       </div>
 
@@ -1195,7 +1396,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
         {item.features.map((f) => (
           <span
             key={f}
-            className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[11px] leading-none text-slate-300"
+            className="rounded-full border border-border bg-muted px-2.5 py-1 text-[11px] leading-none text-foreground/80"
           >
             {f}
           </span>
@@ -1204,10 +1405,10 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
 
       {/* 버튼은 모든 카드에서 같은 모양이다. 사례 칩은 위 줄, 버튼은 아래 줄 오른쪽에 둬서
           좁은 폭(300px 안팎)에서도 겹치지 않는다. */}
-      <div className="mt-4 border-t border-white/10 pt-3">
+      <div className="mt-4 border-t border-border pt-3">
         {hasCases && (
           <div className="mb-3 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-slate-400">사례</span>
+            <span className="text-[11px] text-muted-foreground">사례</span>
             {cases.map((c) => (
               <a
                 key={c.url}
@@ -1223,7 +1424,7 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
           </div>
         )}
         <div className="flex items-center justify-between gap-2">
-          {!hasCases && <span className="text-[11px] text-slate-400">요구사항에 맞춰 설계</span>}
+          {!hasCases && <span className="text-[11px] text-muted-foreground">요구사항에 맞춰 설계</span>}
           <button
             type="button"
             onClick={() => openInquiry(item.title)}
@@ -1242,13 +1443,13 @@ function GroupTitle({ title, badge }: { title: string; badge?: React.ReactNode }
     <div className="mb-2 flex flex-wrap items-center gap-3">
       <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
       {badge}
-      <div className="hidden h-px flex-1 bg-white/10 sm:block" />
+      <div className="hidden h-px flex-1 bg-border sm:block" />
     </div>
   );
 }
 
 // ── 할 수 있는 일 ──────────────────────────────────────────────────
-// 예전에는 이 섹션만 흰 배경(bg-slate-50)이라 다크 톤 사이에서 튀었다. 블랙 계열로 맞춘다.
+// 2026-11 흰 바탕 개편으로 다른 섹션과 같은 밝은 톤(surface)이다.
 // id 는 예전 "pricing" 에서 "capabilities" 로 바꿨다(가격 섹션이 아니다).
 function Capabilities() {
   const { openInquiry } = useInquiry();
@@ -1256,18 +1457,18 @@ function Capabilities() {
   return (
     <section
       id="capabilities"
-      className="scroll-mt-24 border-y border-white/[0.06] bg-[oklch(0.1_0.015_280)] px-4 py-24 md:py-32"
+      className="scroll-mt-24 border-y border-border bg-surface px-4 py-24 md:py-32"
     >
       <div className="mx-auto max-w-6xl">
         <div className="text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-medium text-primary-glow">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-4 py-1.5 text-xs font-medium text-primary-glow">
             <Sparkles className="h-3.5 w-3.5" />
             What We Build
           </span>
           <h2 className="mt-5 font-display text-3xl font-bold tracking-tight md:text-5xl">
             제공 <span className="text-gradient">서비스</span>
           </h2>
-          <p className="mx-auto mt-5 max-w-2xl break-keep text-slate-400">
+          <p className="mx-auto mt-5 max-w-2xl break-keep text-muted-foreground">
             구축부터 운영까지, 비즈니스에 필요한 시스템을 만듭니다.
           </p>
         </div>
@@ -1285,7 +1486,7 @@ function Capabilities() {
         {/* A-2. 콘텐츠·마케팅 자동화 — 직접 운영 중인 시스템이 근거, 사례 링크는 없다 */}
         <div className="mt-14">
           <GroupTitle title="콘텐츠·마케팅 자동화" />
-          <p className="mb-5 text-sm text-slate-400">
+          <p className="mb-5 text-sm text-muted-foreground">
             직접 만들어 운영 중인 콘텐츠 자동화를 바탕으로 만듭니다. 공식 API와 고객 제공 정보,
             라이선스 스톡·고객 촬영본·AI 생성 소재만 씁니다.
           </p>
@@ -1301,12 +1502,12 @@ function Capabilities() {
           <GroupTitle
             title="맞춤 설계로 진행하는 영역"
             badge={
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/[0.06] px-2.5 py-1 text-[11px] font-medium text-slate-300">
+              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-foreground/80">
                 <MessageCircle className="h-3 w-3" /> 상담으로 시작합니다
               </span>
             }
           />
-          <p className="mb-5 text-sm text-slate-400">
+          <p className="mb-5 text-sm text-muted-foreground">
             요구사항을 들은 뒤 범위와 일정을 맞춰 제안드립니다.
           </p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -1317,9 +1518,9 @@ function Capabilities() {
         </div>
 
         {/* C. 그 밖에 기획·개발하는 분야 */}
-        <div className="mt-14 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <div className="mt-14 rounded-3xl border border-border bg-card p-6 sm:p-8">
           <GroupTitle title="그 밖에 기획·개발하는 분야" />
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             분야를 누르면 해당 주제로 바로 상담을 신청하실 수 있습니다.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -1328,7 +1529,7 @@ function Capabilities() {
                 key={name}
                 type="button"
                 onClick={() => openInquiry(name)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:border-primary-glow/50 hover:text-primary-glow"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground/85 transition hover:border-primary-glow/50 hover:text-primary-glow"
               >
                 <Wrench className="h-3 w-3 text-primary-glow" /> {name}
               </button>
@@ -1337,12 +1538,12 @@ function Capabilities() {
         </div>
 
         {/* D. 연동해 본 것 */}
-        <div className="mt-6 rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+        <div className="mt-6 rounded-3xl border border-border bg-card p-6 sm:p-8">
           <GroupTitle
             title="실제 연동 경험"
             badge={<Link2 className="h-4 w-4 text-primary-glow" />}
           />
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-muted-foreground">
             이 사이트와 납품 프로젝트, 직접 운영 중인 콘텐츠 자동화 시스템에서 실제로 붙여 본 것만
             적었습니다.
           </p>
@@ -1350,7 +1551,7 @@ function Capabilities() {
             {integrations.map((name) => (
               <span
                 key={name}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-slate-200"
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground/85"
               >
                 <ShieldCheck className="h-3.5 w-3.5 text-primary-glow" /> {name}
               </span>
@@ -1358,18 +1559,18 @@ function Capabilities() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center gap-4 rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 to-transparent p-8 text-center md:flex-row md:justify-between md:text-left">
+        <div className="mt-8 flex flex-col items-center gap-4 rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/10 to-card p-8 text-center md:flex-row md:justify-between md:text-left">
           <div>
             <div className="font-display text-lg font-semibold text-foreground">
               필요한 기능이 목록에 없나요?
             </div>
-            <div className="mt-1 text-sm text-slate-400">
+            <div className="mt-1 text-sm text-muted-foreground">
               지금 쓰는 방식과 불편한 지점을 말씀해 주시면, 어떻게 만들지 정리해서 제안드립니다.
             </div>
           </div>
           <a
-            href="#contact"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
+            href="#quick-contact"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition hover:scale-[1.02]"
           >
             <MessageCircle className="h-4 w-4" /> 상담 신청
           </a>
@@ -1425,7 +1626,7 @@ function Nav() {
               </Link>
             )}
             <a
-              href="#contact"
+              href="#quick-contact"
               className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
             >
               상담 신청 <ArrowRight className="h-3.5 w-3.5" />
@@ -1438,7 +1639,7 @@ function Nav() {
               <div className="relative">
                 <button
                   onClick={() => setUserOpen((v) => !v)}
-                  className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/40 px-4 py-2 text-sm text-foreground transition hover:bg-surface"
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-foreground transition hover:bg-surface"
                 >
                   <UserIcon className="h-4 w-4" />
                   <span className="max-w-[120px] truncate">{user.email ?? "내 계정"}</span>
@@ -1446,7 +1647,7 @@ function Nav() {
                 {userOpen && (
                   <div
                     id="user-menu"
-                    className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-border bg-surface/95 p-2 shadow-card backdrop-blur"
+                    className="absolute right-0 mt-2 w-52 overflow-hidden rounded-2xl border border-border bg-card p-2 shadow-[var(--shadow-card)]"
                   >
                     <Link
                       to="/dashboard"
@@ -1471,6 +1672,13 @@ function Nav() {
                           className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
                         >
                           <ShieldCheck className="h-4 w-4 text-primary-glow" /> 관리자
+                        </Link>
+                        <Link
+                          to="/admin/inquiries"
+                          onClick={() => setUserOpen(false)}
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                        >
+                          <Inbox className="h-4 w-4 text-primary-glow" /> 상담 접수
                         </Link>
                         <Link
                           to="/admin/review"
@@ -1516,7 +1724,7 @@ function Nav() {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="mt-2 rounded-3xl border border-border bg-surface/95 p-4 shadow-card backdrop-blur md:hidden">
+          <div className="mt-2 rounded-3xl border border-border bg-card p-4 shadow-[var(--shadow-card)] md:hidden">
             <div className="flex flex-col gap-1 text-sm">
               {navItems.map((n) => (
                 <a
@@ -1547,7 +1755,7 @@ function Nav() {
                 </Link>
               )}
               <a
-                href="#contact"
+                href="#quick-contact"
                 onClick={() => setMobileOpen(false)}
                 className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-br from-primary to-primary-glow px-3 py-2.5 text-sm font-medium text-primary-foreground"
               >
@@ -1578,6 +1786,13 @@ function Nav() {
                         className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated"
                       >
                         <ShieldCheck className="h-4 w-4 text-primary-glow" /> 관리자
+                      </Link>
+                      <Link
+                        to="/admin/inquiries"
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated"
+                      >
+                        <Inbox className="h-4 w-4 text-primary-glow" /> 상담 접수
                       </Link>
                       <Link
                         to="/admin/review"
@@ -1615,31 +1830,31 @@ function Nav() {
 }
 
 // ── 회사 소개 ──────────────────────────────────────────────────────
-// 관점은 "우리가 무엇을 만드는가"가 아니라 "고객 사업이 어떻게 커지는가"다.
+// 관점은 "우리가 무엇을 만드는가"가 아니라 "문의와 매출로 어떻게 이어지는가"다.
 const workSteps = [
   {
     no: "01",
     icon: Compass,
     title: "상담·진단",
-    desc: "사업 목표와 지금의 고객 접점, 막힌 지점을 함께 정리합니다.",
+    desc: "업종과 목표, 지금 문의를 어떻게 받고 있는지, 어디서 손이 많이 가는지 함께 정리합니다.",
   },
   {
     no: "02",
     icon: Layers,
     title: "범위·제안",
-    desc: "필요한 범위만 골라 구조와 일정, 맞춤 견적을 제안드립니다.",
+    desc: "필요한 페이지와 기능만 골라 구성과 일정, 맞춤 견적을 제안드립니다.",
   },
   {
     no: "03",
     icon: Workflow,
-    title: "구축·연동",
-    desc: "플랫폼·광고·송출 시스템을 하나의 데이터 흐름으로 연결합니다.",
+    title: "제작·연결",
+    desc: "페이지를 만들고 상담 접수 알림(시트·카톡)과 필요한 자동화를 연결합니다.",
   },
   {
     no: "04",
     icon: TrendingUp,
     title: "운영·개선",
-    desc: "출시 뒤에도 데이터를 보며 전환과 운영 효율을 계속 끌어올립니다.",
+    desc: "연 뒤에도 문의가 어떻게 들어오는지 보며 문구와 화면을 고쳐 나갑니다.",
   },
 ];
 
@@ -1652,28 +1867,28 @@ function About() {
             eyebrow="About"
             title={
               <>
-                사업의 목표가
+                만들고 끝내지 않고
                 <br />
-                성과가 되는 곳
+                문의로 이어지게
               </>
             }
           />
           <div className="mt-6 space-y-4 text-base leading-relaxed text-muted-foreground md:text-lg">
             <p>
-              에이아이솔루션은 웹·앱 개발사이면서, 마케팅과 오프라인 미디어까지 운영하는 성장
-              파트너입니다.
+              에이아이솔루션은 랜딩페이지·홈페이지를 만들고, 그 뒤에서 돌아가는 상담 접수와 상품
+              관리 같은 업무를 자동화하는 팀입니다.
             </p>
             <p>
-              “무엇을 만들까”보다 “어떻게 매출로 이어질까”를 먼저 묻고, 기획·개발·광고·송출을 한
-              팀이 책임지고 운영합니다. 담당자가 바뀌어도 데이터와 맥락이 끊기지 않습니다.
+              “무엇을 만들까”보다 “손님 문의로 어떻게 이어질까”를 먼저 묻습니다. 기획부터 제작,
+              알림·자동화 연결, 연 뒤의 수정까지 한 팀이 맡습니다.
             </p>
           </div>
         </div>
         <ol className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {workSteps.map((s) => (
-            <li key={s.no} className="rounded-2xl border border-border bg-surface/40 p-5">
+            <li key={s.no} className="rounded-2xl border border-border bg-card p-5 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-background/60 text-primary-glow ring-1 ring-border">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary-glow">
                   <s.icon className="h-4 w-4" />
                 </span>
                 <span className="font-display text-sm font-semibold text-muted-foreground">
@@ -1696,15 +1911,15 @@ function Contact() {
   return (
     <section id="contact" className="scroll-mt-24 px-4 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
-        <div className="relative overflow-hidden rounded-[2rem] border border-border bg-surface/40 p-6 md:p-12">
-          <div className="pointer-events-none absolute -top-32 -right-24 h-80 w-80 rounded-full bg-primary/25 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-primary-glow/15 blur-3xl" />
+        {/* 🚨 모바일(390px)에서는 바깥 상자·안쪽 상자의 테두리·여백을 모두 빼서 폼이 화면 폭(좌우 16px 여백)을
+            거의 다 쓰게 한다. 예전에는 p-6 + p-5 가 겹쳐 입력칸이 270px 안팎으로 좁았다. */}
+        <div className="relative overflow-hidden sm:rounded-[2rem] sm:border sm:border-border sm:bg-surface sm:p-8 md:p-12">
           <div className="relative grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
             <div>
               <SectionHeading
                 eyebrow="Contact"
                 title="프로젝트 상담 신청"
-                desc="예산이나 일정이 아직 정해지지 않아도 괜찮습니다. 현재 상황을 남겨 주시면 담당자가 검토한 뒤 연락드립니다. 견적은 범위를 확인한 뒤 맞춤으로 안내드립니다."
+                desc="예산이나 일정이 아직 정해지지 않아도 괜찮습니다. 지금 상황을 남겨 주시면 담당자가 검토한 뒤 연락드립니다. 견적은 필요한 범위를 확인한 뒤 안내드립니다."
               />
               <ul className="mt-8 space-y-3 text-sm text-muted-foreground">
                 {[
@@ -1713,7 +1928,7 @@ function Contact() {
                   "예산·일정이 미정이어도 상담 가능",
                 ].map((t) => (
                   <li key={t} className="flex items-center gap-2.5">
-                    <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/20 text-primary-glow">
+                    <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/10 text-primary-glow">
                       <Sparkles className="h-3 w-3" />
                     </span>
                     {t}
@@ -1723,7 +1938,7 @@ function Contact() {
               <div className="mt-8 flex flex-col gap-2.5 sm:flex-row lg:flex-col">
                 <a
                   href="mailto:contact@ai-solution.co.kr"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-surface"
+                  className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition hover:bg-surface"
                 >
                   <Mail className="h-4 w-4 text-primary-glow" />
                   contact@ai-solution.co.kr
@@ -1732,14 +1947,14 @@ function Contact() {
                   href={KAKAO_OPENCHAT_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-2xl border border-border bg-background/50 px-4 py-3 text-sm font-medium text-foreground transition hover:bg-surface"
+                  className="inline-flex min-h-12 items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground transition hover:bg-surface"
                 >
                   <MessageCircle className="h-4 w-4 text-primary-glow" />
                   카카오톡 상담
                 </a>
               </div>
             </div>
-            <div className="rounded-3xl border border-border bg-background/70 p-5 backdrop-blur md:p-8">
+            <div className="sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:p-8">
               <InquiryForm variant="section" />
             </div>
           </div>

@@ -3,6 +3,7 @@
  *
  * 이 스크립트는 구글 시트에 "붙어 있는"(컨테이너 바인딩) 스크립트로 쓴다.
  * 설정 방법은 같은 폴더의 README.md 를 따라 하면 된다.
+ * 홈페이지 쪽 코드: src/lib/notify/sheet.ts (본문 모양), src/lib/inquiry.functions.ts (접수)
  *
  * - 홈페이지 서버가 문의 내용을 JSON 으로 POST 하면, 토큰을 확인한 뒤
  *   "문의" 시트에 한 줄을 추가하고 시트 주인에게 메일을 보낸다.
@@ -14,18 +15,24 @@
  */
 
 var SHEET_NAME = "문의";
+
+/**
+ * 새 시트에 쓰는 머리글(1행). 칸은 머리글 "이름"으로 찾아 채운다(getSheet_·rowFor_).
+ * - 예전 시트에 있던 칸(예산·희망 론칭일 등)은 지우지 않고 그대로 두고, 값이 없으면 빈칸으로 둔다.
+ * - 여기 있는데 시트에 없는 칸은 맨 오른쪽에 자동으로 붙인다.
+ * 2026-11: 폼에서 「프로젝트 예산」「희망 론칭일」을 뺐다 → 새 시트 머리글에서도 뺐다.
+ */
 var HEADERS = [
   "접수 시각",
   "이름/회사",
   "연락처",
-  "예산",
-  "희망 론칭일",
   "필요 솔루션",
   "문의 주제",
   "내용",
   "참고 링크",
   "첨부 여부",
   "출처",
+  "문의 번호",
 ];
 
 /** JSON 응답을 만든다. */
@@ -42,16 +49,22 @@ function str_(v) {
 }
 
 /**
- * 수식 주입 방지: = + - @ 로 시작하는 글은 앞에 ' 를 붙여 글자로만 보이게 한다.
- * (누군가 문의 내용에 =IMPORTXML(...) 같은 걸 넣어도 실행되지 않는다.)
+ * 수식 주입 방지: = + - @ 로 시작하는 글(앞에 공백·탭·줄바꿈이 있어도)은 앞에 ' 를 붙여
+ * 글자로만 보이게 한다. (누군가 문의 내용에 =IMPORTXML(...) 같은 걸 넣어도 실행되지 않는다.)
+ * 탭·CR 로 시작하는 글도 같은 이유로 막는다.
+ * 시험: tests/apps-script.test.ts
  */
 function safe_(v) {
   var s = str_(v);
-  if (/^[=+\-@]/.test(s)) return "'" + s;
+  if (/^\s*[=+\-@]/.test(s) || /^[\t\r]/.test(s)) return "'" + s;
   return s;
 }
 
-/** "문의" 시트를 가져온다. 없으면 만들고, 비어 있으면 머리글을 쓴다. */
+/**
+ * "문의" 시트를 가져온다. 없으면 만들고, 비어 있으면 머리글을 쓴다.
+ * 머리글이 이미 있으면 HEADERS 중 빠진 칸만 오른쪽에 덧붙인다(기존 칸·순서는 건드리지 않는다).
+ * 돌려주는 값: { sheet, headers } — headers 는 지금 1행의 머리글 배열.
+ */
 function getSheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(SHEET_NAME);
@@ -60,8 +73,27 @@ function getSheet_() {
     sheet.appendRow(HEADERS);
     sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight("bold");
     sheet.setFrozenRows(1);
+    return { sheet: sheet, headers: HEADERS.slice() };
   }
-  return sheet;
+  var lastCol = Math.max(sheet.getLastColumn(), 1);
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function (h) {
+    return str_(h).trim();
+  });
+  var missing = HEADERS.filter(function (h) {
+    return headers.indexOf(h) === -1;
+  });
+  if (missing.length) {
+    sheet.getRange(1, headers.length + 1, 1, missing.length).setValues([missing]).setFontWeight("bold");
+    headers = headers.concat(missing);
+  }
+  return { sheet: sheet, headers: headers };
+}
+
+/** 머리글 이름 → 값 사전을 시트 칸 순서의 한 줄로. 모르는 머리글 칸은 빈칸. 모든 값은 safe_ 를 거친다. */
+function rowFor_(headers, values) {
+  return headers.map(function (h) {
+    return Object.prototype.hasOwnProperty.call(values, h) ? safe_(values[h]) : "";
+  });
 }
 
 /** 고객 입력을 메일 본문에 넣을 때 길이를 자른다(넘치면 … 표시). */
@@ -162,23 +194,27 @@ function doPost(e) {
   var attachment = attachmentLabel_(body);
 
   // 2) 시트에 한 줄 추가 — 동시에 여러 건이 와도 꼬이지 않게 잠근다.
+  var values = {
+    "접수 시각": receivedAt,
+    "이름/회사": body.name,
+    "연락처": body.contact,
+    "필요 솔루션": services,
+    "문의 주제": body.topic,
+    "내용": body.notes,
+    "참고 링크": body.referenceLinks,
+    "첨부 여부": attachment,
+    "출처": body.source,
+    "문의 번호": body.inquiryId,
+  };
+  // 예전 폼(캐시된 화면)이 보낸 값이 있을 때만. 예전 시트에 이 칸이 있으면 거기에 들어간다.
+  if (str_(body.budget)) values["예산"] = body.budget;
+  if (str_(body.launchDate)) values["희망 론칭일"] = body.launchDate;
+
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    var sheet = getSheet_();
-    sheet.appendRow([
-      receivedAt,
-      safe_(body.name),
-      safe_(body.contact),
-      safe_(body.budget),
-      safe_(body.launchDate),
-      safe_(services),
-      safe_(body.topic),
-      safe_(body.notes),
-      safe_(body.referenceLinks),
-      safe_(attachment),
-      safe_(body.source),
-    ]);
+    var target = getSheet_();
+    target.sheet.appendRow(rowFor_(target.headers, values));
   } finally {
     lock.releaseLock();
   }
@@ -217,10 +253,10 @@ function doPost(e) {
       "접수 시각: " + receivedAt,
       "이름/회사: " + str_(body.name),
       "연락처: " + str_(body.contact),
-      "예산: " + str_(body.budget),
-      "희망 론칭일: " + str_(body.launchDate),
       "필요 솔루션: " + (services || "선택 안 함"),
     ]);
+    if (str_(body.budget)) lines.push("예산: " + str_(body.budget));
+    if (str_(body.launchDate)) lines.push("희망 론칭일: " + str_(body.launchDate));
     if (str_(body.topic)) lines.push("문의 주제: " + str_(body.topic));
     lines.push("첨부: " + attachment);
     lines.push("");
@@ -267,9 +303,8 @@ function testDoPost() {
     receivedAt: new Date().toISOString(),
     name: "테스트 / 예시 회사",
     contact: "test@example.com",
-    budget: "3,000만 원",
-    launchDate: "미정",
-    services: ["Web/App 플랫폼 구축", "AI 업무 자동화"],
+    inquiryId: "test-" + new Date().getTime(),
+    services: ["홈페이지·랜딩페이지 제작", "AI 업무 자동화"],
     topic: "연결 테스트",
     notes: "Apps Script 편집기에서 실행한 테스트 문의입니다. 확인 후 이 줄은 지워도 됩니다.",
     referenceLinks: "",

@@ -35,10 +35,15 @@ import { Route as PaymentResultRouteImport } from './routes/payment.result'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as AdminKakaoConnectRouteImport } from './routes/admin_.kakao-connect'
+import { Route as AdminInquiriesRouteImport } from './routes/admin_.inquiries'
 import { Route as AdminBlogRouteImport } from './routes/admin_.blog'
 import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminReviewRouteImport } from './routes/admin.review'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiKakaoCallbackRouteImport } from './routes/api/kakao/callback'
+import { Route as ApiAdminKakaoRouteImport } from './routes/api/admin/kakao'
+import { Route as ApiAdminInquiriesRouteImport } from './routes/api/admin/inquiries'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -175,6 +180,16 @@ const BlogSlugRoute = BlogSlugRouteImport.update({
   path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminKakaoConnectRoute = AdminKakaoConnectRouteImport.update({
+  id: '/admin_/kakao-connect',
+  path: '/admin/kakao-connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
+  id: '/admin_/inquiries',
+  path: '/admin/inquiries',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBlogRoute = AdminBlogRouteImport.update({
   id: '/admin_/blog',
   path: '/admin/blog',
@@ -193,6 +208,21 @@ const AdminReviewRoute = AdminReviewRouteImport.update({
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiKakaoCallbackRoute = ApiKakaoCallbackRouteImport.update({
+  id: '/api/kakao/callback',
+  path: '/api/kakao/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminKakaoRoute = ApiAdminKakaoRouteImport.update({
+  id: '/api/admin/kakao',
+  path: '/api/admin/kakao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminInquiriesRoute = ApiAdminInquiriesRouteImport.update({
+  id: '/api/admin/inquiries',
+  path: '/api/admin/inquiries',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailTransactionalSendRoute =
@@ -242,6 +272,8 @@ export interface FileRoutesByFullPath {
   '/admin/review': typeof AdminReviewRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/blog': typeof AdminBlogRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/kakao-connect': typeof AdminKakaoConnectRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
@@ -255,6 +287,9 @@ export interface FileRoutesByFullPath {
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/api/admin/inquiries': typeof ApiAdminInquiriesRoute
+  '/api/admin/kakao': typeof ApiAdminKakaoRoute
+  '/api/kakao/callback': typeof ApiKakaoCallbackRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -279,6 +314,8 @@ export interface FileRoutesByTo {
   '/admin/review': typeof AdminReviewRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin/blog': typeof AdminBlogRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/kakao-connect': typeof AdminKakaoConnectRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
@@ -292,6 +329,9 @@ export interface FileRoutesByTo {
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/blog': typeof BlogIndexRoute
+  '/api/admin/inquiries': typeof ApiAdminInquiriesRoute
+  '/api/admin/kakao': typeof ApiAdminKakaoRoute
+  '/api/kakao/callback': typeof ApiKakaoCallbackRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -317,6 +357,8 @@ export interface FileRoutesById {
   '/admin/review': typeof AdminReviewRoute
   '/admin/webhooks': typeof AdminWebhooksRoute
   '/admin_/blog': typeof AdminBlogRoute
+  '/admin_/inquiries': typeof AdminInquiriesRoute
+  '/admin_/kakao-connect': typeof AdminKakaoConnectRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
@@ -330,6 +372,9 @@ export interface FileRoutesById {
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/api/admin/inquiries': typeof ApiAdminInquiriesRoute
+  '/api/admin/kakao': typeof ApiAdminKakaoRoute
+  '/api/kakao/callback': typeof ApiKakaoCallbackRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
   '/api/public/webhooks/lemonsqueezy': typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -356,6 +401,8 @@ export interface FileRouteTypes {
     | '/admin/review'
     | '/admin/webhooks'
     | '/admin/blog'
+    | '/admin/inquiries'
+    | '/admin/kakao-connect'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
@@ -369,6 +416,9 @@ export interface FileRouteTypes {
     | '/solutions/telecom'
     | '/u/$slug'
     | '/blog/'
+    | '/api/admin/inquiries'
+    | '/api/admin/kakao'
+    | '/api/kakao/callback'
     | '/lovable/email/suppression'
     | '/api/admin/blog/run'
     | '/api/public/webhooks/lemonsqueezy'
@@ -393,6 +443,8 @@ export interface FileRouteTypes {
     | '/admin/review'
     | '/admin/webhooks'
     | '/admin/blog'
+    | '/admin/inquiries'
+    | '/admin/kakao-connect'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
@@ -406,6 +458,9 @@ export interface FileRouteTypes {
     | '/solutions/telecom'
     | '/u/$slug'
     | '/blog'
+    | '/api/admin/inquiries'
+    | '/api/admin/kakao'
+    | '/api/kakao/callback'
     | '/lovable/email/suppression'
     | '/api/admin/blog/run'
     | '/api/public/webhooks/lemonsqueezy'
@@ -430,6 +485,8 @@ export interface FileRouteTypes {
     | '/admin/review'
     | '/admin/webhooks'
     | '/admin_/blog'
+    | '/admin_/inquiries'
+    | '/admin_/kakao-connect'
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
@@ -443,6 +500,9 @@ export interface FileRouteTypes {
     | '/solutions/telecom'
     | '/u/$slug'
     | '/blog/'
+    | '/api/admin/inquiries'
+    | '/api/admin/kakao'
+    | '/api/kakao/callback'
     | '/lovable/email/suppression'
     | '/api/admin/blog/run'
     | '/api/public/webhooks/lemonsqueezy'
@@ -466,6 +526,8 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   AdminBlogRoute: typeof AdminBlogRoute
+  AdminInquiriesRoute: typeof AdminInquiriesRoute
+  AdminKakaoConnectRoute: typeof AdminKakaoConnectRoute
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PSlugRoute: typeof PSlugRoute
@@ -479,6 +541,9 @@ export interface RootRouteChildren {
   SolutionsTelecomRoute: typeof SolutionsTelecomRoute
   USlugRoute: typeof USlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  ApiAdminInquiriesRoute: typeof ApiAdminInquiriesRoute
+  ApiAdminKakaoRoute: typeof ApiAdminKakaoRoute
+  ApiKakaoCallbackRoute: typeof ApiKakaoCallbackRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiAdminBlogRunRoute: typeof ApiAdminBlogRunRoute
   ApiPublicWebhooksLemonsqueezyRoute: typeof ApiPublicWebhooksLemonsqueezyRoute
@@ -671,6 +736,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin_/kakao-connect': {
+      id: '/admin_/kakao-connect'
+      path: '/admin/kakao-connect'
+      fullPath: '/admin/kakao-connect'
+      preLoaderRoute: typeof AdminKakaoConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin_/inquiries': {
+      id: '/admin_/inquiries'
+      path: '/admin/inquiries'
+      fullPath: '/admin/inquiries'
+      preLoaderRoute: typeof AdminInquiriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin_/blog': {
       id: '/admin_/blog'
       path: '/admin/blog'
@@ -697,6 +776,27 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/kakao/callback': {
+      id: '/api/kakao/callback'
+      path: '/api/kakao/callback'
+      fullPath: '/api/kakao/callback'
+      preLoaderRoute: typeof ApiKakaoCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/kakao': {
+      id: '/api/admin/kakao'
+      path: '/api/admin/kakao'
+      fullPath: '/api/admin/kakao'
+      preLoaderRoute: typeof ApiAdminKakaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/inquiries': {
+      id: '/api/admin/inquiries'
+      path: '/api/admin/inquiries'
+      fullPath: '/api/admin/inquiries'
+      preLoaderRoute: typeof ApiAdminInquiriesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/transactional/send': {
@@ -764,6 +864,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   AdminBlogRoute: AdminBlogRoute,
+  AdminInquiriesRoute: AdminInquiriesRoute,
+  AdminKakaoConnectRoute: AdminKakaoConnectRoute,
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PSlugRoute: PSlugRoute,
@@ -777,6 +879,9 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsTelecomRoute: SolutionsTelecomRoute,
   USlugRoute: USlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  ApiAdminInquiriesRoute: ApiAdminInquiriesRoute,
+  ApiAdminKakaoRoute: ApiAdminKakaoRoute,
+  ApiKakaoCallbackRoute: ApiKakaoCallbackRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiAdminBlogRunRoute: ApiAdminBlogRunRoute,
   ApiPublicWebhooksLemonsqueezyRoute: ApiPublicWebhooksLemonsqueezyRoute,
