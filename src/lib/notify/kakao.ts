@@ -158,6 +158,9 @@ export function buildAuthorizeUrl(cfg: { restApiKey: string; redirectUri: string
     response_type: "code",
     scope: KAKAO_SCOPE,
     state: cfg.state,
+    // 브라우저에 이미 로그인된 카카오 계정으로 자동 연결되지 않게, 매번 계정을 고르는 로그인 화면을 띄운다
+    // (알림 받을 계정이 브라우저 기본 계정과 다를 수 있다 — 2026-11-04).
+    prompt: "login",
   });
   return `${KAKAO_AUTH_BASE}/oauth/authorize?${q.toString()}`;
 }
