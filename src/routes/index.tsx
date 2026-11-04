@@ -55,16 +55,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useInquiry } from "@/components/InquiryModal";
 import { InquiryForm } from "@/components/InquiryForm";
+import { PricePopup, type PricePopupService } from "@/components/PricePopup";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   TossMiniAppCardBody,
-  TossMiniAppCaseLink,
   TossMiniAppQrDialogContent,
 } from "@/components/TossMiniApp";
 import {
   portfolioSites,
-  portfolioByName,
   shot,
   KAKAO_OPENCHAT_URL,
   TOSS_MINIAPP_URL,
@@ -91,11 +90,18 @@ export const Route = createFileRoute("/")({
 // 🚨 "세 개의 축"(플랫폼·CRM/메타·DOOH)은 지금 바로 받는 일이 아니라 아래로 내리고 접어 두었다.
 // 🚨 예전 "컬렉션(#projects)" 섹션은 products 테이블이 없어 빈 화면만 보여서 뺐다.
 function Index() {
+  // 가격 안내 팝업에서 가격 줄을 누르면 상단 상담폼 「필요한 것」에 그 항목을 미리 골라 둔다.
+  const [presetService, setPresetService] = useState<PricePopupService | undefined>();
   return (
     <div className="min-h-screen text-foreground">
+      <PricePopup
+        onRequestConsult={(service) => {
+          if (service) setPresetService(service);
+        }}
+      />
       <Nav />
       <Hero />
-      <QuickContact />
+      <QuickContact topic={presetService} />
       <Portfolio />
       <Services />
       <FeaturedCase />
@@ -117,6 +123,8 @@ const navItems = [
 ];
 
 // 공용 섹션 머리말
+// title 은 선택값이다(2026-11 대표님 요청으로 작업 사례 섹션은 큰 제목을 뺐다).
+// 제목이 없으면 eyebrow 를 h2 로 그려 문서 구조(제목 순서)는 남기고, desc 를 eyebrow 바로 아래 붙인다.
 function SectionHeading({
   eyebrow,
   title,
@@ -124,20 +132,30 @@ function SectionHeading({
   center,
 }: {
   eyebrow: string;
-  title: React.ReactNode;
+  title?: React.ReactNode;
   desc?: React.ReactNode;
   center?: boolean;
 }) {
+  const eyebrowClass =
+    "font-display text-xs font-semibold tracking-[0.2em] text-primary-glow uppercase";
   return (
     <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
-      <div className="mb-4 font-display text-xs font-semibold tracking-[0.2em] text-primary-glow uppercase">
-        {eyebrow}
-      </div>
-      <h2 className="font-display text-3xl leading-tight font-bold tracking-tight md:text-5xl">
-        {title}
-      </h2>
+      {title ? (
+        <>
+          <div className={`mb-4 ${eyebrowClass}`}>{eyebrow}</div>
+          <h2 className="font-display text-3xl leading-tight font-bold tracking-tight md:text-5xl">
+            {title}
+          </h2>
+        </>
+      ) : (
+        <h2 className={`${desc ? "mb-3 " : ""}${eyebrowClass}`}>{eyebrow}</h2>
+      )}
       {desc && (
-        <p className="mt-5 text-base leading-relaxed text-muted-foreground md:text-lg">{desc}</p>
+        <p
+          className={`${title ? "mt-5" : ""} text-base leading-relaxed text-muted-foreground md:text-lg`}
+        >
+          {desc}
+        </p>
       )}
     </div>
   );
@@ -230,7 +248,7 @@ const howWeWork: { icon: LucideIcon; title: string; short: string; desc: string 
 // ── 바로 상담(히어로 아래) ───────────────────────────────────────────
 // 맨 아래 Contact 와 같은 InquiryForm 을 쓴다. 폼을 두 벌로 만들지 마라.
 // 🚨 모바일(390px)에서 폼이 화면 폭을 거의 다 쓰게(바깥 여백 16px) 카드 테두리·안쪽 여백은 sm 이상에서만 준다.
-function QuickContact() {
+function QuickContact({ topic }: { topic?: string }) {
   return (
     <section id="quick-contact" className="px-4 pb-16 md:pb-24">
       <div className="mx-auto max-w-3xl">
@@ -247,7 +265,7 @@ function QuickContact() {
               정해지지 않아도 괜찮습니다.
             </p>
           </div>
-          <InquiryForm variant="section" />
+          <InquiryForm variant="section" topic={topic} />
         </div>
       </div>
     </section>
@@ -878,15 +896,12 @@ function Portfolio() {
   return (
     <section id="portfolio" className="px-4 py-20 md:py-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-          <SectionHeading
-            eyebrow="Portfolio"
-            title="랜딩페이지·홈페이지 작업 사례"
-            desc="병원·법률·분양·렌트 견적 등 직접 만든 페이지입니다. 카드를 누르면 실제 사이트가 열립니다."
-          />
+        {/* 2026-11 대표님 요청: 큰 제목·설명 문장 없이 작은 eyebrow 와 「제작 상담」 버튼만 둔다. */}
+        <div className="mb-6 flex items-center justify-between gap-4 md:mb-8">
+          <SectionHeading eyebrow="Portfolio" />
           <a
             href="#quick-contact"
-            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 self-start rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface md:self-auto"
+            className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-foreground shadow-sm transition hover:bg-surface"
           >
             제작 상담 <ArrowUpRight className="h-4 w-4" />
           </a>
@@ -1369,14 +1384,12 @@ const developFields = [
   "블로그 콘텐츠 자동화 도구",
 ];
 
-function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean }) {
+// 2026-11-04 대표님 요청으로 홈 서비스 카드에서 사례 줄 숨김.
+// 사례가 있는 카드와 없는 카드가 비교돼 보이지 않게, 모든 카드를 '만들어 줄 수 있는 기능 상품'
+// (제목·부제·기능 칩·상담 문의 버튼) 한 가지 모양으로 그린다. 데이터(cases·tossMiniApp)는 지우지 않았다 —
+// /solutions/* 업종 페이지(SolutionPage.tsx)와 나중에 다시 켤 때를 위해 남겨 둔다.
+function CapabilityCard({ item }: { item: Capability }) {
   const { openInquiry } = useInquiry();
-  const cases = (item.cases ?? []).flatMap((name) => {
-    const site = portfolioByName.get(name);
-    return site ? [{ name, url: site.url }] : [];
-  });
-  // 걸 사례가 없으면 "사례" 라벨만 덩그러니 남는다. 그건 없는 걸 있는 척하는 자리다.
-  const hasCases = !consult && (cases.length > 0 || !!item.tossMiniApp);
 
   return (
     <div className="flex flex-col rounded-2xl border border-border bg-card p-5 transition hover:border-primary/50 hover:bg-surface">
@@ -1403,28 +1416,11 @@ function CapabilityCard({ item, consult }: { item: Capability; consult?: boolean
         ))}
       </div>
 
-      {/* 버튼은 모든 카드에서 같은 모양이다. 사례 칩은 위 줄, 버튼은 아래 줄 오른쪽에 둬서
-          좁은 폭(300px 안팎)에서도 겹치지 않는다. */}
+      {/* 버튼은 모든 카드에서 같은 모양·같은 자리(카드 맨 아래)다. 기능 칩 줄이 flex-1 로 늘어나
+          그리드 한 줄 안의 카드들은 버튼 줄이 같은 높이에 맞는다. */}
       <div className="mt-4 border-t border-border pt-3">
-        {hasCases && (
-          <div className="mb-3 flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-muted-foreground">사례</span>
-            {cases.map((c) => (
-              <a
-                key={c.url}
-                href={c.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 rounded-full border border-primary-glow/30 bg-primary/15 px-2.5 py-1 text-[11px] font-medium text-primary-glow transition hover:bg-primary/25"
-              >
-                {c.name} <ExternalLink className="h-3 w-3" />
-              </a>
-            ))}
-            {item.tossMiniApp && <TossMiniAppCaseLink />}
-          </div>
-        )}
         <div className="flex items-center justify-between gap-2">
-          {!hasCases && <span className="text-[11px] text-muted-foreground">요구사항에 맞춰 설계</span>}
+          <span className="text-[11px] text-muted-foreground">요구사항에 맞춰 설계</span>
           <button
             type="button"
             onClick={() => openInquiry(item.title)}
@@ -1512,7 +1508,7 @@ function Capabilities() {
           </p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {consultCapabilities.map((item) => (
-              <CapabilityCard key={item.title} item={item} consult />
+              <CapabilityCard key={item.title} item={item} />
             ))}
           </div>
         </div>
