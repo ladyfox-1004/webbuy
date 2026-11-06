@@ -313,9 +313,10 @@ BEGIN
   ELSIF v_trial THEN
     IF v_plan <> 1 OR v_credit IS NOT NULL OR v_disc <> 101000 THEN
       v_stale := '체험 조건(1편·할인 101000원)이 맞지 않습니다';
+    -- 한 번이라도 결제된 주문(지금 결제 완료 + 결제 뒤 취소, paid_at 있음)이 있으면 체험 아님(11/6 대표님 결정)
     ELSIF EXISTS (SELECT 1 FROM public.reels_orders
-                   WHERE status = 'paid' AND (insta_id = v_insta OR phone = v_phone)) THEN
-      v_stale := '같은 가게에 결제 완료 주문이 있어 체험이 아닙니다';
+                   WHERE paid_at IS NOT NULL AND (insta_id = v_insta OR phone = v_phone)) THEN
+      v_stale := '같은 가게에 결제된 적 있는 주문이 있어 체험이 아닙니다';
     END IF;
   ELSIF v_credit IS NOT NULL THEN
     SELECT * INTO t FROM public.reels_orders WHERE id = v_credit;
@@ -493,7 +494,7 @@ BEGIN
           v_result := 'applied'; v_mail := true; v_detail := '결제 완료';
           IF o.is_trial THEN
             SELECT order_no INTO v_other FROM public.reels_orders
-             WHERE id <> o.id AND status = 'paid' AND (insta_id = o.insta_id OR phone = o.phone)
+             WHERE id <> o.id AND paid_at IS NOT NULL AND (insta_id = o.insta_id OR phone = o.phone)
              ORDER BY paid_at, order_no LIMIT 1;
             IF v_other IS NOT NULL THEN
               v_flag := format('같은 가게 체험 중복 결제(주문번호 %s)', v_other);

@@ -169,14 +169,26 @@ Deno.test("다른 가게 기록은 무시", () => {
   assertEquals(q5.amount, 750000);
 });
 
-Deno.test("1편: paid 없이 cancelled·expired 만 있으면 다시 체험", () => {
+Deno.test("1편: 결제 안 하고 만료·취소된 대기 주문만 있으면 다시 체험(자격 유지)", () => {
   const q = computeQuote(
     { plan: 1, ...SHOP },
-    [row({ status: "cancelled" }), row({ status: "expired", paid_at: null })],
+    [row({ status: "cancelled", paid_at: null }), row({ status: "expired", paid_at: null })],
     NOW,
   );
   assertEquals(q.amount, 99000);
+  assert(q.is_trial);
   assertEquals(q.supersede_ids, []);
+});
+
+Deno.test("1편: 체험 결제 → 취소·환불된 가게는 체험 썼음 → 200,000원(11/6 결정)", () => {
+  const refunded = row({ status: "cancelled" }); // paid_at 이 남아 있음 = 결제된 적 있음
+  const q = computeQuote({ plan: 1, ...SHOP }, [refunded], NOW);
+  assertEquals(q.amount, 200000);
+  assertFalse(q.is_trial);
+  assertEquals(q.reasons, []);
+  // 아이디만·번호만 겹쳐도 같다
+  assertEquals(computeQuote({ plan: 1, insta: "other_id", phone: SHOP.phone }, [refunded], NOW).amount, 200000);
+  assertEquals(computeQuote({ plan: 1, insta: SHOP.insta, phone: "01099998888" }, [refunded], NOW).amount, 200000);
 });
 
 Deno.test("체험 대기(pending) 중 1편 재주문 → 다시 체험 + 대기 체험은 supersede 목록", () => {
@@ -250,11 +262,13 @@ Deno.test("차감 쓴 주문이 pending·expired·cancelled 면 아직 차감 �
   }
 });
 
-Deno.test("체험이 cancelled(환불) 면 차감 없음", () => {
-  assertEquals(
-    computeQuote({ plan: 5, ...SHOP }, [row({ status: "cancelled" })], NOW).amount,
-    750000,
-  );
+Deno.test("체험 결제 → 취소·환불된 가게: 7일 안 묶음도 차감 없음", () => {
+  const refunded = trialPaidAgo(DAY, { status: "cancelled" });
+  for (const plan of [5, 10] as const) {
+    const q = computeQuote({ plan, ...SHOP }, [refunded], NOW);
+    assertEquals(q.amount, LIST_PRICES[plan]);
+    assertEquals(q.credit_trial_order_id, null);
+  }
 });
 
 Deno.test("체험 pending 만 있는 가게 5편 = 정가", () => {

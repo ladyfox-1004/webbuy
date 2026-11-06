@@ -141,7 +141,9 @@ export function computeQuote(
   };
 
   if (plan === 1) {
-    if (mine.some((r) => r.status === "paid")) return base;
+    // 체험 자격: 같은 가게에 한 번이라도 결제된 주문(지금 paid + 결제 뒤 취소 = paid_at 있음)이 없을 때만(11/6 대표님 결정).
+    // 결제 안 하고 만료·취소된 대기 주문은 세지 않는다. 묶음 차감은 아래처럼 paid 로 남은 체험에만 준다.
+    if (mine.some((r) => r.status === "paid" || r.paid_at != null)) return base;
     return {
       ...base,
       discount: TRIAL_DISCOUNT,

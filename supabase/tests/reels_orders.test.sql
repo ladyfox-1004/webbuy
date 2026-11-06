@@ -604,4 +604,66 @@ BEGIN
   RAISE NOTICE 'PASS 주문번호: 9999 다음은 10000(잘리지 않음)';
 END $$;
 
+-- ───────── 13) 체험 결제 → 취소·환불한 가게는 체험 썼음(11/6 대표님 결정) ─────────
+DO $$
+DECLARE t jsonb; r jsonb; o public.reels_orders; h jsonb; x jsonb;
+BEGIN
+  t := pg_temp.trial('refund_shop', '01055510000');
+  PERFORM pg_temp.pay((t->>'order_id')::uuid, 'MRF1', '99000');
+  r := pg_temp.ev(jsonb_build_object('pay_state', '9', 'var1', t->>'order_id', 'mul_no', 'MRF1', 'price', '99000'));
+  o := pg_temp.ord((t->>'order_id')::uuid);
+  IF o.status IS DISTINCT FROM 'cancelled' OR o.paid_at IS NULL THEN RAISE EXCEPTION 'FAIL 환불 뒤 paid_at 유지: % % % %', o.status, o.paid_at, t, r; END IF;
+  -- shop_history 가 paid_at 을 돌려준다(엣지 함수 computeQuote 가 이 값으로 판정)
+  h := public.reels_shop_history('refund_shop', '01055510000');
+  IF (SELECT count(*) FROM jsonb_array_elements(h) e WHERE e->>'paid_at' IS NOT NULL AND e->>'status' = 'cancelled') <> 1 THEN
+    RAISE EXCEPTION 'FAIL shop_history paid_at: %', h;
+  END IF;
+  -- 1편 체험 다시 → stale_quote (아이디만·번호만 겹쳐도)
+  x := pg_temp.trial('refund_shop', '01055510000');
+  IF (x->>'ok')::boolean OR x->>'reason' <> 'stale_quote' THEN RAISE EXCEPTION 'FAIL 환불 가게 체험 재주문: %', x; END IF;
+  x := pg_temp.trial('refund_shop', '01055519999');
+  IF (x->>'ok')::boolean THEN RAISE EXCEPTION 'FAIL 아이디만 겹침 체험: %', x; END IF;
+  x := pg_temp.trial('refund_other', '01055510000');
+  IF (x->>'ok')::boolean THEN RAISE EXCEPTION 'FAIL 번호만 겹침 체험: %', x; END IF;
+  -- 1편 정가는 된다
+  x := public.reels_create_order(pg_temp.o(1, 200000, 0, false, NULL, 'refund_shop', '01055510000'));
+  IF NOT (x->>'ok')::boolean OR (x->>'amount')::int <> 200000 THEN RAISE EXCEPTION 'FAIL 환불 가게 1편 정가: %', x; END IF;
+  -- 환불된 체험으로 묶음 차감 → stale_quote
+  x := public.reels_create_order(pg_temp.o(5, 750000, 99000, false, (t->>'order_id')::uuid, 'refund_shop', '01055510000'));
+  IF (x->>'ok')::boolean OR x->>'reason' <> 'stale_quote' THEN RAISE EXCEPTION 'FAIL 환불 체험 차감: %', x; END IF;
+  RAISE NOTICE 'PASS 체험 결제→취소 가게: 1편 체험 불가(정가 200,000)·묶음 차감 없음';
+END $$;
+
+DO $$
+DECLARE a jsonb; x jsonb;
+BEGIN
+  -- 결제 안 하고 만료된 체험 → 자격 유지
+  a := pg_temp.trial('expired_shop', '01055511111');
+  UPDATE public.reels_orders SET created_at = now() - interval '25 hours' WHERE id = (a->>'order_id')::uuid;
+  PERFORM public.reels_expire_stale();
+  IF (pg_temp.ord((a->>'order_id')::uuid)).status <> 'expired' THEN RAISE EXCEPTION 'FAIL 만료 준비'; END IF;
+  x := pg_temp.trial('expired_shop', '01055511111');
+  IF NOT (x->>'ok')::boolean THEN RAISE EXCEPTION 'FAIL 만료 체험 뒤 자격 유지: %', x; END IF;
+  -- 결제 안 하고 요청 취소(8)된 체험도 자격 유지
+  PERFORM pg_temp.ev(jsonb_build_object('pay_state', '8', 'var1', x->>'order_id', 'mul_no', 'MEX8', 'price', '99000'));
+  IF (pg_temp.ord((x->>'order_id')::uuid)).status <> 'cancelled' THEN RAISE EXCEPTION 'FAIL 요청 취소'; END IF;
+  x := pg_temp.trial('expired_shop', '01055511111');
+  IF NOT (x->>'ok')::boolean THEN RAISE EXCEPTION 'FAIL 결제 전 취소 뒤 자격 유지: %', x; END IF;
+  RAISE NOTICE 'PASS 결제 안 한 만료·취소 체험은 세지 않음(체험 자격 유지)';
+END $$;
+
+DO $$
+DECLARE t jsonb; b jsonb; r jsonb; o public.reels_orders;
+BEGIN
+  -- 환불된 체험이 있는데 동시에 열어 둔 다른 체험이 결제되면 확인 필요
+  t := pg_temp.trial('refund_dup', '01055512222');
+  b := pg_temp.trial('refund_dup', '01055512222');  -- t 는 만료됨
+  PERFORM pg_temp.pay((t->>'order_id')::uuid, 'MRD1', '99000');
+  PERFORM pg_temp.ev(jsonb_build_object('pay_state', '9', 'var1', t->>'order_id', 'mul_no', 'MRD1', 'price', '99000'));
+  r := pg_temp.pay((b->>'order_id')::uuid, 'MRD2', '99000');
+  o := pg_temp.ord((b->>'order_id')::uuid);
+  IF NOT o.needs_check OR o.check_reason NOT LIKE '같은 가게 체험 중복 결제%' THEN RAISE EXCEPTION 'FAIL 환불 체험 뒤 체험 결제 표시: %', o.check_reason; END IF;
+  RAISE NOTICE 'PASS apply_event: 환불된 체험이 있는 가게의 체험 결제 → needs_check';
+END $$;
+
 ROLLBACK;
