@@ -1,1 +1,17 @@
 project_id = "fnvvpfunmpigfyqwoeea"
+
+# 문의 댓글 릴스 판매(손님은 로그인 없음, reels-admin 은 함수 안에서 관리자 토큰을 직접 확인)
+[functions.reels-quote]
+verify_jwt = false
+
+[functions.reels-checkout]
+verify_jwt = false
+
+[functions.reels-feedback]
+verify_jwt = false
+
+[functions.reels-order]
+verify_jwt = false
+
+[functions.reels-admin]
+verify_jwt = false
