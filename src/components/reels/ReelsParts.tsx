@@ -67,7 +67,7 @@ export function SellerInfo() {
     ["주소", SELLER.address],
     ["전화", SELLER.phone],
     ["이메일", SELLER.email],
-  ];
+  ].filter(([, v]) => v.trim() !== "") as [string, string][]; // 전화가 빈 값이면 줄을 뺀다
   return (
     <dl
       data-testid="seller-info"

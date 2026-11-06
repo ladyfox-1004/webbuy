@@ -8,12 +8,9 @@ export const MAIL_TIMEOUT_MS = 8_000;
 /** sendViaResend 가 키 없음일 때 돌려주는 값(→ reels_mail_done('skipped:메일 미설정')) */
 export const MAIL_NOT_CONFIGURED = "메일 미설정";
 
-/** 아직 정해지지 않은 값 표시. 이 값이면 메일에서 그 줄을 뺀다 */
-export const TBD = "[대표님 확인]";
-
 /**
- * 판매자 정보(한 곳에서만 고친다). 대표자는 홈페이지 개인정보 처리방침의 책임자 표기 기준.
- * address·phone 은 대표님이 정해 주시면 TBD 대신 실제 값을 넣는다(그 전까지 메일에 그 줄이 빠진다).
+ * 판매자 정보. 같은 사업자인 빌드넷 src/config/business.ts 확정값과 같다(화면 src/lib/reels/constants.ts 와 같이 고친다).
+ * phone 이 빈 값이면 메일에서 전화 줄을 뺀다(빌드넷과 같은 방식).
  */
 export const SELLER = {
   name: "에이아이솔루션",
@@ -21,8 +18,8 @@ export const SELLER = {
   bizNo: "215-28-82229",
   mailOrderNo: "2025-서울서초-0732",
   email: "contact@ai-solution.co.kr",
-  address: TBD,
-  phone: TBD,
+  address: "서울특별시 서초구 서초중앙로29길 16-6, B동 303호(반포동, 대림빌라)",
+  phone: "",
 } as const;
 
 export const REFUND_SUMMARY = [
@@ -75,7 +72,7 @@ export function kstDateTimeLabel(iso: string | null | undefined): string {
   return `${k.getUTCFullYear()}년 ${k.getUTCMonth() + 1}월 ${k.getUTCDate()}일 ${p2(k.getUTCHours())}:${p2(k.getUTCMinutes())}`;
 }
 
-/** 판매자 정보 줄들(값이 TBD 인 줄은 뺀다) */
+/** 판매자 정보 줄들(빈 값인 줄은 뺀다) */
 export function sellerLines(): string[] {
   const rows: [string, string][] = [
     ["상호", SELLER.name],
@@ -86,7 +83,7 @@ export function sellerLines(): string[] {
     ["전화", SELLER.phone],
     ["이메일", SELLER.email],
   ];
-  return rows.filter(([, v]) => v && v !== TBD).map(([k, v]) => `${k}: ${v}`);
+  return rows.filter(([, v]) => v.trim() !== "").map(([k, v]) => `${k}: ${v}`);
 }
 
 export function buildReelsMail(d: ReelsMailData, orderUrl: string): BuiltMail {

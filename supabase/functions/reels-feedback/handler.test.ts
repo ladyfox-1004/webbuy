@@ -351,6 +351,7 @@ Deno.test(
         "215-28-82229",
         "2025-서울서초-0732",
         "contact@ai-solution.co.kr",
+        "서초중앙로29길 16-6",
         "제작 시작 전: 전액 환불",
         "편당 2회까지 무료",
         "카카오톡 채널은 준비 중",
@@ -364,7 +365,9 @@ Deno.test(
       for (const banned of ["보장", "10배", "매출 "]) assertFalse(part.includes(banned), banned);
       assertFalse(part.includes("01012345678"));
     }
-    assertFalse(sellerLines().some((l) => l.startsWith("주소") || l.startsWith("전화")));
+    // 주소는 빌드넷 business.ts 확정값, 전화는 빈 값이라 줄이 없어야 한다
+    assert(sellerLines().includes("주소: 서울특별시 서초구 서초중앙로29길 16-6, B동 303호(반포동, 대림빌라)"));
+    assertFalse(sellerLines().some((l) => l.startsWith("전화")));
   },
 );
 

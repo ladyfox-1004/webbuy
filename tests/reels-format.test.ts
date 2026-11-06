@@ -63,6 +63,29 @@ describe("가격표 표시값 = 계약서 상수", () => {
     expect(SELLER.bizNo).toBe("215-28-82229");
     expect(SELLER.mailOrderNo).toBe("2025-서울서초-0732");
     expect(SELLER.email).toBe("contact@ai-solution.co.kr");
+    // 빌드넷 src/config/business.ts 확정값(같은 사업자)
+    expect(SELLER.ceo).toBe("이서연");
+    expect(SELLER.address).toBe("서울특별시 서초구 서초중앙로29길 16-6, B동 303호(반포동, 대림빌라)");
+    expect(SELLER.phone).toBe("");
+  });
+  test("「[대표님 확인]」 이 화면·메일 어디에도 없다", () => {
+    const roots = ["src/lib/reels", "src/components/reels", "supabase/functions"];
+    const files: string[] = [];
+    const walk = (d: string) => {
+      for (const n of readdirSync(d)) {
+        const p = join(d, n);
+        if (statSync(p).isDirectory()) walk(p);
+        else if (/\.(ts|tsx)$/.test(n) && !/\.test\.ts$/.test(n)) files.push(p);
+      }
+    };
+    roots.forEach(walk);
+    for (const n of readdirSync("src/routes")) if (/^(reels|admin_\.reels)/.test(n)) files.push(join("src/routes", n));
+    expect(files.length).toBeGreaterThan(5);
+    for (const f of files) expect(readFileSync(f, "utf8").includes("[대표님 확인]")).toBe(false);
+  });
+  test("전화가 빈 값이면 판매자 정보에서 전화 줄을 뺀다", () => {
+    const src = readFileSync("src/components/reels/ReelsParts.tsx", "utf8");
+    expect(src).toMatch(/\.filter\(\(\[, v\]\) => v\.trim\(\) !== ""\)/);
   });
 });
 

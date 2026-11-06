@@ -102,15 +102,18 @@ export const REELS_STEPS: readonly { title: string; desc: string }[] = [
   { title: "완성본 전달", desc: "완성본을 보내 드리고, 편당 2회까지 무료로 고쳐 드립니다." },
 ];
 
-/** 판매자 정보(법적 표시). 주의: 주소·전화는 홈페이지 어디에도 값이 없어 대표님 확인 전이다 — 이 한 곳만 고치면 된다. */
+/**
+ * 판매자 정보(법적 표시). 같은 사업자(에이아이솔루션)인 빌드넷 src/config/business.ts 의 확정값과 같다.
+ * 전화는 아직 없음(빈 값) → 화면에서 전화 줄을 뺀다. 정해지면 이 한 곳과 supabase/functions/_shared/reelsMail.ts 를 같이 고친다.
+ */
 export const SELLER = {
   name: "에이아이솔루션",
   ceo: "이서연",
   bizNo: "215-28-82229",
   mailOrderNo: "2025-서울서초-0732",
   email: "contact@ai-solution.co.kr",
-  address: "[대표님 확인]",
-  phone: "[대표님 확인]",
+  address: "서울특별시 서초구 서초중앙로29길 16-6, B동 303호(반포동, 대림빌라)",
+  phone: "",
 } as const;
 
 export const PAYMENT_AGENT = "페이앱(PayApp)";
