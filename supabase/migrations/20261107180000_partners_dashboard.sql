@@ -10,7 +10,27 @@
 --   3) 내려받기 자료: partner_transfer_list(_month) — 그 달 지급 전 정산(스냅샷 계좌)
 --                    partner_paid_list(_from, _to) — 지급일이 기간 안인 지급 완료 정산(원천징수 지급 내역)
 --
+-- B) 파트너 로그인 대시보드
+--   1) 계정: partners.user_id(auth.users, UNIQUE). 계정은 서버가 service role admin.createUser(email_confirm) 로 만들고,
+--      승인 때 만든 view_key 로 본인 확인 뒤 partner_link_user 로 연결한다. 브라우저에 RLS 정책은 열지 않는다(정책 0개 그대로).
+--      계정 만들기 안내 메일 기록: partners.account_mail_sent_at · account_mail_error
+--   2) 대시보드·정보 수정·계좌 변경은 서버가 Supabase 세션 토큰 → user id 를 확인한 뒤 아래 함수로만 한다.
+--      대시보드 응답에 계좌 전체 번호는 넣지 않는다(끝 4자리만).
+--   3) 계좌 변경 이력: partner_account_changes(바뀐 시각·옛/새 은행·옛/새 끝 4자리·user agent 요약). 대표님 카톡은 서버가 보낸다.
+--
 -- 함수 계약(service_role 전용, jsonb 반환)
+--   partner_account_target(_view_key)                → {ok:true, id, name, email, status, has_account} | {ok:false, reason:'not_found'}
+--   partner_link_user(_view_key, _user_id, _email)   → {ok:true, id} | {ok:false, reason:'not_found'|'already_linked'|'user_taken'|'email_mismatch'}
+--   partner_session(_user_id)                        → {partner:true, id, code, name, status} | {partner:false}
+--   partner_dashboard(_user_id, _period, _now)       → {...} | null   (_period: '7d'|'30d'|'month')
+--   partner_update_profile(_user_id, _phone, _channels) → {ok:true, phone, channels} | {ok:false, reason:'not_found'|'invalid'|'phone_taken'}
+--   partner_change_account(_user_id, _bank_name, _bank_account, _bank_holder, _user_agent, _now)
+--                                                    → {ok:true, name, bank_name, old_last4, new_last4, changed_at} | {ok:false, reason:'not_found'|'invalid'|'same'}
+--   partner_account_mail_target(_id)                 → {ok:true, name, email, view_key} | {ok:false, reason:'not_found'|'not_approved'|'has_account'}
+--   partner_account_mail_result(_id, _error, _now)   → {ok:true} | {ok:false, reason:'not_found'}
+--   partner_admin_overview: partners 에 user_linked · account_mail_sent_at · account_mail_error · last_account_change_at 추가
+--
+-- 함수 계약(service_role 전용, jsonb 반환) — A
 --   partner_auto_payouts(_now)                       → {ok:true, due:false}
 --                                                    | {ok:true, due:true, created, run_month, payout_month, partners, net_total, notify}
 --      notify=true 이면 워커가 카톡을 보내고 partner_auto_payouts_notified 로 결과를 적는다(실패면 다음 실행에 다시, 최대 3번).
@@ -228,7 +248,30 @@ BEGIN
 END;
 $$;
 
--- ───────── A4) 관리자 화면: 정산 계좌는 스냅샷 ─────────
+-- ───────── B1) 계정 연결·계정 안내 메일 기록·계좌 변경 이력(표·열) ─────────
+-- 관리자 화면 묶음(A4)이 이 열·표를 읽으므로 먼저 만든다.
+ALTER TABLE public.partners
+  ADD COLUMN user_id uuid UNIQUE REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN account_mail_sent_at timestamptz,
+  ADD COLUMN account_mail_error text CHECK (account_mail_error IS NULL OR char_length(account_mail_error) <= 500);
+
+CREATE TABLE public.partner_account_changes (
+  id             uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  partner_id     uuid NOT NULL REFERENCES public.partners(id) ON DELETE CASCADE,
+  changed_at     timestamptz NOT NULL DEFAULT now(),
+  old_bank_name  text,
+  new_bank_name  text NOT NULL,
+  old_last4      text CHECK (old_last4 IS NULL OR old_last4 ~ '^[0-9]{0,4}$'),
+  new_last4      text NOT NULL CHECK (new_last4 ~ '^[0-9]{1,4}$'),
+  user_agent     text CHECK (user_agent IS NULL OR char_length(user_agent) <= 120)
+);
+CREATE INDEX partner_account_changes_partner_idx ON public.partner_account_changes (partner_id, changed_at DESC);
+ALTER TABLE public.partner_account_changes ENABLE ROW LEVEL SECURITY;
+-- 정책은 일부러 만들지 않는다(브라우저는 직접 못 읽는다)
+REVOKE ALL ON public.partner_account_changes FROM PUBLIC, anon, authenticated;
+GRANT ALL ON public.partner_account_changes TO service_role;
+
+-- ───────── A4) 관리자 화면: 정산 계좌는 스냅샷(+ B 계정 연결·계정 메일·계좌 변경 시각) ─────────
 CREATE OR REPLACE FUNCTION public.partner_admin_overview(_now timestamptz DEFAULT now())
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -246,6 +289,8 @@ BEGIN
   SELECT coalesce(jsonb_agg(x ORDER BY x.created_at DESC), '[]'::jsonb) INTO v_partners FROM (
     SELECT p.id, p.code, p.status, p.name, p.phone, p.email, p.channels, p.bank_name, p.bank_account, p.bank_holder,
            p.created_at, p.approved_at, p.view_key, p.memo, p.approval_mail_sent_at, p.approval_mail_error,
+           (p.user_id IS NOT NULL) AS user_linked, p.account_mail_sent_at, p.account_mail_error,
+           (SELECT max(ac.changed_at) FROM public.partner_account_changes ac WHERE ac.partner_id = p.id) AS last_account_change_at,
            (SELECT count(DISTINCT v.visitor_id) FROM public.site_visits v
              WHERE v.ref_code = p.code AND v.created_at >= _now - interval '30 days') AS visits_30d,
            (SELECT count(*) FROM public.inquiries i WHERE i.ref_code = p.code) AS inquiries,
@@ -309,6 +354,261 @@ BEGIN
 END;
 $$;
 
+-- ───────── B2) 계정 만들기·연결 ─────────
+-- 계정 만들기 화면(/partner/signup?k=…)이 보여 줄 것. 승인·일시정지만(신청 중·거절은 not_found).
+CREATE FUNCTION public.partner_account_target(_view_key text)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+BEGIN
+  IF _view_key IS NULL OR _view_key !~ '^[0-9a-f]{64}$' THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'not_found');
+  END IF;
+  SELECT * INTO p FROM public.partners WHERE view_key = _view_key AND status IN ('approved', 'paused');
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'not_found');
+  END IF;
+  RETURN jsonb_build_object('ok', true, 'id', p.id, 'name', p.name, 'email', lower(p.email), 'status', p.status,
+                            'has_account', p.user_id IS NOT NULL);
+END;
+$$;
+
+-- view_key(본인 확인) + 계정 이메일이 신청 이메일과 같을 때만 연결. 한 파트너에 계정 하나, 한 계정에 파트너 하나.
+CREATE FUNCTION public.partner_link_user(_view_key text, _user_id uuid, _email text)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+BEGIN
+  IF _view_key IS NULL OR _view_key !~ '^[0-9a-f]{64}$' OR _user_id IS NULL THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'not_found');
+  END IF;
+  SELECT * INTO p FROM public.partners WHERE view_key = _view_key AND status IN ('approved', 'paused') FOR UPDATE;
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'not_found');
+  END IF;
+  IF p.user_id IS NOT NULL THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'already_linked');
+  END IF;
+  IF lower(btrim(coalesce(_email, ''))) <> lower(p.email) THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'email_mismatch');
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.partners WHERE user_id = _user_id) THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'user_taken');
+  END IF;
+  BEGIN
+    UPDATE public.partners SET user_id = _user_id, updated_at = now() WHERE id = p.id;
+  EXCEPTION WHEN unique_violation THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'user_taken');
+  END;
+  RETURN jsonb_build_object('ok', true, 'id', p.id);
+END;
+$$;
+
+-- 로그인한 사람이 파트너인가(연결됨 + 승인·일시정지)
+CREATE FUNCTION public.partner_session(_user_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+BEGIN
+  IF _user_id IS NULL THEN RETURN jsonb_build_object('partner', false); END IF;
+  SELECT * INTO p FROM public.partners WHERE user_id = _user_id AND status IN ('approved', 'paused');
+  IF NOT FOUND THEN RETURN jsonb_build_object('partner', false); END IF;
+  RETURN jsonb_build_object('partner', true, 'id', p.id, 'code', p.code, 'name', p.name, 'status', p.status);
+END;
+$$;
+
+-- ───────── B3) 대시보드 ─────────
+-- _period: '7d' | '30d' | 'month'(한국 시간 이번 달 1일부터). 기간은 방문·상담·결제 수에만, 수수료 합계·목록·정산은 전체.
+-- 🚨 계좌는 은행·끝 4자리·예금주만. 손님 이름·연락처는 내보내지 않는다.
+CREATE FUNCTION public.partner_dashboard(_user_id uuid, _period text DEFAULT '30d', _now timestamptz DEFAULT now())
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+  v_period text := CASE WHEN _period IN ('7d', '30d', 'month') THEN _period ELSE '30d' END;
+  v_since timestamptz;
+  v_digits text;
+  v_comm jsonb;
+  v_months jsonb;
+BEGIN
+  IF _user_id IS NULL THEN RETURN NULL; END IF;
+  SELECT * INTO p FROM public.partners WHERE user_id = _user_id AND status IN ('approved', 'paused');
+  IF NOT FOUND THEN RETURN NULL; END IF;
+  PERFORM public.partner_refresh_payable(_now);
+
+  v_since := CASE v_period
+    WHEN '7d' THEN _now - interval '7 days'
+    WHEN 'month' THEN (date_trunc('month', (_now AT TIME ZONE 'UTC') + interval '9 hours') - interval '9 hours') AT TIME ZONE 'UTC'
+    ELSE _now - interval '30 days' END;
+  v_digits := regexp_replace(p.bank_account, '[^0-9]', '', 'g');
+
+  SELECT coalesce(jsonb_agg(x ORDER BY x.created_at DESC), '[]'::jsonb) INTO v_comm FROM (
+    SELECT c.created_at, c.source, c.base_amount, c.amount, c.status, c.payable_at, c.paid_at,
+           CASE WHEN c.source = 'reels' THEN o.plan END AS plan,
+           (c.reversal_of IS NOT NULL) AS is_reversal
+      FROM public.partner_commissions c
+      LEFT JOIN public.partner_commissions orig ON orig.id = c.reversal_of
+      LEFT JOIN public.reels_orders o ON o.id = coalesce(c.reels_order_id, orig.reels_order_id)
+     WHERE c.partner_id = p.id
+     ORDER BY c.created_at DESC
+     LIMIT 100
+  ) x;
+
+  SELECT coalesce(jsonb_agg(x ORDER BY x.month DESC), '[]'::jsonb) INTO v_months FROM (
+    SELECT y.month, y.gross, y.income_tax, y.local_tax, y.withholding, y.net, y.status, y.paid_at
+      FROM public.partner_payouts y WHERE y.partner_id = p.id
+     ORDER BY y.month DESC LIMIT 36
+  ) x;
+
+  RETURN jsonb_build_object(
+    'name', p.name, 'code', p.code, 'status', p.status,
+    'phone', p.phone, 'email', p.email, 'channels', p.channels,
+    'bank_name', p.bank_name, 'bank_last4', right(v_digits, 4), 'bank_holder', p.bank_holder,
+    'account_changed_at', (SELECT max(changed_at) FROM public.partner_account_changes WHERE partner_id = p.id),
+    'period', v_period, 'since', v_since,
+    'visits', (SELECT count(DISTINCT v.visitor_id) FROM public.site_visits v
+                WHERE v.ref_code = p.code AND v.created_at >= v_since AND v.created_at <= _now),
+    'inquiries', (SELECT count(*) FROM public.inquiries i
+                   WHERE i.ref_code = p.code AND i.created_at >= v_since AND i.created_at <= _now),
+    'paid_count', (SELECT count(*) FROM public.partner_commissions c
+                    WHERE c.partner_id = p.id AND c.status <> 'cancelled' AND c.reversal_of IS NULL
+                      AND c.created_at >= v_since AND c.created_at <= _now),
+    'sum_pending', (SELECT coalesce(sum(amount), 0) FROM public.partner_commissions
+                     WHERE partner_id = p.id AND status = 'pending'),
+    'sum_payable', (SELECT coalesce(sum(amount), 0) FROM public.partner_commissions
+                     WHERE partner_id = p.id AND status = 'payable'),
+    'sum_paid', (SELECT coalesce(sum(amount), 0) FROM public.partner_commissions
+                  WHERE partner_id = p.id AND status = 'paid'),
+    'sum_reversed', (SELECT coalesce(sum(amount), 0) FROM public.partner_commissions
+                      WHERE partner_id = p.id AND reversal_of IS NOT NULL),
+    'commissions', v_comm,
+    'months', v_months);
+END;
+$$;
+
+-- 내 정보 수정: 휴대폰·활동 채널만(이름·이메일은 대표님께 문의)
+CREATE FUNCTION public.partner_update_profile(_user_id uuid, _phone text, _channels text)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+  v_phone text := regexp_replace(coalesce(_phone, ''), '[^0-9]', '', 'g');
+  v_channels text := btrim(coalesce(_channels, ''));
+BEGIN
+  SELECT * INTO p FROM public.partners WHERE user_id = _user_id AND status IN ('approved', 'paused') FOR UPDATE;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok', false, 'reason', 'not_found'); END IF;
+  IF v_phone !~ '^01[016789][0-9]{7,8}$' OR char_length(v_channels) NOT BETWEEN 1 AND 1000 THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'invalid');
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.partners WHERE phone = v_phone AND id <> p.id) THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'phone_taken');
+  END IF;
+  BEGIN
+    UPDATE public.partners SET phone = v_phone, channels = v_channels, updated_at = now() WHERE id = p.id;
+  EXCEPTION WHEN unique_violation THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'phone_taken');
+  END;
+  RETURN jsonb_build_object('ok', true, 'phone', v_phone, 'channels', v_channels);
+END;
+$$;
+
+-- 정산 계좌 변경(서버가 비밀번호를 다시 확인한 뒤 부른다) + 이력. 이미 만든 정산은 스냅샷이라 그대로다.
+CREATE FUNCTION public.partner_change_account(
+  _user_id uuid, _bank_name text, _bank_account text, _bank_holder text,
+  _user_agent text DEFAULT NULL, _now timestamptz DEFAULT now()
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+  v_bank text := btrim(coalesce(_bank_name, ''));
+  v_account text := regexp_replace(btrim(coalesce(_bank_account, '')), '[[:space:]]', '', 'g');
+  v_holder text := btrim(coalesce(_bank_holder, ''));
+  v_old4 text;
+  v_new4 text;
+BEGIN
+  SELECT * INTO p FROM public.partners WHERE user_id = _user_id AND status IN ('approved', 'paused') FOR UPDATE;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok', false, 'reason', 'not_found'); END IF;
+  IF char_length(v_bank) NOT BETWEEN 1 AND 30 OR v_account !~ '^[0-9-]{6,30}$'
+     OR char_length(v_holder) NOT BETWEEN 1 AND 30 THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'invalid');
+  END IF;
+  IF v_bank = p.bank_name AND regexp_replace(v_account, '[^0-9]', '', 'g') = regexp_replace(p.bank_account, '[^0-9]', '', 'g')
+     AND v_holder = p.bank_holder THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'same');
+  END IF;
+  v_old4 := right(regexp_replace(p.bank_account, '[^0-9]', '', 'g'), 4);
+  v_new4 := right(regexp_replace(v_account, '[^0-9]', '', 'g'), 4);
+  UPDATE public.partners SET bank_name = v_bank, bank_account = v_account, bank_holder = v_holder, updated_at = now()
+   WHERE id = p.id;
+  INSERT INTO public.partner_account_changes (partner_id, changed_at, old_bank_name, new_bank_name, old_last4, new_last4, user_agent)
+  VALUES (p.id, _now, p.bank_name, v_bank, v_old4, v_new4, nullif(left(btrim(coalesce(_user_agent, '')), 120), ''));
+  RETURN jsonb_build_object('ok', true, 'name', p.name, 'bank_name', v_bank, 'old_last4', v_old4, 'new_last4', v_new4,
+                            'changed_at', _now);
+END;
+$$;
+
+-- ───────── B4) 계정 만들기 안내 메일 대상·결과 ─────────
+-- 이미 승인된 파트너에게도 보낼 수 있다(승인·일시정지, 아직 계정 연결 전).
+CREATE FUNCTION public.partner_account_mail_target(_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  p public.partners%ROWTYPE;
+BEGIN
+  SELECT * INTO p FROM public.partners WHERE id = _id;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok', false, 'reason', 'not_found'); END IF;
+  IF p.status NOT IN ('approved', 'paused') OR p.view_key IS NULL THEN
+    RETURN jsonb_build_object('ok', false, 'reason', 'not_approved');
+  END IF;
+  IF p.user_id IS NOT NULL THEN RETURN jsonb_build_object('ok', false, 'reason', 'has_account'); END IF;
+  RETURN jsonb_build_object('ok', true, 'name', p.name, 'email', p.email, 'code', p.code, 'view_key', p.view_key);
+END;
+$$;
+
+CREATE FUNCTION public.partner_account_mail_result(_id uuid, _error text DEFAULT NULL, _now timestamptz DEFAULT now())
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_err text := nullif(left(btrim(coalesce(_error, '')), 500), '');
+BEGIN
+  UPDATE public.partners
+     SET account_mail_sent_at = CASE WHEN v_err IS NULL THEN _now ELSE account_mail_sent_at END,
+         account_mail_error = v_err,
+         updated_at = now()
+   WHERE id = _id;
+  IF NOT FOUND THEN RETURN jsonb_build_object('ok', false, 'reason', 'not_found'); END IF;
+  RETURN jsonb_build_object('ok', true);
+END;
+$$;
+
 -- ───────── 실행 권한 ─────────
 REVOKE EXECUTE ON FUNCTION public.partner_auto_payouts(timestamptz) FROM PUBLIC, anon, authenticated;
 REVOKE EXECUTE ON FUNCTION public.partner_auto_payouts_notified(text, text, timestamptz) FROM PUBLIC, anon, authenticated;
@@ -318,4 +618,20 @@ GRANT  EXECUTE ON FUNCTION public.partner_auto_payouts(timestamptz) TO service_r
 GRANT  EXECUTE ON FUNCTION public.partner_auto_payouts_notified(text, text, timestamptz) TO service_role;
 GRANT  EXECUTE ON FUNCTION public.partner_transfer_list(text) TO service_role;
 GRANT  EXECUTE ON FUNCTION public.partner_paid_list(timestamptz, timestamptz) TO service_role;
+REVOKE EXECUTE ON FUNCTION public.partner_account_target(text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_link_user(text, uuid, text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_session(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_dashboard(uuid, text, timestamptz) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_update_profile(uuid, text, text) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_change_account(uuid, text, text, text, text, timestamptz) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_account_mail_target(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.partner_account_mail_result(uuid, text, timestamptz) FROM PUBLIC, anon, authenticated;
+GRANT  EXECUTE ON FUNCTION public.partner_account_target(text) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_link_user(text, uuid, text) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_session(uuid) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_dashboard(uuid, text, timestamptz) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_update_profile(uuid, text, text) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_change_account(uuid, text, text, text, text, timestamptz) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_account_mail_target(uuid) TO service_role;
+GRANT  EXECUTE ON FUNCTION public.partner_account_mail_result(uuid, text, timestamptz) TO service_role;
 -- CREATE OR REPLACE 는 기존 권한을 그대로 둔다(partner_make_payouts·partner_admin_overview 는 20261107160000 에서 이미 막아 둠).

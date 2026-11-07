@@ -5,6 +5,7 @@
 //        승인이면 바로 파트너에게 안내 메일(지메일 API) → 응답에 mail: 'sent'|'failed'|'skipped', mail_error.
 //        메일이 실패해도 승인은 그대로(결과는 partners.approval_mail_sent_at·approval_mail_error 에 기록).
 //   POST { action: 'resend_approval_mail', id }          → 승인 안내 메일 다시 보내기
+//   POST { action: 'send_account_mail', id }             → 「파트너 계정 만들기」 안내 메일(승인·일시정지, 계정 연결 전만)
 //   POST { action: 'inquiry_paid', inquiry_id, amount }  → 상담 계약 결제됨, 10% payable
 //   POST { action: 'cancel_commission', id, note? }      → 지급 전이면 취소, 지급 뒤면 음수 차감 줄(다음 정산에서 빠짐)
 //   POST { action: 'make_payouts', month? }              → 그 달(기본: 한국 시간 이번 달) 정산 만들기
@@ -13,7 +14,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { checkAdmin, json } from "@/lib/notify/admin-auth";
 import { ADMIN_REASON_TEXT, parseAdminAction } from "@/lib/partner/admin";
-import { deliverApprovalMail, type ApprovalMailTarget } from "@/lib/partner/approval-mail";
+import { deliverAccountMail, deliverApprovalMail, type ApprovalMailTarget } from "@/lib/partner/approval-mail";
 import { PARTNER_MIGRATION_HINT, partnerDb } from "@/lib/partner/server";
 import { readOutreachEnv } from "@/lib/outreach/env";
 import type { ServiceDb } from "@/lib/notify/token-store";
@@ -34,6 +35,24 @@ function sendApprovalMail(db: ServiceDb, id: string) {
     record: async (pid, err) => {
       const { error } = await db.rpc("partner_approval_mail_result", { _id: pid, _error: err ?? undefined });
       if (error) console.error(`[admin/partners] 메일 결과 기록 실패 [${error.code ?? "?"}]`);
+    },
+  });
+}
+
+/** 계정 만들기 안내 메일 보내고 결과 기록. 던지지 않는다. */
+function sendAccountMail(db: ServiceDb, id: string) {
+  return deliverAccountMail(id, {
+    env: readOutreachEnv(),
+    getTarget: async (pid) => {
+      const { data, error } = await db.rpc("partner_account_mail_target", { _id: pid });
+      if (error) throw new Error(`rpc ${error.code ?? "?"}`);
+      const r = (data ?? {}) as RpcResult;
+      if (r.ok !== true) return { ok: false, reason: String(r.reason ?? "not_found") };
+      return { ok: true, target: r as unknown as ApprovalMailTarget };
+    },
+    record: async (pid, err) => {
+      const { error } = await db.rpc("partner_account_mail_result", { _id: pid, _error: err ?? undefined });
+      if (error) console.error(`[admin/partners] 계정 메일 결과 기록 실패 [${error.code ?? "?"}]`);
     },
   });
 }
@@ -72,6 +91,13 @@ export const Route = createFileRoute("/api/admin/partners")({
           const m = await sendApprovalMail(db, a.id);
           if (m.mail === "skipped") return json({ error: m.mail_error }, 409);
           if (m.mail === "failed") console.error("[admin/partners] 승인 메일 다시 보내기 실패");
+          return json({ ok: true, ...m });
+        }
+
+        if (a.action === "send_account_mail") {
+          const m = await sendAccountMail(db, a.id);
+          if (m.mail === "skipped") return json({ error: m.mail_error }, 409);
+          if (m.mail === "failed") console.error("[admin/partners] 계정 만들기 메일 실패");
           return json({ ok: true, ...m });
         }
 

@@ -1,6 +1,7 @@
 // /partner/me?k=<view_key> — 파트너 본인 화면(로그인 없음, 승인 때 만든 긴 무작위 열쇠로만 연다).
 // 🚨 head 에는 title·robots(noindex)만. canonical 넣지 마라(비공개 화면).
 // 자료: GET /api/partner/me (src/routes/api/partner/me.ts → public.partner_me). 계좌는 끝 4자리만 온다.
+// 11/7: 로그인 대시보드(/partner/dashboard)가 생겼다. 이 비밀 링크 화면은 당분간 그대로 두고 맨 위에 계정 만들기·로그인 안내만 붙인다.
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
@@ -66,7 +67,10 @@ function PartnerMePage() {
         ) : q.error ? (
           <Notice text={(q.error as Error).message} />
         ) : q.data ? (
-          <MeView me={q.data} />
+          <>
+            <DashboardNotice k={k} />
+            <MeView me={q.data} />
+          </>
         ) : null}
       </main>
     </div>
@@ -75,6 +79,31 @@ function PartnerMePage() {
 
 function Notice({ text }: { text: string }) {
   return <p className="rounded-2xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">{text}</p>;
+}
+
+function DashboardNotice({ k }: { k: string }) {
+  return (
+    <div className="mb-6 rounded-2xl border border-primary/30 bg-primary/5 p-4" data-testid="dashboard-notice">
+      <p className="text-sm font-semibold text-foreground">로그인 대시보드가 생겼어요</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        이메일·비밀번호로 로그인해서 수수료·정산을 보고, 정산 계좌와 연락처를 직접 바꿀 수 있습니다.
+      </p>
+      <div className="mt-3 flex gap-2">
+        <a
+          href={`/partner/signup?k=${encodeURIComponent(k)}`}
+          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 text-sm font-semibold text-primary-foreground"
+        >
+          계정 만들기
+        </a>
+        <a
+          href="/login?next=/partner/dashboard"
+          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-full border border-border bg-card px-4 text-sm font-semibold"
+        >
+          로그인
+        </a>
+      </div>
+    </div>
+  );
 }
 
 function MeView({ me }: { me: PartnerMe }) {

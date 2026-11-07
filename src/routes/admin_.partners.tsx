@@ -43,6 +43,11 @@ type Partner = {
   view_key: string | null;
   approval_mail_sent_at: string | null;
   approval_mail_error: string | null;
+  /** 파트너 로그인 계정이 연결됐나 */
+  user_linked?: boolean;
+  account_mail_sent_at?: string | null;
+  account_mail_error?: string | null;
+  last_account_change_at?: string | null;
   visits_30d: number;
   inquiries: number;
   paid_count: number;
@@ -378,6 +383,7 @@ function AdminPartnersView({
                 </div>
               )}
               {p.status === "approved" && <MailStatus p={p} />}
+              {(p.status === "approved" || p.status === "paused") && <AccountStatus p={p} />}
               <div className="mt-3 flex flex-wrap gap-2">
                 {p.status === "approved" && (
                   <SmallButton
@@ -393,6 +399,22 @@ function AdminPartnersView({
                       })
                     }
                     text="메일 다시 보내기"
+                  />
+                )}
+                {(p.status === "approved" || p.status === "paused") && !p.user_linked && (
+                  <SmallButton
+                    disabled={busy}
+                    onClick={() =>
+                      ask({
+                        title: `${p.name}님에게 계정 만들기 메일을 보낼까요?`,
+                        body: `${p.email} 로 「파트너 계정 만들기」 링크를 보냅니다. 파트너가 비밀번호만 정하면 바로 로그인 대시보드를 씁니다.`,
+                        label: "보내기",
+                        run: async () => {
+                          await post({ action: "send_account_mail", id: p.id }, `${p.name}님 계정 만들기 메일`);
+                        },
+                      })
+                    }
+                    text={p.account_mail_sent_at ? "계정 만들기 메일 다시 보내기" : "계정 만들기 메일 보내기"}
                   />
                 )}
                 {p.status === "approved" && (
@@ -687,6 +709,33 @@ function MailStatus({ p }: { p: Partner }) {
     return <p className="mt-2 text-xs text-muted-foreground">안내 메일 보냄 · {shortDate(p.approval_mail_sent_at)}</p>;
   }
   return <p className="mt-2 text-xs text-muted-foreground">안내 메일 아직 안 보냄</p>;
+}
+
+function AccountStatus({ p }: { p: Partner }) {
+  const recent = p.last_account_change_at && Date.now() - new Date(p.last_account_change_at).getTime() < 14 * 86400_000;
+  return (
+    <div className="mt-2 space-y-1 text-xs">
+      {p.user_linked ? (
+        <p className="text-emerald-800">로그인 계정 연결됨</p>
+      ) : (
+        <>
+          <p className="text-muted-foreground">
+            로그인 계정 아직 없음
+            {p.account_mail_sent_at ? ` · 계정 메일 보냄 ${shortDate(p.account_mail_sent_at)}` : ""}
+          </p>
+          {p.account_mail_error && (
+            <p className="rounded-xl border border-rose-500/40 bg-rose-50 px-3 py-2 text-rose-800">계정 메일 실패: {p.account_mail_error}</p>
+          )}
+          {p.view_key && <CopyRow label="계정 만들기 링크" value={`${SITE}/partner/signup?k=${p.view_key}`} />}
+        </>
+      )}
+      {p.last_account_change_at && (
+        <p className={recent ? "font-semibold text-amber-800" : "text-muted-foreground"}>
+          파트너가 정산 계좌를 바꿈 · {shortDate(p.last_account_change_at)}
+        </p>
+      )}
+    </div>
+  );
 }
 
 function Empty({ text }: { text: string }) {

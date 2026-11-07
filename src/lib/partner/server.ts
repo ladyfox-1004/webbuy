@@ -3,6 +3,21 @@ import { readNotifyEnv } from "@/lib/notify/env";
 import { buildKakaoTextTemplate, sendKakaoTemplate } from "@/lib/notify/kakao";
 import { createNotifyServiceClient, supabaseTokenStore, type ServiceDb } from "@/lib/notify/token-store";
 import type { NotifyStatus } from "@/lib/notify/types";
+import type { AuthUser } from "@/lib/partner/account";
+
+/** Supabase 세션 토큰 → 사용자(서버 service 클라이언트로 확인). 틀리거나 만료면 null. */
+export async function userFromToken(db: ServiceDb, token: string): Promise<AuthUser | null> {
+  if (!token) return null;
+  const { data, error } = await db.auth.getUser(token);
+  if (error || !data.user) return null;
+  return { id: data.user.id, email: data.user.email ?? null };
+}
+
+/** user_roles.role='admin' 인가. 읽다 실패하면 false */
+export async function isAdminUser(db: ServiceDb, userId: string): Promise<boolean> {
+  const { data, error } = await db.from("user_roles").select("role").eq("user_id", userId).eq("role", "admin").maybeSingle();
+  return !error && !!data;
+}
 
 export const PARTNER_MIGRATION_HINT = "마이그레이션 20261107160000_partners.sql 적용 여부를 확인하세요.";
 

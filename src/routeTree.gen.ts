@@ -35,7 +35,9 @@ import { Route as SolutionsHospitalRouteImport } from './routes/solutions/hospit
 import { Route as SolutionsAutomationRouteImport } from './routes/solutions/automation'
 import { Route as ReelsCheckoutRouteImport } from './routes/reels.checkout'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
+import { Route as PartnerSignupRouteImport } from './routes/partner.signup'
 import { Route as PartnerMeRouteImport } from './routes/partner.me'
+import { Route as PartnerDashboardRouteImport } from './routes/partner.dashboard'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -53,7 +55,10 @@ import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminReviewRouteImport } from './routes/admin.review'
 import { Route as ReelsOrderOrderNoRouteImport } from './routes/reels.order.$orderNo'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPartnerSignupRouteImport } from './routes/api/partner/signup'
+import { Route as ApiPartnerSessionRouteImport } from './routes/api/partner/session'
 import { Route as ApiPartnerMeRouteImport } from './routes/api/partner/me'
+import { Route as ApiPartnerDashboardRouteImport } from './routes/api/partner/dashboard'
 import { Route as ApiPartnerAttachRouteImport } from './routes/api/partner/attach'
 import { Route as ApiPartnerApplyRouteImport } from './routes/api/partner/apply'
 import { Route as ApiKakaoSkillRouteImport } from './routes/api/kakao/skill'
@@ -201,9 +206,19 @@ const PaymentResultRoute = PaymentResultRouteImport.update({
   path: '/payment/result',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerSignupRoute = PartnerSignupRouteImport.update({
+  id: '/partner/signup',
+  path: '/partner/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PartnerMeRoute = PartnerMeRouteImport.update({
   id: '/partner/me',
   path: '/partner/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerDashboardRoute = PartnerDashboardRouteImport.update({
+  id: '/partner/dashboard',
+  path: '/partner/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PSlugRoute = PSlugRouteImport.update({
@@ -291,9 +306,24 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPartnerSignupRoute = ApiPartnerSignupRouteImport.update({
+  id: '/api/partner/signup',
+  path: '/api/partner/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPartnerSessionRoute = ApiPartnerSessionRouteImport.update({
+  id: '/api/partner/session',
+  path: '/api/partner/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPartnerMeRoute = ApiPartnerMeRouteImport.update({
   id: '/api/partner/me',
   path: '/api/partner/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPartnerDashboardRoute = ApiPartnerDashboardRouteImport.update({
+  id: '/api/partner/dashboard',
+  path: '/api/partner/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPartnerAttachRoute = ApiPartnerAttachRouteImport.update({
@@ -410,7 +440,9 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/me': typeof PartnerMeRoute
+  '/partner/signup': typeof PartnerSignupRoute
   '/payment/result': typeof PaymentResultRoute
   '/reels/checkout': typeof ReelsCheckoutRoute
   '/solutions/automation': typeof SolutionsAutomationRoute
@@ -435,7 +467,10 @@ export interface FileRoutesByFullPath {
   '/api/kakao/skill': typeof ApiKakaoSkillRoute
   '/api/partner/apply': typeof ApiPartnerApplyRoute
   '/api/partner/attach': typeof ApiPartnerAttachRoute
+  '/api/partner/dashboard': typeof ApiPartnerDashboardRoute
   '/api/partner/me': typeof ApiPartnerMeRoute
+  '/api/partner/session': typeof ApiPartnerSessionRoute
+  '/api/partner/signup': typeof ApiPartnerSignupRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reels/order/$orderNo': typeof ReelsOrderOrderNoRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
@@ -473,7 +508,9 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/me': typeof PartnerMeRoute
+  '/partner/signup': typeof PartnerSignupRoute
   '/payment/result': typeof PaymentResultRoute
   '/reels/checkout': typeof ReelsCheckoutRoute
   '/solutions/automation': typeof SolutionsAutomationRoute
@@ -498,7 +535,10 @@ export interface FileRoutesByTo {
   '/api/kakao/skill': typeof ApiKakaoSkillRoute
   '/api/partner/apply': typeof ApiPartnerApplyRoute
   '/api/partner/attach': typeof ApiPartnerAttachRoute
+  '/api/partner/dashboard': typeof ApiPartnerDashboardRoute
   '/api/partner/me': typeof ApiPartnerMeRoute
+  '/api/partner/session': typeof ApiPartnerSessionRoute
+  '/api/partner/signup': typeof ApiPartnerSignupRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reels/order/$orderNo': typeof ReelsOrderOrderNoRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
@@ -537,7 +577,9 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/dashboard': typeof PartnerDashboardRoute
   '/partner/me': typeof PartnerMeRoute
+  '/partner/signup': typeof PartnerSignupRoute
   '/payment/result': typeof PaymentResultRoute
   '/reels/checkout': typeof ReelsCheckoutRoute
   '/solutions/automation': typeof SolutionsAutomationRoute
@@ -562,7 +604,10 @@ export interface FileRoutesById {
   '/api/kakao/skill': typeof ApiKakaoSkillRoute
   '/api/partner/apply': typeof ApiPartnerApplyRoute
   '/api/partner/attach': typeof ApiPartnerAttachRoute
+  '/api/partner/dashboard': typeof ApiPartnerDashboardRoute
   '/api/partner/me': typeof ApiPartnerMeRoute
+  '/api/partner/session': typeof ApiPartnerSessionRoute
+  '/api/partner/signup': typeof ApiPartnerSignupRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reels/order/$orderNo': typeof ReelsOrderOrderNoRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
@@ -602,7 +647,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
+    | '/partner/dashboard'
     | '/partner/me'
+    | '/partner/signup'
     | '/payment/result'
     | '/reels/checkout'
     | '/solutions/automation'
@@ -627,7 +674,10 @@ export interface FileRouteTypes {
     | '/api/kakao/skill'
     | '/api/partner/apply'
     | '/api/partner/attach'
+    | '/api/partner/dashboard'
     | '/api/partner/me'
+    | '/api/partner/session'
+    | '/api/partner/signup'
     | '/lovable/email/suppression'
     | '/reels/order/$orderNo'
     | '/api/admin/blog/run'
@@ -665,7 +715,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
+    | '/partner/dashboard'
     | '/partner/me'
+    | '/partner/signup'
     | '/payment/result'
     | '/reels/checkout'
     | '/solutions/automation'
@@ -690,7 +742,10 @@ export interface FileRouteTypes {
     | '/api/kakao/skill'
     | '/api/partner/apply'
     | '/api/partner/attach'
+    | '/api/partner/dashboard'
     | '/api/partner/me'
+    | '/api/partner/session'
+    | '/api/partner/signup'
     | '/lovable/email/suppression'
     | '/reels/order/$orderNo'
     | '/api/admin/blog/run'
@@ -728,7 +783,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
+    | '/partner/dashboard'
     | '/partner/me'
+    | '/partner/signup'
     | '/payment/result'
     | '/reels/checkout'
     | '/solutions/automation'
@@ -753,7 +810,10 @@ export interface FileRouteTypes {
     | '/api/kakao/skill'
     | '/api/partner/apply'
     | '/api/partner/attach'
+    | '/api/partner/dashboard'
     | '/api/partner/me'
+    | '/api/partner/session'
+    | '/api/partner/signup'
     | '/lovable/email/suppression'
     | '/reels/order/$orderNo'
     | '/api/admin/blog/run'
@@ -790,7 +850,9 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PSlugRoute: typeof PSlugRoute
+  PartnerDashboardRoute: typeof PartnerDashboardRoute
   PartnerMeRoute: typeof PartnerMeRoute
+  PartnerSignupRoute: typeof PartnerSignupRoute
   PaymentResultRoute: typeof PaymentResultRoute
   ReelsCheckoutRoute: typeof ReelsCheckoutRoute
   SolutionsAutomationRoute: typeof SolutionsAutomationRoute
@@ -815,7 +877,10 @@ export interface RootRouteChildren {
   ApiKakaoSkillRoute: typeof ApiKakaoSkillRoute
   ApiPartnerApplyRoute: typeof ApiPartnerApplyRoute
   ApiPartnerAttachRoute: typeof ApiPartnerAttachRoute
+  ApiPartnerDashboardRoute: typeof ApiPartnerDashboardRoute
   ApiPartnerMeRoute: typeof ApiPartnerMeRoute
+  ApiPartnerSessionRoute: typeof ApiPartnerSessionRoute
+  ApiPartnerSignupRoute: typeof ApiPartnerSignupRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ReelsOrderOrderNoRoute: typeof ReelsOrderOrderNoRoute
   ApiAdminBlogRunRoute: typeof ApiAdminBlogRunRoute
@@ -1009,11 +1074,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentResultRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/signup': {
+      id: '/partner/signup'
+      path: '/partner/signup'
+      fullPath: '/partner/signup'
+      preLoaderRoute: typeof PartnerSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/partner/me': {
       id: '/partner/me'
       path: '/partner/me'
       fullPath: '/partner/me'
       preLoaderRoute: typeof PartnerMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner/dashboard': {
+      id: '/partner/dashboard'
+      path: '/partner/dashboard'
+      fullPath: '/partner/dashboard'
+      preLoaderRoute: typeof PartnerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/p/$slug': {
@@ -1135,11 +1214,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/partner/signup': {
+      id: '/api/partner/signup'
+      path: '/api/partner/signup'
+      fullPath: '/api/partner/signup'
+      preLoaderRoute: typeof ApiPartnerSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/partner/session': {
+      id: '/api/partner/session'
+      path: '/api/partner/session'
+      fullPath: '/api/partner/session'
+      preLoaderRoute: typeof ApiPartnerSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/partner/me': {
       id: '/api/partner/me'
       path: '/api/partner/me'
       fullPath: '/api/partner/me'
       preLoaderRoute: typeof ApiPartnerMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/partner/dashboard': {
+      id: '/api/partner/dashboard'
+      path: '/api/partner/dashboard'
+      fullPath: '/api/partner/dashboard'
+      preLoaderRoute: typeof ApiPartnerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/partner/attach': {
@@ -1296,7 +1396,9 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PSlugRoute: PSlugRoute,
+  PartnerDashboardRoute: PartnerDashboardRoute,
   PartnerMeRoute: PartnerMeRoute,
+  PartnerSignupRoute: PartnerSignupRoute,
   PaymentResultRoute: PaymentResultRoute,
   ReelsCheckoutRoute: ReelsCheckoutRoute,
   SolutionsAutomationRoute: SolutionsAutomationRoute,
@@ -1321,7 +1423,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiKakaoSkillRoute: ApiKakaoSkillRoute,
   ApiPartnerApplyRoute: ApiPartnerApplyRoute,
   ApiPartnerAttachRoute: ApiPartnerAttachRoute,
+  ApiPartnerDashboardRoute: ApiPartnerDashboardRoute,
   ApiPartnerMeRoute: ApiPartnerMeRoute,
+  ApiPartnerSessionRoute: ApiPartnerSessionRoute,
+  ApiPartnerSignupRoute: ApiPartnerSignupRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ReelsOrderOrderNoRoute: ReelsOrderOrderNoRoute,
   ApiAdminBlogRunRoute: ApiAdminBlogRunRoute,

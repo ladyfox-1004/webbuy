@@ -8,7 +8,8 @@ export type AdminAction =
   | { action: "cancel_commission"; id: string; note: string }
   | { action: "make_payouts"; month: string }
   | { action: "payout_paid"; id: string }
-  | { action: "resend_approval_mail"; id: string };
+  | { action: "resend_approval_mail"; id: string }
+  | { action: "send_account_mail"; id: string };
 
 /** 한국 시간 기준 'YYYY-MM' */
 export function kstMonth(now = new Date()): string {
@@ -55,6 +56,9 @@ export function parseAdminAction(body: unknown, now = new Date()): AdminAction |
     case "resend_approval_mail":
       if (!id) return { error: "대상이 없습니다." };
       return { action: "resend_approval_mail", id };
+    case "send_account_mail":
+      if (!id) return { error: "대상이 없습니다." };
+      return { action: "send_account_mail", id };
     default:
       return { error: "모르는 동작입니다." };
   }

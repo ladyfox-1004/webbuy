@@ -18,6 +18,7 @@ import {
   Inbox,
   Layers,
   LayoutDashboard,
+  Handshake,
   Link2,
   LogOut,
   Mail,
@@ -53,6 +54,7 @@ import type { LucideIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsPartner } from "@/hooks/useIsPartner";
 import { useInquiry } from "@/components/InquiryModal";
 import { InquiryForm } from "@/components/InquiryForm";
 import { PricePopup, type PricePopupService } from "@/components/PricePopup";
@@ -1580,6 +1582,8 @@ function Capabilities() {
 function Nav() {
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
+  // 계정이 연결된 승인 파트너면 사용자 메뉴에 「파트너 대시보드」(서버 /api/partner/session 으로 확인)
+  const isPartner = useIsPartner();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
@@ -1655,6 +1659,15 @@ function Nav() {
                     >
                       <Package className="h-4 w-4 text-primary-glow" /> 보관함
                     </Link>
+                    {isPartner && (
+                      <a
+                        href="/partner/dashboard"
+                        onClick={() => setUserOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition hover:bg-surface-elevated"
+                      >
+                        <Handshake className="h-4 w-4 text-primary-glow" /> 파트너 대시보드
+                      </a>
+                    )}
                     {isAdmin && (
                       <>
                         <div className="my-1 h-px bg-border" />
@@ -1761,6 +1774,15 @@ function Nav() {
                   >
                     <Package className="h-4 w-4 text-primary-glow" /> 보관함
                   </Link>
+                  {isPartner && (
+                    <a
+                      href="/partner/dashboard"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-foreground transition hover:bg-surface-elevated"
+                    >
+                      <Handshake className="h-4 w-4 text-primary-glow" /> 파트너 대시보드
+                    </a>
+                  )}
                   {isAdmin && (
                     <>
                       <Link

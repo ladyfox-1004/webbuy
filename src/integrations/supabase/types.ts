@@ -930,6 +930,12 @@ export type Database = {
         Args: { p_day: string; p_units: number }
         Returns: number
       }
+      partner_account_mail_result: {
+        Args: { _id: string; _error?: string; _now?: string }
+        Returns: Json
+      }
+      partner_account_mail_target: { Args: { _id: string }; Returns: Json }
+      partner_account_target: { Args: { _view_key: string }; Returns: Json }
       partner_admin_overview: { Args: { _now?: string }; Returns: Json }
       partner_apply: { Args: { _p: Json }; Returns: Json }
       partner_approval_mail_result: {
@@ -946,13 +952,32 @@ export type Database = {
         Args: { _run_month: string; _status: string; _now?: string }
         Returns: Json
       }
+      partner_change_account: {
+        Args: {
+          _user_id: string
+          _bank_name: string
+          _bank_account: string
+          _bank_holder: string
+          _user_agent?: string
+          _now?: string
+        }
+        Returns: Json
+      }
       partner_cleanup_unapproved: { Args: { _now?: string }; Returns: number }
       partner_commission_cancel: {
         Args: { _id: string; _note?: string; _now?: string }
         Returns: Json
       }
+      partner_dashboard: {
+        Args: { _user_id: string; _period?: string; _now?: string }
+        Returns: Json
+      }
       partner_inquiry_paid: {
         Args: { _inquiry_id: string; _amount: number; _now?: string }
+        Returns: Json
+      }
+      partner_link_user: {
+        Args: { _view_key: string; _user_id: string; _email: string }
         Returns: Json
       }
       partner_make_payouts: { Args: { _month: string; _now?: string }; Returns: Json }
@@ -960,11 +985,16 @@ export type Database = {
       partner_paid_list: { Args: { _from: string; _to: string }; Returns: Json }
       partner_payout_mark_paid: { Args: { _id: string; _now?: string }; Returns: Json }
       partner_refresh_payable: { Args: { _now?: string }; Returns: number }
+      partner_session: { Args: { _user_id: string }; Returns: Json }
       partner_set_status: {
         Args: { _id: string; _status: string; _now?: string }
         Returns: Json
       }
       partner_transfer_list: { Args: { _month: string }; Returns: Json }
+      partner_update_profile: {
+        Args: { _user_id: string; _phone: string; _channels: string }
+        Returns: Json
+      }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {

@@ -4,17 +4,27 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
+import { postLoginTarget, safeNextPath } from "@/lib/auth/next";
+import { fetchSessionKind } from "@/hooks/useIsPartner";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
   head: () => ({ meta: [{ title: "로그인 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
-// 로그인 뒤 갈 곳. 같은 사이트 안 /admin 경로만 허용(외부 주소로 튕기는 것 방지).
+// 로그인 뒤 갈 곳. 같은 사이트 안 /admin·/partner 경로만 허용(외부 주소·// 로 튕기는 것 방지 — src/lib/auth/next.ts).
 function safeNext(): string | null {
   if (typeof window === "undefined") return null;
-  const n = new URLSearchParams(window.location.search).get("next");
-  return n && n.startsWith("/admin") && !n.startsWith("//") ? n : null;
+  return safeNextPath(new URLSearchParams(window.location.search).get("next"));
+}
+
+/** next 가 있으면 그곳. 없으면 관리자는 기존대로 홈, 파트너는 /partner/dashboard(서버 /api/partner/session 으로 확인). */
+async function goAfterLogin(navigate: ReturnType<typeof useNavigate>) {
+  const next = safeNext();
+  const kind = next ? { admin: false, partner: false } : await fetchSessionKind();
+  const to = postLoginTarget({ next, ...kind });
+  if (to === "/") navigate({ to: "/" });
+  else window.location.replace(to);
 }
 
 const schema = z.object({
@@ -30,11 +40,7 @@ function LoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        const next = safeNext();
-        if (next) window.location.replace(next);
-        else navigate({ to: "/" });
-      }
+      if (data.session) void goAfterLogin(navigate);
     });
   }, [navigate]);
 
@@ -53,9 +59,7 @@ function LoginPage() {
       return;
     }
     toast.success("로그인 성공");
-    const next = safeNext();
-    if (next) window.location.replace(next);
-    else navigate({ to: "/" });
+    await goAfterLogin(navigate);
   }
 
   return (

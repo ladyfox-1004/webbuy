@@ -238,4 +238,244 @@ BEGIN
   RAISE NOTICE 'PASS A 0명: 실행 기록은 남기고 카톡 차례는 아님';
 END $$;
 
+-- ───────── B1) 구조·권한 ─────────
+DO $$
+DECLARE f text;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'partners'
+                  AND column_name = 'user_id' AND data_type = 'uuid') THEN
+    RAISE EXCEPTION 'FAIL partners.user_id 없음';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid = 'public.partners'::regclass AND contype = 'f'
+                  AND confrelid = 'auth.users'::regclass) THEN
+    RAISE EXCEPTION 'FAIL user_id 는 auth.users 참조';
+  END IF;
+  IF NOT (SELECT relrowsecurity FROM pg_class WHERE oid = 'public.partner_account_changes'::regclass)
+     OR EXISTS (SELECT 1 FROM pg_policies WHERE schemaname = 'public' AND tablename IN ('partner_account_changes', 'partners')) THEN
+    RAISE EXCEPTION 'FAIL 변경 이력 표 RLS 켬·정책 0개(partners 도 정책 0개)';
+  END IF;
+  IF has_table_privilege('anon', 'public.partner_account_changes', 'SELECT')
+     OR has_table_privilege('authenticated', 'public.partner_account_changes', 'SELECT')
+     OR has_table_privilege('authenticated', 'public.partners', 'SELECT') THEN
+    RAISE EXCEPTION 'FAIL 브라우저 역할이 표를 읽을 수 있음';
+  END IF;
+  FOREACH f IN ARRAY ARRAY['public.partner_account_target(text)', 'public.partner_link_user(text, uuid, text)',
+                            'public.partner_session(uuid)', 'public.partner_dashboard(uuid, text, timestamptz)',
+                            'public.partner_update_profile(uuid, text, text)',
+                            'public.partner_change_account(uuid, text, text, text, text, timestamptz)',
+                            'public.partner_account_mail_target(uuid)',
+                            'public.partner_account_mail_result(uuid, text, timestamptz)'] LOOP
+    IF has_function_privilege('anon', f, 'EXECUTE') OR has_function_privilege('authenticated', f, 'EXECUTE') THEN
+      RAISE EXCEPTION 'FAIL anon/authenticated 가 함수를 부를 수 있음: %', f;
+    END IF;
+    IF NOT has_function_privilege('service_role', f, 'EXECUTE') THEN
+      RAISE EXCEPTION 'FAIL service_role 이 함수를 못 부름: %', f;
+    END IF;
+  END LOOP;
+  RAISE NOTICE 'PASS B 구조: user_id(auth.users·UNIQUE)·변경 이력 표 RLS(정책 0)·브라우저 역할 못 읽음·함수 service_role 만';
+END $$;
+
+-- ───────── B2) 계정 만들기: view_key 확인·이메일 같아야 연결·이미 계정 있음 ─────────
+DO $$
+DECLARE pa uuid; pb uuid; u1 uuid := gen_random_uuid(); u2 uuid := gen_random_uuid(); k text; kb text; r jsonb; ap uuid;
+BEGIN
+  INSERT INTO auth.users (id) VALUES (u1), (u2);
+  pa := pg_temp.partner('정계정', '01071110001', 'acctone');
+  pb := pg_temp.partner('한계정', '01071110002', 'accttwo');
+  SELECT view_key INTO k FROM public.partners WHERE id = pa;
+  SELECT view_key INTO kb FROM public.partners WHERE id = pb;
+
+  r := public.partner_account_target(k);
+  IF NOT (r->>'ok')::boolean OR r->>'email' <> 'acctone@partner.example.com' OR (r->>'has_account')::boolean
+     OR r->>'name' <> '정계정' THEN
+    RAISE EXCEPTION 'FAIL 계정 만들기 대상: %', r;
+  END IF;
+  IF (public.partner_account_target(repeat('0', 64))->>'ok')::boolean
+     OR (public.partner_account_target('short')->>'ok')::boolean THEN
+    RAISE EXCEPTION 'FAIL 틀린 열쇠는 not_found';
+  END IF;
+  -- 신청 중(승인 전)은 열쇠가 없다 → 대상 아님
+  r := public.partner_apply(jsonb_build_object('name', '신청만', 'phone', '01071110003', 'email', 'applyonly@example.com',
+        'code', 'applyonly', 'channels', 'x', 'bank_name', '국민', 'bank_account', '123456789', 'bank_holder', '신청만'));
+  ap := (r->>'id')::uuid;
+  IF (SELECT view_key FROM public.partners WHERE id = ap) IS NOT NULL THEN RAISE EXCEPTION 'FAIL 준비'; END IF;
+
+  -- 이메일이 다르면 연결 안 함
+  r := public.partner_link_user(k, u1, 'someone@else.com');
+  IF r->>'reason' <> 'email_mismatch' THEN RAISE EXCEPTION 'FAIL 이메일 다름: %', r; END IF;
+  -- 틀린 열쇠
+  r := public.partner_link_user(repeat('a', 64), u1, 'acctone@partner.example.com');
+  IF r->>'reason' <> 'not_found' THEN RAISE EXCEPTION 'FAIL 틀린 열쇠 연결: %', r; END IF;
+  -- 연결(대소문자 무시)
+  r := public.partner_link_user(k, u1, ' AcctOne@Partner.Example.com ');
+  IF NOT (r->>'ok')::boolean OR (SELECT user_id FROM public.partners WHERE id = pa) <> u1 THEN
+    RAISE EXCEPTION 'FAIL 연결: %', r;
+  END IF;
+  -- 이미 계정 있음
+  r := public.partner_link_user(k, u2, 'acctone@partner.example.com');
+  IF r->>'reason' <> 'already_linked' THEN RAISE EXCEPTION 'FAIL 이미 계정: %', r; END IF;
+  IF NOT (public.partner_account_target(k)->>'has_account')::boolean THEN RAISE EXCEPTION 'FAIL has_account 표시'; END IF;
+  -- 한 계정을 두 파트너에 붙이지 못함
+  r := public.partner_link_user(kb, u1, 'accttwo@partner.example.com');
+  IF r->>'reason' <> 'user_taken' THEN RAISE EXCEPTION 'FAIL 한 계정 두 파트너: %', r; END IF;
+
+  -- 로그인 판정: 연결 + 승인·일시정지만
+  r := public.partner_session(u1);
+  IF NOT (r->>'partner')::boolean OR r->>'code' <> 'acctone' THEN RAISE EXCEPTION 'FAIL 파트너 세션: %', r; END IF;
+  IF (public.partner_session(u2)->>'partner')::boolean OR (public.partner_session(NULL)->>'partner')::boolean THEN
+    RAISE EXCEPTION 'FAIL 연결 안 된 사람은 파트너 아님';
+  END IF;
+  PERFORM public.partner_set_status(pa, 'paused');
+  IF NOT (public.partner_session(u1)->>'partner')::boolean THEN RAISE EXCEPTION 'FAIL 일시정지도 대시보드는 봄'; END IF;
+  PERFORM public.partner_set_status(pa, 'rejected');
+  IF (public.partner_session(u1)->>'partner')::boolean OR public.partner_dashboard(u1) IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL 거절이면 파트너 아님';
+  END IF;
+  PERFORM public.partner_set_status(pa, 'approved');
+
+  -- 계정 만들기 메일 대상: 계정 있으면 has_account, 없으면 ok(이미 승인된 사람도), 신청 중은 not_approved
+  IF public.partner_account_mail_target(pa)->>'reason' <> 'has_account' THEN RAISE EXCEPTION 'FAIL 메일 대상 has_account'; END IF;
+  r := public.partner_account_mail_target(pb);
+  IF NOT (r->>'ok')::boolean OR r->>'view_key' <> kb OR r->>'email' <> 'accttwo@partner.example.com' THEN
+    RAISE EXCEPTION 'FAIL 메일 대상: %', r;
+  END IF;
+  IF public.partner_account_mail_target(ap)->>'reason' <> 'not_approved'
+     OR public.partner_account_mail_target(gen_random_uuid())->>'reason' <> 'not_found' THEN
+    RAISE EXCEPTION 'FAIL 메일 대상 아님';
+  END IF;
+  PERFORM public.partner_account_mail_result(pb, 'Gmail 연결 안 됨', '2026-11-07 01:00:00+00');
+  PERFORM public.partner_account_mail_result(pb, NULL, '2026-11-07 02:00:00+00');
+  IF (SELECT account_mail_sent_at FROM public.partners WHERE id = pb) <> '2026-11-07 02:00:00+00'
+     OR (SELECT account_mail_error FROM public.partners WHERE id = pb) IS NOT NULL THEN
+    RAISE EXCEPTION 'FAIL 계정 메일 기록';
+  END IF;
+  r := public.partner_admin_overview(now());
+  IF NOT EXISTS (SELECT 1 FROM jsonb_array_elements(r->'partners') e WHERE e->>'code' = 'acctone' AND (e->>'user_linked')::boolean)
+     OR NOT EXISTS (SELECT 1 FROM jsonb_array_elements(r->'partners') e WHERE e->>'code' = 'accttwo'
+                     AND NOT (e->>'user_linked')::boolean AND e->>'account_mail_sent_at' IS NOT NULL) THEN
+    RAISE EXCEPTION 'FAIL 관리자 화면 계정 표시';
+  END IF;
+  RAISE NOTICE 'PASS B 계정: view_key 확인·이메일 같아야 연결·이미 계정 있음·한 계정 한 파트너·세션 판정·계정 메일 대상/기록';
+END $$;
+
+-- ───────── B3) 대시보드: 기간(7일·30일·이번 달 KST)·전체 계좌 없음 ─────────
+DO $$
+DECLARE pa uuid; u uuid; d jsonb; t text; n timestamptz := '2026-11-20 03:00:00+00';
+BEGIN
+  SELECT id, user_id INTO pa, u FROM public.partners WHERE code = 'acctone';
+  -- 방문: 2일 전·10일 전·40일 전, 그리고 이번 달 1일 00:30 KST(= 10/31 15:30 UTC)·10/31 23:00 KST(= 10/31 14:00 UTC)
+  INSERT INTO public.site_visits (created_at, visitor_id, session_id, path, ref_code) VALUES
+    (n - interval '2 days',  'visitor-aaaa', 'session-1111', '/', 'acctone'),
+    (n - interval '2 days',  'visitor-aaaa', 'session-1112', '/reels', 'acctone'),
+    (n - interval '10 days', 'visitor-bbbb', 'session-2222', '/', 'acctone'),
+    (n - interval '40 days', 'visitor-cccc', 'session-3333', '/', 'acctone'),
+    ('2026-10-31 15:30:00+00', 'visitor-dddd', 'session-4444', '/', 'acctone'),
+    ('2026-10-31 14:00:00+00', 'visitor-eeee', 'session-5555', '/', 'acctone'),
+    (n - interval '1 day',   'visitor-ffff', 'session-6666', '/', 'otherpp');
+  INSERT INTO public.inquiries (name, contact, ref_code, created_at) VALUES
+    ('손님1', '010-0000-0001', 'acctone', n - interval '3 days'),
+    ('손님2', '010-0000-0002', 'acctone', n - interval '25 days');
+  d := public.partner_dashboard(u, '7d', n);
+  IF (d->>'visits')::int <> 1 OR (d->>'inquiries')::int <> 1 OR d->>'period' <> '7d' THEN RAISE EXCEPTION 'FAIL 7일: %', d; END IF;
+  d := public.partner_dashboard(u, '30d', n);
+  -- 30일: aaaa·bbbb·dddd·eeee (cccc 는 40일 전)
+  IF (d->>'visits')::int <> 4 OR (d->>'inquiries')::int <> 2 THEN RAISE EXCEPTION 'FAIL 30일: %', d; END IF;
+  d := public.partner_dashboard(u, 'month', n);
+  -- 이번 달(11/1 00:00 KST = 10/31 15:00 UTC 부터): aaaa·bbbb·dddd
+  IF (d->>'visits')::int <> 3 OR (d->>'since')::timestamptz <> '2026-10-31 15:00:00+00' THEN
+    RAISE EXCEPTION 'FAIL 이번 달(한국 시간): %', d;
+  END IF;
+  IF public.partner_dashboard(u, 'nonsense', n)->>'period' <> '30d' THEN RAISE EXCEPTION 'FAIL 모르는 기간은 30일'; END IF;
+  IF public.partner_dashboard(gen_random_uuid(), '30d', n) IS NOT NULL THEN RAISE EXCEPTION 'FAIL 연결 안 된 사람은 null'; END IF;
+
+  -- 수수료·정산 목록, 차감 합계
+  PERFORM pg_temp.inq('acctone', 100000);
+  d := public.partner_dashboard(u, '30d', now());
+  IF (d->>'sum_payable')::int <> 10000 OR jsonb_array_length(d->'commissions') <> 1 OR (d->>'paid_count')::int <> 1 THEN
+    RAISE EXCEPTION 'FAIL 수수료: %', d;
+  END IF;
+  -- 🚨 전체 계좌 번호가 응답 어디에도 없다(끝 4자리만)
+  t := d::text;
+  IF position('123456-01-987654' IN t) > 0 OR position('12345601987654' IN t) > 0 OR d ? 'bank_account' THEN
+    RAISE EXCEPTION 'FAIL 대시보드에 전체 계좌가 있음: %', t;
+  END IF;
+  IF d->>'bank_last4' <> '7654' OR d->>'bank_name' <> '국민은행' OR d->>'bank_holder' <> '정계정'
+     OR d->>'phone' <> '01071110001' OR d->>'email' <> 'acctone@partner.example.com' THEN
+    RAISE EXCEPTION 'FAIL 내 정보·계좌 표시: %', d;
+  END IF;
+  RAISE NOTICE 'PASS B 대시보드: 7일·30일·이번 달(KST 1일부터) 방문·상담·결제, 연결 안 된 사람 null, 계좌 끝 4자리만';
+END $$;
+
+-- ───────── B4) 내 정보 수정 ─────────
+DO $$
+DECLARE u uuid; r jsonb;
+BEGIN
+  SELECT user_id INTO u FROM public.partners WHERE code = 'acctone';
+  IF public.partner_update_profile(u, '02-123-4567', 'x')->>'reason' <> 'invalid'
+     OR public.partner_update_profile(u, '01071119999', '  ')->>'reason' <> 'invalid' THEN
+    RAISE EXCEPTION 'FAIL 형식';
+  END IF;
+  IF public.partner_update_profile(u, '010-7111-0002', 'x')->>'reason' <> 'phone_taken' THEN RAISE EXCEPTION 'FAIL 다른 파트너 번호'; END IF;
+  IF public.partner_update_profile(gen_random_uuid(), '01071119999', 'x')->>'reason' <> 'not_found' THEN RAISE EXCEPTION 'FAIL 없는 사람'; END IF;
+  r := public.partner_update_profile(u, '010-7111-9999', ' https://blog.example.com/me ');
+  IF NOT (r->>'ok')::boolean OR (SELECT phone || '|' || channels FROM public.partners WHERE code = 'acctone')
+     <> '01071119999|https://blog.example.com/me' THEN
+    RAISE EXCEPTION 'FAIL 수정: %', r;
+  END IF;
+  RAISE NOTICE 'PASS B 내 정보: 휴대폰·채널만, 형식·다른 파트너 번호·없는 사람 거절';
+END $$;
+
+-- ───────── B5) 계좌 변경: 이력·정산 스냅샷 유지 ─────────
+DO $$
+DECLARE pa uuid; u uuid; r jsonb; h public.partner_account_changes%ROWTYPE; y public.partner_payouts%ROWTYPE; d jsonb;
+BEGIN
+  SELECT id, user_id INTO pa, u FROM public.partners WHERE code = 'acctone';
+  -- 계좌 바꾸기 전에 지급 전 정산 하나(B3 의 10,000)
+  PERFORM public.partner_make_payouts('2026-11', now());
+  SELECT * INTO y FROM public.partner_payouts WHERE partner_id = pa AND month = '2026-11';
+  IF y.pay_bank_account <> '123456-01-987654' THEN RAISE EXCEPTION 'FAIL 준비 정산'; END IF;
+
+  IF public.partner_change_account(u, '', '110-222-333444', '정계정')->>'reason' <> 'invalid'
+     OR public.partner_change_account(u, '신한은행', '12ab', '정계정')->>'reason' <> 'invalid'
+     OR public.partner_change_account(u, '국민은행', '12345601987654', '정계정')->>'reason' <> 'same'
+     OR public.partner_change_account(gen_random_uuid(), '신한은행', '110222333444', 'x')->>'reason' <> 'not_found' THEN
+    RAISE EXCEPTION 'FAIL 계좌 변경 거절 사유';
+  END IF;
+  IF EXISTS (SELECT 1 FROM public.partner_account_changes WHERE partner_id = pa) THEN RAISE EXCEPTION 'FAIL 거절은 이력 없음'; END IF;
+
+  r := public.partner_change_account(u, '신한은행', '110 222 335566', '정계정', 'iPhone Safari', '2026-11-07 05:03:00+00');
+  IF NOT (r->>'ok')::boolean OR r->>'old_last4' <> '7654' OR r->>'new_last4' <> '5566' OR r->>'bank_name' <> '신한은행'
+     OR r->>'name' <> '정계정' OR r ? 'bank_account' THEN
+    RAISE EXCEPTION 'FAIL 변경 결과: %', r;
+  END IF;
+  SELECT * INTO h FROM public.partner_account_changes WHERE partner_id = pa;
+  IF h.old_last4 <> '7654' OR h.new_last4 <> '5566' OR h.old_bank_name <> '국민은행' OR h.new_bank_name <> '신한은행'
+     OR h.user_agent <> 'iPhone Safari' OR h.changed_at <> '2026-11-07 05:03:00+00' THEN
+    RAISE EXCEPTION 'FAIL 이력: %', row_to_json(h);
+  END IF;
+  IF (SELECT bank_account FROM public.partners WHERE id = pa) <> '110222335566' THEN RAISE EXCEPTION 'FAIL 계좌 저장(공백 제거)'; END IF;
+  -- 이미 만든 정산은 옛 계좌 그대로(대량이체 목록도)
+  IF (SELECT pay_bank_name || '/' || pay_bank_account FROM public.partner_payouts WHERE id = y.id) <> '국민은행/123456-01-987654' THEN
+    RAISE EXCEPTION 'FAIL 정산 스냅샷이 바뀜';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM jsonb_array_elements(public.partner_transfer_list('2026-11')) e
+                  WHERE e->>'code' = 'acctone' AND e->>'bank_account' = '123456-01-987654') THEN
+    RAISE EXCEPTION 'FAIL 대량이체는 스냅샷';
+  END IF;
+  d := public.partner_dashboard(u, '30d', now());
+  IF d->>'bank_last4' <> '5566' OR d->>'account_changed_at' IS NULL OR position('110222335566' IN d::text) > 0 THEN
+    RAISE EXCEPTION 'FAIL 대시보드 새 계좌 끝 4자리만: %', d;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM jsonb_array_elements(public.partner_admin_overview(now())->'partners') e
+                  WHERE e->>'code' = 'acctone' AND e->>'last_account_change_at' IS NOT NULL) THEN
+    RAISE EXCEPTION 'FAIL 관리자 화면 계좌 변경 시각';
+  END IF;
+  -- user agent 는 120자까지
+  r := public.partner_change_account(u, '우리은행', '1002-000-111111', '정계정', repeat('x', 300));
+  IF (SELECT max(char_length(user_agent)) FROM public.partner_account_changes WHERE partner_id = pa) <> 120 THEN
+    RAISE EXCEPTION 'FAIL user agent 자르기';
+  END IF;
+  RAISE NOTICE 'PASS B 계좌 변경: 형식·같음 거절, 이력(옛/새 은행·끝 4자리·UA), 이미 만든 정산·대량이체는 옛 계좌, 대시보드는 끝 4자리';
+END $$;
+
 ROLLBACK;
