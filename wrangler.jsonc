@@ -16,6 +16,9 @@
   // 블로그 예약 실행 크론은 vite.config.ts 의 nitro.scheduledTasks 에 있다(빌드 때 triggers 로 들어감).
   "vars": {
     "SUPABASE_URL": "https://fnvvpfunmpigfyqwoeea.supabase.co",
+    // 서버 함수(관리자 대시보드 등 auth-middleware)가 읽는 공개 anon 키. 브라우저 번들에도 그대로 나가는 값이라 비밀 아님.
+    // 🚨 2026-11-07 이게 빠져 있어서 /admin 대시보드가 영원히 로딩됐다.
+    "SUPABASE_PUBLISHABLE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZudnZwZnVubXBpZ2Z5cXdvZWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMxNTk5OTYsImV4cCI6MjA5ODczNTk5Nn0.WQwIpnoEZX-g46yPevbecNESAQ_7gia8FM3T3f_LKBc",
     "BLOG_PLAYLIST_ID": "PLY7xPjoryumg",
     "BLOG_DAILY_LIMIT": "3",
     "GEMINI_MODEL": "gemini-3.8-flash",

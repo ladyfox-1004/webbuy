@@ -1,22 +1,18 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useAdminGate } from "@/hooks/useAdminGate";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Plus, Trash2, Pencil, ShieldCheck, Webhook, NotebookPen } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Pencil, ShieldCheck, Webhook, NotebookPen, Clapperboard, Inbox, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminListPayments, adminListUsers, adminStats } from "@/lib/admin.functions";
 import { listProducts, upsertProduct, deleteProduct } from "@/lib/products.functions";
 import { StatusBadge } from "@/components/StatusBadge";
 
 export const Route = createFileRoute("/admin")({
-  beforeLoad: async () => {
-    const { data: u } = await supabase.auth.getUser();
-    if (!u.user) throw redirect({ to: "/login" });
-    const { data: role } = await supabase
-      .from("user_roles").select("role").eq("user_id", u.user.id).eq("role", "admin").maybeSingle();
-    if (!role) throw redirect({ to: "/" });
-  },
+  // 🚨 2026-11-07: beforeLoad 로 관리자 확인을 하면 서버에서 처음 그릴 때 세션이 없어(브라우저에만 있음)
+  //    로그인한 관리자도 홈으로 튕겼다. 화면이 뜬 뒤 useAdminGate 로 확인한다(admin_.blog.tsx 머리 주석 참고).
   component: AdminPage,
   head: () => ({ meta: [{ title: "관리자 — 에이아이솔루션(AISOLITION)" }] }),
 });
@@ -24,10 +20,31 @@ export const Route = createFileRoute("/admin")({
 type Tab = "stats" | "payments" | "products" | "users";
 
 function AdminPage() {
-  const [tab, setTab] = useState<Tab>("stats");
+  const ok = useAdminGate();
+  if (!ok) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 aria-hidden className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+  return <AdminHome />;
+}
+
+// 2026-11-07: 예전 러버블 틀의 대시보드·결제내역·상품·회원 탭은 이 Supabase(fnvvpfunmpigfyqwoeea)에
+// payments·products 표가 없어서 영원히 로딩됐다. 실제로 쓰는 관리 화면 바로가기 모음으로 바꿨다.
+// 옛 패널 함수(StatsPanel 등)는 아래에 남아 있지만 화면에서 쓰지 않는다.
+const ADMIN_LINKS = [
+  { to: "/admin/reels", label: "쇼츠 주문", desc: "판매 페이지 주문·결제 스위치·자료", Icon: Clapperboard },
+  { to: "/admin/inquiries", label: "상담 문의", desc: "홈페이지 상담 신청 목록", Icon: Inbox },
+  { to: "/admin/blog", label: "블로그", desc: "글 초안·예약 발행", Icon: NotebookPen },
+  { to: "/admin/kakao-connect", label: "카카오톡 알림 연결", desc: "문의 알림 받을 카톡 연결", Icon: MessageCircle },
+] as const;
+
+function AdminHome() {
   return (
     <div className="min-h-screen px-4 py-20">
-      <div className="mx-auto mt-12 max-w-6xl">
+      <div className="mx-auto mt-12 max-w-4xl">
         <Link to="/" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />홈
         </Link>
@@ -35,42 +52,22 @@ function AdminPage() {
           <ShieldCheck className="h-7 w-7 text-primary-glow" />
           <h1 className="font-display text-4xl font-bold">관리자</h1>
         </div>
-
-        <div className="mb-8 flex gap-1 rounded-full border border-border bg-surface/40 p-1">
-          {([
-            ["stats", "대시보드"],
-            ["payments", "결제내역"],
-            ["products", "상품"],
-            ["users", "회원"],
-          ] as const).map(([k, label]) => (
-            <button
-              key={k}
-              onClick={() => setTab(k)}
-              className={`flex-1 rounded-full px-4 py-2 text-sm transition ${
-                tab === k ? "bg-gradient-to-br from-primary to-primary-glow text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {label}
-            </button>
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {ADMIN_LINKS.map(({ to, label, desc, Icon }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                className="flex items-start gap-3 rounded-2xl border border-border bg-card p-5 transition hover:border-primary/50"
+              >
+                <Icon className="mt-0.5 h-5 w-5 text-primary-glow" />
+                <span>
+                  <span className="block font-semibold text-foreground">{label}</span>
+                  <span className="mt-1 block text-sm text-muted-foreground">{desc}</span>
+                </span>
+              </Link>
+            </li>
           ))}
-          <Link
-            to="/admin/blog"
-            className="ml-auto inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-primary-glow transition hover:bg-surface/60"
-          >
-            <NotebookPen className="h-3.5 w-3.5" /> 블로그
-          </Link>
-          <Link
-            to="/admin/webhooks"
-            className="mr-2 inline-flex items-center gap-1 rounded-full px-4 py-2 text-sm text-primary-glow transition hover:bg-surface/60"
-          >
-            <Webhook className="h-3.5 w-3.5" /> 웹훅 로그
-          </Link>
-        </div>
-
-        {tab === "stats" && <StatsPanel />}
-        {tab === "payments" && <PaymentsPanel />}
-        {tab === "products" && <ProductsPanel />}
-        {tab === "users" && <UsersPanel />}
+        </ul>
       </div>
     </div>
   );
