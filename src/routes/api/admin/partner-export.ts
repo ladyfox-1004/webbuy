@@ -3,6 +3,7 @@
 //   ?kind=transfer&month=YYYY-MM&format=xlsx|csv  → 그 달 지급 전 정산의 은행 대량이체 파일(계좌는 정산 만들 때 스냅샷)
 //        경고(은행 못 알아봄 등)는 머리 x-export-warnings(encodeURIComponent(JSON 배열))로 준다. 파일 안에는 넣지 않는다(은행 업로드가 깨진다).
 //   ?kind=withholding&from=YYYY-MM&to=YYYY-MM     → 지급일이 그 기간(한국 시간, 최대 12달)인 지급 완료 정산 + 월별 합계(.xlsx)
+//   ?kind=list&period=7d|30d|month|all&status=…&q=…&sort=…&dir=… → 「파트너」 탭 목록(화면과 같은 검색·필터·정렬, 계좌 끝 4자리만)
 // 🚨 파일에 계좌·연락처가 있다. cache-control: no-store, 로그에 내용을 찍지 마라.
 import { createFileRoute } from "@tanstack/react-router";
 import { checkAdmin, json } from "@/lib/notify/admin-auth";
@@ -18,6 +19,8 @@ import {
   type TransferPayout,
 } from "@/lib/partner/export";
 import { XLSX_MIME } from "@/lib/partner/xlsx";
+import { filterPartners, kstDay, parseListQuery, sortPartners, type ListResponse } from "@/lib/partner/admin-list";
+import { buildPartnerListXlsx } from "@/lib/partner/admin-list-xlsx";
 import { partnerDb } from "@/lib/partner/server";
 
 const HINT = "마이그레이션 20261107180000_partners_dashboard.sql 적용 여부를 확인하세요.";
@@ -82,6 +85,26 @@ export const Route = createFileRoute("/api/admin/partner-export")({
             XLSX_MIME,
             `파트너_원천징수_지급내역_${from}_${to}.xlsx`,
             `partner-withholding-${from}_${to}.xlsx`,
+            { "x-export-rows": String(list.length) },
+          );
+        }
+
+        if (kind === "list") {
+          const opt = parseListQuery(q);
+          const { data, error } = await db.rpc("partner_admin_list", { _period: opt.period });
+          if (error) {
+            console.error(`[admin/partner-export] 파트너 목록 실패 [${error.code ?? "?"}]`);
+            return json({ error: `목록을 읽지 못했습니다 [${error.code ?? "?"}] — 마이그레이션 20261107190000_partners_admin_list.sql 적용 여부를 확인하세요.` }, 500);
+          }
+          const all = ((data ?? {}) as unknown as ListResponse).partners ?? [];
+          const list = sortPartners(filterPartners(all, opt), opt.sort, opt.dir);
+          if (list.length === 0) return json({ error: "조건에 맞는 파트너가 없습니다." }, 404);
+          const day = kstDay(new Date().toISOString());
+          return fileResponse(
+            buildPartnerListXlsx(list, opt.period),
+            XLSX_MIME,
+            `파트너_목록_${day}.xlsx`,
+            `partner-list-${day}.xlsx`,
             { "x-export-rows": String(list.length) },
           );
         }

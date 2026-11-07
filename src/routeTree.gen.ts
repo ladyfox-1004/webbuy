@@ -66,6 +66,7 @@ import { Route as ApiKakaoCallbackRouteImport } from './routes/api/kakao/callbac
 import { Route as ApiAdminVisitsRouteImport } from './routes/api/admin/visits'
 import { Route as ApiAdminPartnersRouteImport } from './routes/api/admin/partners'
 import { Route as ApiAdminPartnerExportRouteImport } from './routes/api/admin/partner-export'
+import { Route as ApiAdminPartnerAccountRouteImport } from './routes/api/admin/partner-account'
 import { Route as ApiAdminOutreachRouteImport } from './routes/api/admin/outreach'
 import { Route as ApiAdminKakaoQuestionsRouteImport } from './routes/api/admin/kakao-questions'
 import { Route as ApiAdminKakaoRouteImport } from './routes/api/admin/kakao'
@@ -361,6 +362,11 @@ const ApiAdminPartnerExportRoute = ApiAdminPartnerExportRouteImport.update({
   path: '/api/admin/partner-export',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminPartnerAccountRoute = ApiAdminPartnerAccountRouteImport.update({
+  id: '/api/admin/partner-account',
+  path: '/api/admin/partner-account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminOutreachRoute = ApiAdminOutreachRouteImport.update({
   id: '/api/admin/outreach',
   path: '/api/admin/outreach',
@@ -460,6 +466,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/kakao': typeof ApiAdminKakaoRoute
   '/api/admin/kakao-questions': typeof ApiAdminKakaoQuestionsRoute
   '/api/admin/outreach': typeof ApiAdminOutreachRoute
+  '/api/admin/partner-account': typeof ApiAdminPartnerAccountRoute
   '/api/admin/partner-export': typeof ApiAdminPartnerExportRoute
   '/api/admin/partners': typeof ApiAdminPartnersRoute
   '/api/admin/visits': typeof ApiAdminVisitsRoute
@@ -528,6 +535,7 @@ export interface FileRoutesByTo {
   '/api/admin/kakao': typeof ApiAdminKakaoRoute
   '/api/admin/kakao-questions': typeof ApiAdminKakaoQuestionsRoute
   '/api/admin/outreach': typeof ApiAdminOutreachRoute
+  '/api/admin/partner-account': typeof ApiAdminPartnerAccountRoute
   '/api/admin/partner-export': typeof ApiAdminPartnerExportRoute
   '/api/admin/partners': typeof ApiAdminPartnersRoute
   '/api/admin/visits': typeof ApiAdminVisitsRoute
@@ -597,6 +605,7 @@ export interface FileRoutesById {
   '/api/admin/kakao': typeof ApiAdminKakaoRoute
   '/api/admin/kakao-questions': typeof ApiAdminKakaoQuestionsRoute
   '/api/admin/outreach': typeof ApiAdminOutreachRoute
+  '/api/admin/partner-account': typeof ApiAdminPartnerAccountRoute
   '/api/admin/partner-export': typeof ApiAdminPartnerExportRoute
   '/api/admin/partners': typeof ApiAdminPartnersRoute
   '/api/admin/visits': typeof ApiAdminVisitsRoute
@@ -667,6 +676,7 @@ export interface FileRouteTypes {
     | '/api/admin/kakao'
     | '/api/admin/kakao-questions'
     | '/api/admin/outreach'
+    | '/api/admin/partner-account'
     | '/api/admin/partner-export'
     | '/api/admin/partners'
     | '/api/admin/visits'
@@ -735,6 +745,7 @@ export interface FileRouteTypes {
     | '/api/admin/kakao'
     | '/api/admin/kakao-questions'
     | '/api/admin/outreach'
+    | '/api/admin/partner-account'
     | '/api/admin/partner-export'
     | '/api/admin/partners'
     | '/api/admin/visits'
@@ -803,6 +814,7 @@ export interface FileRouteTypes {
     | '/api/admin/kakao'
     | '/api/admin/kakao-questions'
     | '/api/admin/outreach'
+    | '/api/admin/partner-account'
     | '/api/admin/partner-export'
     | '/api/admin/partners'
     | '/api/admin/visits'
@@ -870,6 +882,7 @@ export interface RootRouteChildren {
   ApiAdminKakaoRoute: typeof ApiAdminKakaoRoute
   ApiAdminKakaoQuestionsRoute: typeof ApiAdminKakaoQuestionsRoute
   ApiAdminOutreachRoute: typeof ApiAdminOutreachRoute
+  ApiAdminPartnerAccountRoute: typeof ApiAdminPartnerAccountRoute
   ApiAdminPartnerExportRoute: typeof ApiAdminPartnerExportRoute
   ApiAdminPartnersRoute: typeof ApiAdminPartnersRoute
   ApiAdminVisitsRoute: typeof ApiAdminVisitsRoute
@@ -1291,6 +1304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminPartnerExportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/partner-account': {
+      id: '/api/admin/partner-account'
+      path: '/api/admin/partner-account'
+      fullPath: '/api/admin/partner-account'
+      preLoaderRoute: typeof ApiAdminPartnerAccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/outreach': {
       id: '/api/admin/outreach'
       path: '/api/admin/outreach'
@@ -1416,6 +1436,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminKakaoRoute: ApiAdminKakaoRoute,
   ApiAdminKakaoQuestionsRoute: ApiAdminKakaoQuestionsRoute,
   ApiAdminOutreachRoute: ApiAdminOutreachRoute,
+  ApiAdminPartnerAccountRoute: ApiAdminPartnerAccountRoute,
   ApiAdminPartnerExportRoute: ApiAdminPartnerExportRoute,
   ApiAdminPartnersRoute: ApiAdminPartnersRoute,
   ApiAdminVisitsRoute: ApiAdminVisitsRoute,

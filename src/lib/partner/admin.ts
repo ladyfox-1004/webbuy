@@ -9,7 +9,8 @@ export type AdminAction =
   | { action: "make_payouts"; month: string }
   | { action: "payout_paid"; id: string }
   | { action: "resend_approval_mail"; id: string }
-  | { action: "send_account_mail"; id: string };
+  | { action: "send_account_mail"; id: string }
+  | { action: "set_memo"; id: string; memo: string };
 
 /** 한국 시간 기준 'YYYY-MM' */
 export function kstMonth(now = new Date()): string {
@@ -59,6 +60,13 @@ export function parseAdminAction(body: unknown, now = new Date()): AdminAction |
     case "send_account_mail":
       if (!id) return { error: "대상이 없습니다." };
       return { action: "send_account_mail", id };
+    case "set_memo": {
+      if (!id) return { error: "대상이 없습니다." };
+      if (b.memo !== null && b.memo !== undefined && typeof b.memo !== "string") return { error: "메모 형식이 틀렸습니다." };
+      const memo = typeof b.memo === "string" ? b.memo.trim() : "";
+      if (memo.length > 2000) return { error: "메모는 2000자까지입니다." };
+      return { action: "set_memo", id, memo };
+    }
     default:
       return { error: "모르는 동작입니다." };
   }

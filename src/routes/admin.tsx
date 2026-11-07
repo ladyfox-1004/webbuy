@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAdminGate } from "@/hooks/useAdminGate";
+import { adminFetch, useAdminGate } from "@/hooks/useAdminGate";
+import { partnerSummaryText } from "@/lib/partner/admin-list";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -46,6 +47,7 @@ const ADMIN_LINKS = [
 ] as const;
 
 function AdminHome() {
+  const partnerDesc = usePartnerSummaryDesc();
   return (
     <div className="min-h-screen px-4 py-20">
       <div className="mx-auto mt-12 max-w-4xl">
@@ -57,7 +59,9 @@ function AdminHome() {
           <h1 className="font-display text-4xl font-bold">관리자</h1>
         </div>
         <ul className="grid gap-4 sm:grid-cols-2">
-          {ADMIN_LINKS.map(({ to, label, desc, Icon }) => (
+          {ADMIN_LINKS.map(({ to, label, desc: baseDesc, Icon }) => {
+            const desc = to === "/admin/partners" && partnerDesc ? partnerDesc : baseDesc;
+            return (
             <li key={to}>
               <Link
                 to={to}
@@ -70,11 +74,27 @@ function AdminHome() {
                 </span>
               </Link>
             </li>
-          ))}
+            );
+          })}
         </ul>
       </div>
     </div>
   );
+}
+
+/** 「파트너」 바로가기 카드 설명에 요약 숫자(가벼운 API 한 번). 실패하면 null → 원래 설명 */
+function usePartnerSummaryDesc(): string | null {
+  const { data } = useQuery({
+    queryKey: ["admin-partner-summary"],
+    queryFn: async () => {
+      const res = await adminFetch("/api/admin/partners?view=summary");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return (await res.json()) as { approved?: number; applied?: number; payable_total?: number };
+    },
+    retry: false,
+    staleTime: 60_000,
+  });
+  return data ? partnerSummaryText(data) : null;
 }
 
 function StatsPanel() {

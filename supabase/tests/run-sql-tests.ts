@@ -88,6 +88,9 @@ const partnersFollowupTestFile = new URL("./partners_followup.test.sql", here);
 //   마이그레이션 직전에 「옛 정산 한 줄」을 넣어 스냅샷 채우기(기존 행 백필)를 확인한다(시험 파일이 지우지 않고 그대로 둔다).
 const partnersDashboardMigration = new URL("../migrations/20261107180000_partners_dashboard.sql", here);
 const partnersDashboardTestFile = new URL("./partners_dashboard.test.sql", here);
+// 관리자 파트너 목록(20261107190000_partners_admin_list.sql) — 표 집계·요약·상세·계좌 전체 보기·메모. 대시보드 다음에.
+const partnersAdminListMigration = new URL("../migrations/20261107190000_partners_admin_list.sql", here);
+const partnersAdminListTestFile = new URL("./partners_admin_list.test.sql", here);
 const PARTNERS_DASHBOARD_SEED_SQL = `
 INSERT INTO public.partners (code, status, name, phone, email, bank_name, bank_account, bank_holder, approved_at)
 VALUES ('seedold', 'approved', '옛정산', '01069990001', 'seedold@example.com', '하나은행', '333-444444-55555', '옛정산', now());
@@ -140,6 +143,8 @@ await step("시험 partners_followup.test.sql", await Deno.readTextFile(partners
 await step("시드: 옛 정산 한 줄(스냅샷 채우기 확인용)", PARTNERS_DASHBOARD_SEED_SQL);
 await step("마이그레이션 20261107180000_partners_dashboard.sql", await Deno.readTextFile(partnersDashboardMigration));
 await step("시험 partners_dashboard.test.sql", await Deno.readTextFile(partnersDashboardTestFile));
+await step("마이그레이션 20261107190000_partners_admin_list.sql", await Deno.readTextFile(partnersAdminListMigration));
+await step("시험 partners_admin_list.test.sql", await Deno.readTextFile(partnersAdminListTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

@@ -1,6 +1,7 @@
 // /api/admin/partners — 관리자 파트너 화면(/admin/partners)용.
 // 인증: Bearer <관리자 access token> (api/admin/outreach.ts 와 같은 checkAdmin)
 //   GET  → public.partner_admin_overview: 파트너(통계)·추천 붙은 상담·수수료 원장·정산 (조회 때 7일 지난 쇼츠 수수료를 payable 로)
+//   GET  ?view=list&period=…|detail&id=…|summary → 목록(표)·상세·첫 화면 요약 (src/lib/partner/admin-list-api.ts)
 //   POST { action: 'set_status', id, status: 'approved'|'rejected'|'paused' } → 승인 때 view_key 생성
 //        승인이면 바로 파트너에게 안내 메일(지메일 API) → 응답에 mail: 'sent'|'failed'|'skipped', mail_error.
 //        메일이 실패해도 승인은 그대로(결과는 partners.approval_mail_sent_at·approval_mail_error 에 기록).
@@ -10,10 +11,12 @@
 //   POST { action: 'cancel_commission', id, note? }      → 지급 전이면 취소, 지급 뒤면 음수 차감 줄(다음 정산에서 빠짐)
 //   POST { action: 'make_payouts', month? }              → 그 달(기본: 한국 시간 이번 달) 정산 만들기
 //   POST { action: 'payout_paid', id }                   → 지급 완료
+//   POST { action: 'set_memo', id, memo }                → 관리자 메모(빈 값이면 지움, 2000자)
 // 🚨 로그에 계좌·전화 전체를 넣지 마라(이유 코드만).
 import { createFileRoute } from "@tanstack/react-router";
 import { checkAdmin, json } from "@/lib/notify/admin-auth";
 import { ADMIN_REASON_TEXT, parseAdminAction } from "@/lib/partner/admin";
+import { handleAdminPartnersGet } from "@/lib/partner/admin-list-api";
 import { deliverAccountMail, deliverApprovalMail, type ApprovalMailTarget } from "@/lib/partner/approval-mail";
 import { PARTNER_MIGRATION_HINT, partnerDb } from "@/lib/partner/server";
 import { readOutreachEnv } from "@/lib/outreach/env";
@@ -63,14 +66,7 @@ export const Route = createFileRoute("/api/admin/partners")({
       GET: async ({ request }) => {
         const db = partnerDb();
         if (!db) return json({ error: "서버 설정 누락(SUPABASE_SERVICE_ROLE_KEY)" }, 500);
-        const denied = await checkAdmin(request, db);
-        if (denied) return denied;
-        const { data, error } = await db.rpc("partner_admin_overview", {});
-        if (error) {
-          console.error(`[admin/partners] 목록 실패 [${error.code ?? "?"}]`);
-          return json({ error: `파트너 목록을 읽지 못했습니다 [${error.code ?? "?"}] — ${PARTNER_MIGRATION_HINT}` }, 500);
-        }
-        return json(data);
+        return handleAdminPartnersGet(request, db);
       },
 
       POST: async ({ request }) => {
@@ -113,6 +109,8 @@ export const Route = createFileRoute("/api/admin/partners")({
               return db.rpc("partner_make_payouts", { _month: a.month });
             case "payout_paid":
               return db.rpc("partner_payout_mark_paid", { _id: a.id });
+            case "set_memo":
+              return db.rpc("partner_set_memo", { _id: a.id, _memo: a.memo });
           }
           throw new Error("unreachable");
         };

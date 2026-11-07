@@ -7,13 +7,15 @@
 // 지급 뒤 환불·계약 취소는 음수 「차감」 줄로 남고 다음 정산에서 빠진다(합계 0 이하면 정산 없이 이월).
 // 정산의 계좌는 만들 때 스냅샷이다(파트너가 대시보드에서 계좌를 바꿔도 이미 만든 정산은 그대로). 매월 1일 09시에 지난달 정산이 자동으로 생긴다.
 // 「정산」 탭에서 은행 대량이체(.xlsx·CSV)·원천징수 지급 내역(.xlsx)을 내려받는다(/api/admin/partner-export).
-// 자료: /api/admin/partners (src/routes/api/admin/partners.ts → public.partner_admin_overview 등)
+// 「파트너」 탭은 한눈에 보는 목록(표)이다 — src/components/partner/AdminPartnerList.tsx (PC 가로 표+오른쪽 상세, 휴대폰 한 줄 요약+펼치기)
+// 자료: /api/admin/partners (src/routes/api/admin/partners.ts → public.partner_admin_overview·partner_admin_list 등)
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ArrowLeft, Loader2, RefreshCw } from "lucide-react";
 import { adminFetch, useAdminGate } from "@/hooks/useAdminGate";
 import { CopyRow } from "@/components/partner/CopyRow";
+import { AdminPartnerList } from "@/components/partner/AdminPartnerList";
 import { PayoutDownloads } from "@/components/partner/PayoutDownloads";
 import { kstMonth, parseWon } from "@/lib/partner/admin";
 import { commissionOf } from "@/lib/partner/ref";
@@ -122,7 +124,6 @@ type Confirm = { title: string; body: string; label: string; run: () => Promise<
 type MailOutcome = { mail?: "sent" | "failed" | "skipped"; mail_error?: string | null };
 type PostResult = MailOutcome & { error?: string; view_key?: string; partners?: number; carried?: number; reversed?: boolean };
 
-const shortDate = (iso: string) => new Date(iso).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 function AdminPartnersPage() {
   const ok = useAdminGate();
@@ -146,7 +147,10 @@ function AdminPartners() {
       return body;
     },
   });
-  return <AdminPartnersView data={q.data} loading={q.isLoading} error={q.error as Error | null} fetching={q.isFetching} refetch={() => void q.refetch()} />;
+  const qc = useQueryClient();
+  // 목록(표)·상세도 같은 "admin-partners" 묶음이라 한 번에 새로 읽는다
+  const refetch = () => void qc.invalidateQueries({ queryKey: ["admin-partners"] });
+  return <AdminPartnersView data={q.data} loading={q.isLoading} error={q.error as Error | null} fetching={q.isFetching} refetch={refetch} />;
 }
 
 function AdminPartnersView({
@@ -162,7 +166,7 @@ function AdminPartnersView({
   fetching: boolean;
   refetch: () => void;
 }) {
-  const [tab, setTab] = useState<Tab>("apply");
+  const [tab, setTab] = useState<Tab>("partners");
   const [confirm, setConfirm] = useState<Confirm | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
@@ -171,7 +175,6 @@ function AdminPartnersView({
 
   const partners = data?.partners ?? [];
   const applied = partners.filter((p) => p.status === "applied");
-  const others = partners.filter((p) => p.status !== "applied");
   const month = kstMonth();
 
   async function post(body: Record<string, unknown>, okText: string) {
@@ -216,14 +219,14 @@ function AdminPartnersView({
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: "apply", label: "신청", count: applied.length },
-    { id: "partners", label: "파트너", count: others.length },
+    { id: "partners", label: "파트너", count: partners.length },
     { id: "inquiries", label: "추천 상담", count: data?.inquiries.length },
     { id: "ledger", label: "원장" },
     { id: "payouts", label: "정산" },
   ];
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-40 pt-8" data-testid="admin-partners">
+    <div className={`mx-auto px-4 pb-40 pt-8 ${tab === "partners" ? "max-w-[1440px]" : "max-w-2xl"}`} data-testid="admin-partners">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Link to="/admin" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -356,104 +359,13 @@ function AdminPartnersView({
         </section>
       )}
 
-      {data && tab === "partners" && (
-        <section className="mt-4 space-y-3">
-          {others.length === 0 && <Empty text="아직 승인한 파트너가 없습니다." />}
-          {others.map((p) => (
-            <article key={p.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="font-semibold">
-                    {p.name} <span className="font-normal text-muted-foreground">· {p.code}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    방문 {p.visits_30d}명(30일) · 상담 {p.inquiries} · 결제 {p.paid_count}
-                  </div>
-                </div>
-                <Badge text={P_LABEL[p.status]} />
-              </div>
-              <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs">
-                <Mini label="대기" value={won(p.sum_pending)} />
-                <Mini label="지급 가능" value={won(p.sum_payable)} />
-                <Mini label="지급 완료" value={won(p.sum_paid)} />
-              </div>
-              {p.view_key && p.status !== "rejected" && (
-                <div className="mt-3">
-                  <CopyRow label="파트너 화면 링크" value={`${SITE}/partner/me?k=${p.view_key}`} />
-                </div>
-              )}
-              {p.status === "approved" && <MailStatus p={p} />}
-              {(p.status === "approved" || p.status === "paused") && <AccountStatus p={p} />}
-              <div className="mt-3 flex flex-wrap gap-2">
-                {p.status === "approved" && (
-                  <SmallButton
-                    disabled={busy}
-                    onClick={() =>
-                      ask({
-                        title: `${p.name}님에게 안내 메일을 다시 보낼까요?`,
-                        body: `${p.email} 로 코드·전용 링크·파트너 화면 주소를 다시 보냅니다.`,
-                        label: "보내기",
-                        run: async () => {
-                          await post({ action: "resend_approval_mail", id: p.id }, `${p.name}님 메일 다시 보내기`);
-                        },
-                      })
-                    }
-                    text="메일 다시 보내기"
-                  />
-                )}
-                {(p.status === "approved" || p.status === "paused") && !p.user_linked && (
-                  <SmallButton
-                    disabled={busy}
-                    onClick={() =>
-                      ask({
-                        title: `${p.name}님에게 계정 만들기 메일을 보낼까요?`,
-                        body: `${p.email} 로 「파트너 계정 만들기」 링크를 보냅니다. 파트너가 비밀번호만 정하면 바로 로그인 대시보드를 씁니다.`,
-                        label: "보내기",
-                        run: async () => {
-                          await post({ action: "send_account_mail", id: p.id }, `${p.name}님 계정 만들기 메일`);
-                        },
-                      })
-                    }
-                    text={p.account_mail_sent_at ? "계정 만들기 메일 다시 보내기" : "계정 만들기 메일 보내기"}
-                  />
-                )}
-                {p.status === "approved" && (
-                  <SmallButton
-                    disabled={busy}
-                    onClick={() =>
-                      ask({
-                        title: `${p.name}님을 일시정지할까요?`,
-                        body: "멈추는 동안 새 결제에는 수수료가 쌓이지 않습니다. 이미 쌓인 금액은 그대로 정산됩니다.",
-                        label: "일시정지",
-                        run: async () => {
-                          await post({ action: "set_status", id: p.id, status: "paused" }, `${p.name}님 일시정지`);
-                        },
-                      })
-                    }
-                    text="일시정지"
-                  />
-                )}
-                {(p.status === "paused" || p.status === "rejected") && (
-                  <SmallButton
-                    disabled={busy}
-                    onClick={() =>
-                      ask({
-                        title: `${p.name}님을 다시 승인할까요?`,
-                        body: "다시 승인하면 이 코드로 들어온 새 결제에 수수료가 쌓입니다.",
-                        label: "승인",
-                        run: async () => {
-                          const r = await post({ action: "set_status", id: p.id, status: "approved" }, `${p.name}님 승인`);
-                          if (r?.view_key) setJustApproved({ name: p.name, key: r.view_key, mail: r });
-                        },
-                      })
-                    }
-                    text="다시 승인"
-                  />
-                )}
-              </div>
-            </article>
-          ))}
-        </section>
+      {tab === "partners" && (
+        <AdminPartnerList
+          busy={busy}
+          ask={ask}
+          post={post}
+          onApproved={(name, key, mail) => setJustApproved({ name, key, mail })}
+        />
       )}
 
       {data && tab === "inquiries" && (
@@ -696,48 +608,6 @@ function AdminPartnersView({
   );
 }
 
-function MailStatus({ p }: { p: Partner }) {
-  if (p.approval_mail_error) {
-    return (
-      <p className="mt-2 rounded-xl border border-rose-500/40 bg-rose-50 px-3 py-2 text-xs text-rose-800">
-        안내 메일 실패: {p.approval_mail_error}
-        {p.approval_mail_sent_at ? ` (전에 ${shortDate(p.approval_mail_sent_at)} 보냄)` : ""} — 다시 보내거나 링크를 직접 보내 주세요.
-      </p>
-    );
-  }
-  if (p.approval_mail_sent_at) {
-    return <p className="mt-2 text-xs text-muted-foreground">안내 메일 보냄 · {shortDate(p.approval_mail_sent_at)}</p>;
-  }
-  return <p className="mt-2 text-xs text-muted-foreground">안내 메일 아직 안 보냄</p>;
-}
-
-function AccountStatus({ p }: { p: Partner }) {
-  const recent = p.last_account_change_at && Date.now() - new Date(p.last_account_change_at).getTime() < 14 * 86400_000;
-  return (
-    <div className="mt-2 space-y-1 text-xs">
-      {p.user_linked ? (
-        <p className="text-emerald-800">로그인 계정 연결됨</p>
-      ) : (
-        <>
-          <p className="text-muted-foreground">
-            로그인 계정 아직 없음
-            {p.account_mail_sent_at ? ` · 계정 메일 보냄 ${shortDate(p.account_mail_sent_at)}` : ""}
-          </p>
-          {p.account_mail_error && (
-            <p className="rounded-xl border border-rose-500/40 bg-rose-50 px-3 py-2 text-rose-800">계정 메일 실패: {p.account_mail_error}</p>
-          )}
-          {p.view_key && <CopyRow label="계정 만들기 링크" value={`${SITE}/partner/signup?k=${p.view_key}`} />}
-        </>
-      )}
-      {p.last_account_change_at && (
-        <p className={recent ? "font-semibold text-amber-800" : "text-muted-foreground"}>
-          파트너가 정산 계좌를 바꿈 · {shortDate(p.last_account_change_at)}
-        </p>
-      )}
-    </div>
-  );
-}
-
 function Empty({ text }: { text: string }) {
   return <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">{text}</p>;
 }
@@ -752,14 +622,6 @@ function Row({ k, v }: { k: string; v: React.ReactNode }) {
     <div className="flex gap-3">
       <dt className="w-14 shrink-0 text-muted-foreground">{k}</dt>
       <dd className="min-w-0 break-words">{v}</dd>
-    </div>
-  );
-}
-function Mini({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl bg-muted/60 p-2">
-      <div className="text-muted-foreground">{label}</div>
-      <div className="mt-0.5 font-semibold text-foreground">{value}</div>
     </div>
   );
 }

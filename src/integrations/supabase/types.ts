@@ -937,6 +937,10 @@ export type Database = {
       partner_account_mail_target: { Args: { _id: string }; Returns: Json }
       partner_account_target: { Args: { _view_key: string }; Returns: Json }
       partner_admin_overview: { Args: { _now?: string }; Returns: Json }
+      partner_admin_bank: { Args: { _id: string }; Returns: Json }
+      partner_admin_detail: { Args: { _id: string }; Returns: Json }
+      partner_admin_list: { Args: { _period?: string; _now?: string }; Returns: Json }
+      partner_admin_summary: { Args: { _now?: string }; Returns: Json }
       partner_apply: { Args: { _p: Json }; Returns: Json }
       partner_approval_mail_result: {
         Args: { _id: string; _error?: string; _now?: string }
@@ -986,6 +990,10 @@ export type Database = {
       partner_payout_mark_paid: { Args: { _id: string; _now?: string }; Returns: Json }
       partner_refresh_payable: { Args: { _now?: string }; Returns: number }
       partner_session: { Args: { _user_id: string }; Returns: Json }
+      partner_set_memo: {
+        Args: { _id: string; _memo: string; _now?: string }
+        Returns: Json
+      }
       partner_set_status: {
         Args: { _id: string; _status: string; _now?: string }
         Returns: Json
