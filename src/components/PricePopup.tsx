@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { ArrowRight, ChevronRight, X } from "lucide-react";
+import { ArrowRight, ChevronRight, MessageCircle, X } from "lucide-react";
+import { KAKAO_OPENCHAT_URL } from "@/lib/portfolio";
 import { Dialog, DialogClose, DialogOverlay, DialogPortal } from "@/components/ui/dialog";
 import {
   hidePricePopupToday,
@@ -133,6 +134,17 @@ export function PricePopup({
           >
             상담 신청하기 <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
+
+          {/* 2026-11-07 대표님: 카톡 문의 단추(오픈프로필). 주소는 src/lib/portfolio.ts KAKAO_OPENCHAT_URL 한 곳 */}
+          <a
+            href={KAKAO_OPENCHAT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => handleOpenChange(false)}
+            className="mt-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#FEE500] px-6 text-base font-semibold text-[#191919] transition hover:brightness-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden /> 카카오톡으로 문의하기
+          </a>
 
           <div className="mt-2 flex items-center justify-between gap-2">
             <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
