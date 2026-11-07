@@ -215,9 +215,8 @@ function Examples() {
           ))}
         </ul>
 
-        <h3 className="mt-14 text-lg font-bold text-foreground md:text-xl">저희가 만든 예시</h3>
-        <p className="mt-1 text-sm text-muted-foreground">30초 안팎으로 만든 시험 영상입니다. 눌러서 보실 수 있어요.</p>
-        <ul className="mt-5 grid max-w-3xl grid-cols-3 gap-3 md:gap-6">
+        {/* 2026-11-07 대표님: 「저희가 만든 예시」 제목을 따로 달면 위 캡처가 남의 것처럼 보인다 → 제목 없이 같은 묶음으로 이어 보여 준다 */}
+        <ul className="mt-6 grid max-w-3xl grid-cols-3 gap-3 md:gap-6">
           {EXAMPLES.map((ex) => (
             <li key={ex.src} data-testid="example-slot">
               <video
