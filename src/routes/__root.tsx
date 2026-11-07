@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 import { InquiryProvider } from "@/components/InquiryModal";
+import { VisitTracker } from "@/components/VisitTracker";
 
 import appCss from "../styles.css?url";
 
@@ -160,6 +161,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <InquiryProvider>
         <Outlet />
+        {/* 방문 기록(/admin/visits 에서 본다). 관리자·로그인 화면과 관리자 본인은 빠진다. */}
+        <VisitTracker />
         <Toaster theme="light" position="top-center" richColors />
       </InquiryProvider>
     </QueryClientProvider>

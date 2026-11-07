@@ -4,6 +4,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { markNoTrack } from "@/lib/analytics/client-track";
 
 export function useAdminGate(): boolean {
   const navigate = useNavigate();
@@ -29,7 +30,11 @@ export function useAdminGate(): boolean {
       .catch(() => "login" as const)
       .then((r) => {
         if (!alive) return;
-        if (r === "ok") setOk(true);
+        if (r === "ok") {
+          // 관리자 본인의 방문은 홈페이지 방문 기록(/admin/visits)에서 뺀다(이 브라우저에 aisol_no_track=1).
+          markNoTrack();
+          setOk(true);
+        }
         else navigate({ to: r === "home" ? "/" : "/login", replace: true });
       });
     return () => {

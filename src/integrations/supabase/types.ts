@@ -519,6 +519,48 @@ export type Database = {
         }
         Relationships: []
       }
+      site_visits: {
+        Row: {
+          created_at: string
+          device: string
+          id: number
+          path: string
+          referrer_host: string | null
+          session_id: string
+          source: string
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string
+          device?: string
+          id?: number
+          path: string
+          referrer_host?: string | null
+          session_id: string
+          source?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string
+          id?: number
+          path?: string
+          referrer_host?: string | null
+          session_id?: string
+          source?: string
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -603,6 +645,10 @@ export type Database = {
         }[]
       }
       show_limit: { Args: never; Returns: number }
+      site_visit_stats: {
+        Args: { _days?: number; _now?: string }
+        Returns: Json
+      }
       show_trgm: { Args: { "": string }; Returns: string[] }
       slugify: { Args: { input: string }; Returns: string }
     }
