@@ -1,7 +1,7 @@
 // 카카오 채널 챗봇 시험 — 실행: bun test ./tests
 // 네트워크·DB 에 나가지 않는다(저장소·AI·접수·알림을 가짜로 끼운다).
 import { describe, expect, test } from "bun:test";
-import { KAKAO_OPENCHAT_URL } from "../src/lib/portfolio";
+import { KAKAO_OPEN_PROFILE_URL as KAKAO_OPENCHAT_URL } from "../src/lib/portfolio";
 import { LIST_PRICE, REFUND_RULES } from "../src/lib/reels/constants";
 import {
   COMMON_FAQ,

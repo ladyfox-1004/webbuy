@@ -226,7 +226,7 @@ describe("화면 문구 정적 검사", () => {
     }
   });
 
-  test("카카오톡 단추는 오픈프로필 주소 한 곳(KAKAO_OPENCHAT_URL)으로 새 창 연결", () => {
+  test("카카오톡 단추는 채널 채팅 주소 한 곳(KAKAO_OPENCHAT_URL)으로 새 창 연결", () => {
     const src = readFileSync(join(ROOT, "src/components/reels/ReelsParts.tsx"), "utf8");
     const start = src.indexOf("export function KakaoChannelLink");
     const end = src.indexOf("\n}\n", start);
@@ -236,7 +236,7 @@ describe("화면 문구 정적 검사", () => {
     expect(body).toContain('target="_blank"');
     expect(body).toContain("noopener");
     const portfolio = readFileSync(join(ROOT, "src/lib/portfolio.ts"), "utf8");
-    expect(portfolio).toContain('KAKAO_OPENCHAT_URL = "https://open.kakao.com/o/sd29wW8h"');
+    expect(portfolio).toContain('KAKAO_OPENCHAT_URL = "https://pf.kakao.com/_rxeJxeX/chat"');
     // 화면들은 이 컴포넌트만 쓰고 카카오 주소를 직접 걸지 않는다
     for (const f of reelsFiles) {
       const s = readFileSync(f, "utf8");

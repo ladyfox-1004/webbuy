@@ -10,6 +10,13 @@ export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "로그인 — 에이아이솔루션(AISOLITION)" }] }),
 });
 
+// 로그인 뒤 갈 곳. 같은 사이트 안 /admin 경로만 허용(외부 주소로 튕기는 것 방지).
+function safeNext(): string | null {
+  if (typeof window === "undefined") return null;
+  const n = new URLSearchParams(window.location.search).get("next");
+  return n && n.startsWith("/admin") && !n.startsWith("//") ? n : null;
+}
+
 const schema = z.object({
   email: z.string().trim().email("올바른 이메일을 입력해주세요"),
   password: z.string().min(6, "비밀번호는 6자 이상").max(72),
@@ -23,7 +30,11 @@ function LoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/" });
+      if (data.session) {
+        const next = safeNext();
+        if (next) window.location.replace(next);
+        else navigate({ to: "/" });
+      }
     });
   }, [navigate]);
 
@@ -42,7 +53,9 @@ function LoginPage() {
       return;
     }
     toast.success("로그인 성공");
-    navigate({ to: "/" });
+    const next = safeNext();
+    if (next) window.location.replace(next);
+    else navigate({ to: "/" });
   }
 
   return (

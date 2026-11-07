@@ -135,7 +135,7 @@ export function PricePopup({
             상담 신청하기 <ArrowRight className="h-4 w-4" aria-hidden />
           </button>
 
-          {/* 2026-11-07 대표님: 카톡 문의 단추(오픈프로필). 주소는 src/lib/portfolio.ts KAKAO_OPENCHAT_URL 한 곳 */}
+          {/* 2026-11-07 대표님: 카톡 문의 단추(카카오톡 채널 채팅). 주소는 src/lib/portfolio.ts KAKAO_OPENCHAT_URL 한 곳 */}
           <a
             href={KAKAO_OPENCHAT_URL}
             target="_blank"

@@ -42,8 +42,11 @@ export const portfolioByName = new Map(
   ),
 );
 
-// 에이아이솔루션 1:1 오픈채팅 (개인 카톡 아이디 대신 영업 창구로 사용)
-export const KAKAO_OPENCHAT_URL = "https://open.kakao.com/o/sd29wW8h";
+// 홈페이지·쇼츠 페이지의 「카카오톡 문의」 단추 = 카카오톡 채널 「에이아이솔루션」 채팅(상담 챗봇이 받음).
+// 2026-11-07 대표님: 오픈프로필 → 채널로 바꿈. 이름은 예전 그대로(KAKAO_OPENCHAT_URL) 두어 쓰는 곳을 안 바꿈.
+export const KAKAO_OPENCHAT_URL = "https://pf.kakao.com/_rxeJxeX/chat";
+// 대표 개인 오픈프로필 — 챗봇 안의 「대표와 바로 대화」 단추에만 쓴다(src/lib/kakao/faq.ts OPEN_PROFILE_URL).
+export const KAKAO_OPEN_PROFILE_URL = "https://open.kakao.com/o/sd29wW8h";
 
 // 토스 미니앱은 토스 앱 컨테이너 안에서만 실행된다. PC 브라우저로는 열리지 않는다.
 export const TOSS_MINIAPP_URL = "https://minion.toss.im/VlDAkiWn";

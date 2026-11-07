@@ -54,7 +54,7 @@ export type MenuDef = {
   collect: CollectStep[];
 };
 
-export const OPEN_PROFILE_URL = "https://open.kakao.com/o/sd29wW8h"; // src/lib/portfolio.ts KAKAO_OPENCHAT_URL 과 같아야 함(시험이 확인)
+export const OPEN_PROFILE_URL = "https://open.kakao.com/o/sd29wW8h"; // src/lib/portfolio.ts KAKAO_OPEN_PROFILE_URL 과 같아야 함(시험이 확인)
 export const REELS_ORDER_URL = "https://ai-solution.co.kr/reels";
 export const PORTFOLIO_URL = "https://ai-solution.co.kr/#portfolio";
 export const PRIVACY_URL = "https://ai-solution.co.kr/privacy";

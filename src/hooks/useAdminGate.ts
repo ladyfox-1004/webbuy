@@ -35,7 +35,12 @@ export function useAdminGate(): boolean {
           markNoTrack();
           setOk(true);
         }
-        else navigate({ to: r === "home" ? "/" : "/login", replace: true });
+        else if (r === "home") navigate({ to: "/", replace: true });
+        else {
+          // 🚨 11/7: 카톡 알림 링크(/admin/…)로 들어와 로그인하면 원래 화면으로 돌아가게 next 를 붙인다.
+          const next = window.location.pathname + window.location.search;
+          window.location.replace(`/login?next=${encodeURIComponent(next)}`);
+        }
       });
     return () => {
       alive = false;

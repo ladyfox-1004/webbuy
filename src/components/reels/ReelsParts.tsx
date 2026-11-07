@@ -28,7 +28,7 @@ export function ReelsNav() {
 }
 
 /**
- * 카카오톡 상담 단추. 2026-11-07 대표님: 채널 대신 오픈프로필 주소(KAKAO_OPENCHAT_URL, 홈 「카카오톡 상담」과 같은 주소)를 쓴다.
+ * 카카오톡 상담 단추. 2026-11-07 대표님: 카카오톡 채널 채팅(KAKAO_OPENCHAT_URL, 홈 「카카오톡 상담」과 같은 주소, 상담 챗봇이 받음).
  * 주의: 카카오 주소는 src/lib/portfolio.ts 한 곳에서만 고친다. 화면들은 이 컴포넌트만 쓴다.
  */
 export function KakaoChannelLink({ className = "" }: { className?: string }) {
