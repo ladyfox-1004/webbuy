@@ -231,18 +231,32 @@ function wrap76(b64: string): string {
 
 export type MimeOptions = { boundary?: string };
 
-/** 지메일 API 에 넣을 원문 MIME(줄바꿈 CRLF). multipart/alternative = 글 판 + HTML 판. */
+/** 어떤 메일이든 MIME 에 필요한 칸(영업 메일·파트너 승인 안내 메일 공용). to 는 만드는 쪽에서 검사·정리해 넣는다. */
+export type MimeMail = { to: string; subject: string; text: string; html: string };
+
+/** 영업 메일 MIME — 공용 MIME 에 수신거부 머리(List-Unsubscribe·원클릭)를 더한다. */
 export function buildMime(mail: OutreachMail, opts: MimeOptions = {}): string {
+  const mailtoUnsub = `mailto:${FROM_EMAIL}?subject=${encodeURIComponent("수신거부")}`;
+  return buildMimeMessage(
+    mail,
+    [`List-Unsubscribe: <${mail.oneClickUrl}>, <${mailtoUnsub}>`, "List-Unsubscribe-Post: List-Unsubscribe=One-Click"],
+    opts,
+  );
+}
+
+/**
+ * 공용 MIME 원문(줄바꿈 CRLF). multipart/alternative = 글 판 + HTML 판.
+ * 머리 순서: From · To · Subject · MIME-Version · (extraHeaders) · Content-Type. 보낸 사람은 언제나 FROM_NAME <FROM_EMAIL>.
+ */
+export function buildMimeMessage(mail: MimeMail, extraHeaders: string[] = [], opts: MimeOptions = {}): string {
   const boundary =
     opts.boundary ?? `aisol_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
-  const mailtoUnsub = `mailto:${FROM_EMAIL}?subject=${encodeURIComponent("수신거부")}`;
   const headers = [
     `From: ${encodeHeaderWord(FROM_NAME)} <${FROM_EMAIL}>`,
     `To: <${mail.to}>`,
     `Subject: ${encodeHeaderWord(oneLine(mail.subject))}`,
     "MIME-Version: 1.0",
-    `List-Unsubscribe: <${mail.oneClickUrl}>, <${mailtoUnsub}>`,
-    "List-Unsubscribe-Post: List-Unsubscribe=One-Click",
+    ...extraHeaders.map((h) => oneLine(h)),
     `Content-Type: multipart/alternative; boundary="${boundary}"`,
   ];
   const part = (type: string, body: string) =>

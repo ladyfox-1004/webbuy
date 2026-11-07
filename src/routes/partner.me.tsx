@@ -31,7 +31,7 @@ type PartnerMe = {
   sum_pending: number;
   sum_payable: number;
   sum_paid: number;
-  recent: { created_at: string; source: "reels" | "inquiry"; base_amount: number; amount: number; status: Status; plan: number | null }[];
+  recent: { created_at: string; source: "reels" | "inquiry"; base_amount: number; amount: number; status: Status; plan: number | null; is_reversal?: boolean }[];
   months: { month: string; gross: number; income_tax: number; local_tax: number; withholding: number; net: number; status: "pending" | "paid"; paid_at: string | null }[];
 };
 
@@ -167,7 +167,7 @@ function MeView({ me }: { me: PartnerMe }) {
               <li key={`${r.created_at}-${i}`} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
                   <div className="font-medium">
-                    {r.source === "reels" ? `쇼츠 ${r.plan ?? ""}편` : "상담 계약"} · {won(r.base_amount)}
+                    {r.is_reversal ? "환불·취소 차감 · " : ""}{r.source === "reels" ? `쇼츠 ${r.plan ?? ""}편` : "상담 계약"} · {won(r.base_amount)}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     {new Date(r.created_at).toLocaleDateString("ko-KR")} · {STATUS_LABEL[r.status]}

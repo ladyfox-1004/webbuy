@@ -3,6 +3,8 @@
 // 🚨 beforeLoad 로 관리자 확인하지 마라 — useAdminGate(화면이 뜬 뒤 확인). 실제 보호는 서버 checkAdmin.
 // 🚨 head 에는 title·robots 만. canonical 넣지 마라.
 // 🚨 확인은 window.confirm 대신 화면 안 확인 상자.
+// 승인하면 서버가 바로 안내 메일을 보낸다(실패해도 승인은 그대로 — 「메일 다시 보내기」·링크 복사로 보완).
+// 지급 뒤 환불·계약 취소는 음수 「차감」 줄로 남고 다음 정산에서 빠진다(합계 0 이하면 정산 없이 이월).
 // 자료: /api/admin/partners (src/routes/api/admin/partners.ts → public.partner_admin_overview 등)
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -36,6 +38,8 @@ type Partner = {
   created_at: string;
   approved_at: string | null;
   view_key: string | null;
+  approval_mail_sent_at: string | null;
+  approval_mail_error: string | null;
   visits_30d: number;
   inquiries: number;
   paid_count: number;
@@ -55,6 +59,7 @@ type RefInquiry = {
   base_amount: number | null;
   commission: number | null;
   commission_status: CStatus | null;
+  reversed: boolean;
 };
 type Commission = {
   id: string;
@@ -64,6 +69,8 @@ type Commission = {
   amount: number;
   status: CStatus;
   note: string | null;
+  reversal_of: string | null;
+  reversed: boolean;
   code: string;
   partner_name: string;
   order_no: string | null;
@@ -102,6 +109,10 @@ const C_CLASS: Record<CStatus, string> = {
 
 type Tab = "apply" | "partners" | "inquiries" | "ledger" | "payouts";
 type Confirm = { title: string; body: string; label: string; run: () => Promise<void> };
+type MailOutcome = { mail?: "sent" | "failed" | "skipped"; mail_error?: string | null };
+type PostResult = MailOutcome & { error?: string; view_key?: string; partners?: number; carried?: number; reversed?: boolean };
+
+const shortDate = (iso: string) => new Date(iso).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
 function AdminPartnersPage() {
   const ok = useAdminGate();
@@ -146,7 +157,7 @@ function AdminPartnersView({
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
   const [amounts, setAmounts] = useState<Record<string, string>>({});
-  const [justApproved, setJustApproved] = useState<{ name: string; key: string } | null>(null);
+  const [justApproved, setJustApproved] = useState<{ name: string; key: string; mail: MailOutcome } | null>(null);
 
   const partners = data?.partners ?? [];
   const applied = partners.filter((p) => p.status === "applied");
@@ -158,9 +169,13 @@ function AdminPartnersView({
     setResult(null);
     try {
       const res = await adminFetch("/api/admin/partners", { method: "POST", body: JSON.stringify(body) });
-      const r = (await res.json().catch(() => ({}))) as { error?: string; view_key?: string; partners?: number };
+      const r = (await res.json().catch(() => ({}))) as PostResult;
       if (!res.ok) throw new Error(r.error ?? `HTTP ${res.status}`);
-      setResult({ kind: "ok", text: okText + (typeof r.partners === "number" ? ` (${r.partners}명)` : "") });
+      let text = okText + (typeof r.partners === "number" ? ` (${r.partners}명)` : "");
+      if (r.carried) text += ` · ${r.carried}명은 차감이 더 커서 다음 달로 넘김`;
+      if (r.mail === "sent") text += " · 안내 메일 보냄";
+      if (r.mail === "failed") text += ` · 안내 메일 실패: ${r.mail_error ?? ""}`;
+      setResult({ kind: r.mail === "failed" ? "error" : "ok", text });
       return r;
     } catch (e) {
       setResult({ kind: "error", text: (e as Error).message });
@@ -173,6 +188,20 @@ function AdminPartnersView({
 
   function ask(c: Confirm) {
     setConfirm(c);
+  }
+
+  /** 상담 계약 「결제 취소」: 지급 전이면 수수료 취소, 지급 뒤면 음수 차감 줄(다음 정산에서 빠짐) */
+  function askContractCancel(commissionId: string, partnerName: string, amount: number, paid: boolean) {
+    ask({
+      title: "이 계약을 취소 처리할까요?",
+      body: paid
+        ? `${partnerName}님에게 이미 지급한 ${won(amount)}을 다음 정산에서 뺍니다(−${won(amount)} 차감 줄). 되돌릴 수 없습니다.`
+        : `${partnerName}님 수수료 ${won(amount)}을 취소합니다. 정산에 묶여 있었다면 그 정산 금액도 다시 계산됩니다.`,
+      label: "계약 취소",
+      run: async () => {
+        await post({ action: "cancel_commission", id: commissionId, note: "계약 취소" }, paid ? "계약 취소 — 다음 정산에서 차감" : "계약 취소");
+      },
+    });
   }
 
   const tabs: { id: Tab; label: string; count?: number }[] = [
@@ -236,7 +265,12 @@ function AdminPartnersView({
 
       {justApproved && (
         <div className="mt-4 rounded-2xl border border-emerald-600/30 bg-emerald-50 p-4">
-          <p className="text-sm font-semibold text-emerald-900">{justApproved.name}님 승인 — 아래 링크를 보내 주세요</p>
+          <p className="text-sm font-semibold text-emerald-900">
+            {justApproved.name}님 승인 —{" "}
+            {justApproved.mail.mail === "sent"
+              ? "안내 메일을 보냈습니다(코드·링크·내 화면 주소)."
+              : `안내 메일을 못 보냈습니다${justApproved.mail.mail_error ? `(${justApproved.mail.mail_error})` : ""}. 아래 링크를 직접 보내 주세요.`}
+          </p>
           <div className="mt-2">
             <CopyRow label="파트너 화면 링크" value={`${SITE}/partner/me?k=${justApproved.key}`} />
           </div>
@@ -298,7 +332,7 @@ function AdminPartnersView({
                       label: "승인",
                       run: async () => {
                         const r = await post({ action: "set_status", id: p.id, status: "approved" }, `${p.name}님 승인`);
-                        if (r?.view_key) setJustApproved({ name: p.name, key: r.view_key });
+                        if (r?.view_key) setJustApproved({ name: p.name, key: r.view_key, mail: r });
                       },
                     })
                   }
@@ -338,7 +372,24 @@ function AdminPartnersView({
                   <CopyRow label="파트너 화면 링크" value={`${SITE}/partner/me?k=${p.view_key}`} />
                 </div>
               )}
+              {p.status === "approved" && <MailStatus p={p} />}
               <div className="mt-3 flex flex-wrap gap-2">
+                {p.status === "approved" && (
+                  <SmallButton
+                    disabled={busy}
+                    onClick={() =>
+                      ask({
+                        title: `${p.name}님에게 안내 메일을 다시 보낼까요?`,
+                        body: `${p.email} 로 코드·전용 링크·파트너 화면 주소를 다시 보냅니다.`,
+                        label: "보내기",
+                        run: async () => {
+                          await post({ action: "resend_approval_mail", id: p.id }, `${p.name}님 메일 다시 보내기`);
+                        },
+                      })
+                    }
+                    text="메일 다시 보내기"
+                  />
+                )}
                 {p.status === "approved" && (
                   <SmallButton
                     disabled={busy}
@@ -365,7 +416,7 @@ function AdminPartnersView({
                         label: "승인",
                         run: async () => {
                           const r = await post({ action: "set_status", id: p.id, status: "approved" }, `${p.name}님 승인`);
-                          if (r?.view_key) setJustApproved({ name: p.name, key: r.view_key });
+                          if (r?.view_key) setJustApproved({ name: p.name, key: r.view_key, mail: r });
                         },
                       })
                     }
@@ -403,9 +454,19 @@ function AdminPartnersView({
                   {i.commission_status && <CBadge s={i.commission_status} />}
                 </div>
                 {i.commission_id ? (
-                  <p className="mt-3 text-sm">
-                    계약 {won(i.base_amount)} → 수수료 <b>{won(i.commission)}</b>
-                  </p>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm">
+                      계약 {won(i.base_amount)} → 수수료 <b>{won(i.commission)}</b>
+                      {i.reversed && <span className="ml-1 text-amber-800">· 계약 취소됨(다음 정산에서 차감)</span>}
+                    </p>
+                    {!i.reversed && (
+                      <SmallButton
+                        disabled={busy}
+                        text="계약 취소"
+                        onClick={() => askContractCancel(i.commission_id as string, i.partner_name ?? "", i.commission ?? 0, i.commission_status === "paid")}
+                      />
+                    )}
+                  </div>
                 ) : i.partner_status === "approved" ? (
                   <div className="mt-3 flex gap-2">
                     <input
@@ -457,6 +518,7 @@ function AdminPartnersView({
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="font-medium">
+                      {c.reversal_of && <span className="mr-1 rounded border border-amber-500/40 bg-amber-50 px-1.5 py-0.5 text-xs text-amber-900">차감</span>}
                       {c.partner_name} · {c.source === "reels" ? `쇼츠 ${c.plan ?? ""}편 ${c.order_no ?? ""}` : `상담 ${c.inquiry_name ?? ""}`}
                     </div>
                     <div className="text-xs text-muted-foreground">
@@ -469,7 +531,16 @@ function AdminPartnersView({
                     <CBadge s={c.status} />
                   </div>
                 </div>
-                {(c.status === "pending" || c.status === "payable") && (
+                {!c.reversal_of && c.source === "inquiry" && c.status !== "cancelled" && !c.reversed && (
+                  <div className="mt-2">
+                    <SmallButton
+                      disabled={busy}
+                      text="계약 취소"
+                      onClick={() => askContractCancel(c.id, c.partner_name, c.amount, c.status === "paid")}
+                    />
+                  </div>
+                )}
+                {!c.reversal_of && c.source === "reels" && (c.status === "pending" || c.status === "payable") && (
                   <div className="mt-2">
                     <SmallButton
                       disabled={busy}
@@ -501,7 +572,7 @@ function AdminPartnersView({
             onClick={() =>
               ask({
                 title: `${month.replace("-", "년 ")}월 정산을 만들까요?`,
-                body: "지급 가능한 수수료를 파트너별로 모아 정산 목록을 만듭니다(3.3% 원천징수 계산). 다시 눌러도 겹치지 않습니다.",
+                body: "지급 가능한 수수료를 파트너별로 모아 정산 목록을 만듭니다(3.3% 원천징수 계산). 지급 뒤 환불 차감도 함께 빠지고, 차감이 더 크면 그 파트너는 다음 달로 넘깁니다. 다시 눌러도 겹치지 않습니다.",
                 label: "만들기",
                 run: async () => {
                   await post({ action: "make_payouts", month }, `${month} 정산 만들기 완료`);
@@ -588,6 +659,21 @@ function AdminPartnersView({
       )}
     </div>
   );
+}
+
+function MailStatus({ p }: { p: Partner }) {
+  if (p.approval_mail_error) {
+    return (
+      <p className="mt-2 rounded-xl border border-rose-500/40 bg-rose-50 px-3 py-2 text-xs text-rose-800">
+        안내 메일 실패: {p.approval_mail_error}
+        {p.approval_mail_sent_at ? ` (전에 ${shortDate(p.approval_mail_sent_at)} 보냄)` : ""} — 다시 보내거나 링크를 직접 보내 주세요.
+      </p>
+    );
+  }
+  if (p.approval_mail_sent_at) {
+    return <p className="mt-2 text-xs text-muted-foreground">안내 메일 보냄 · {shortDate(p.approval_mail_sent_at)}</p>;
+  }
+  return <p className="mt-2 text-xs text-muted-foreground">안내 메일 아직 안 보냄</p>;
 }
 
 function Empty({ text }: { text: string }) {

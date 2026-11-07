@@ -81,6 +81,9 @@ const kakaoChatTestFile = new URL("./kakao_chat.test.sql", here);
 // 추천인(파트너)(20261107160000_partners.sql) — reels_orders·inquiries·site_visits 에 ref_code 열·트리거를 더하므로 맨 뒤에.
 const partnersMigration = new URL("../migrations/20261107160000_partners.sql", here);
 const partnersTestFile = new URL("./partners.test.sql", here);
+// 추천인 후속(20261107170000_partners_followup.sql) — 지급 뒤 환불 차감·승인 메일 기록·미승인 정리. 파트너 다음에.
+const partnersFollowupMigration = new URL("../migrations/20261107170000_partners_followup.sql", here);
+const partnersFollowupTestFile = new URL("./partners_followup.test.sql", here);
 
 const db = new PGlite();
 let passed = 0;
@@ -122,6 +125,8 @@ await step("마이그레이션 20261107150000_kakao_chat.sql", await Deno.readTe
 await step("시험 kakao_chat.test.sql", await Deno.readTextFile(kakaoChatTestFile));
 await step("마이그레이션 20261107160000_partners.sql", await Deno.readTextFile(partnersMigration));
 await step("시험 partners.test.sql", await Deno.readTextFile(partnersTestFile));
+await step("마이그레이션 20261107170000_partners_followup.sql", await Deno.readTextFile(partnersFollowupMigration));
+await step("시험 partners_followup.test.sql", await Deno.readTextFile(partnersFollowupTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

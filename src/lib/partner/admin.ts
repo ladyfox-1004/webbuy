@@ -7,7 +7,8 @@ export type AdminAction =
   | { action: "inquiry_paid"; inquiryId: string; amount: number }
   | { action: "cancel_commission"; id: string; note: string }
   | { action: "make_payouts"; month: string }
-  | { action: "payout_paid"; id: string };
+  | { action: "payout_paid"; id: string }
+  | { action: "resend_approval_mail"; id: string };
 
 /** 한국 시간 기준 'YYYY-MM' */
 export function kstMonth(now = new Date()): string {
@@ -51,6 +52,9 @@ export function parseAdminAction(body: unknown, now = new Date()): AdminAction |
     case "payout_paid":
       if (!id) return { error: "대상이 없습니다." };
       return { action: "payout_paid", id };
+    case "resend_approval_mail":
+      if (!id) return { error: "대상이 없습니다." };
+      return { action: "resend_approval_mail", id };
     default:
       return { error: "모르는 동작입니다." };
   }
@@ -65,7 +69,9 @@ export const ADMIN_REASON_TEXT: Record<string, string> = {
   no_ref: "추천 코드가 없는 상담입니다.",
   partner_not_approved: "추천한 파트너가 승인 상태가 아닙니다(신청·거절·일시정지).",
   duplicate: "이미 「결제됨」으로 넣은 상담입니다. 고치려면 원장에서 취소한 뒤 다시 넣어 주세요.",
-  not_cancellable: "지급 완료됐거나 이미 취소된 수수료는 취소할 수 없습니다.",
+  not_cancellable: "이미 취소된 수수료입니다.",
+  already_reversed: "이미 차감 줄을 넣은 수수료입니다(다음 정산에서 빠집니다).",
+  is_reversal: "환불·계약 취소 차감 줄은 취소할 수 없습니다.",
   bad_month: "정산 달이 틀렸습니다.",
   already_paid: "이미 지급 완료된 정산입니다.",
 };

@@ -932,10 +932,16 @@ export type Database = {
       }
       partner_admin_overview: { Args: { _now?: string }; Returns: Json }
       partner_apply: { Args: { _p: Json }; Returns: Json }
+      partner_approval_mail_result: {
+        Args: { _id: string; _error?: string; _now?: string }
+        Returns: Json
+      }
+      partner_approval_mail_target: { Args: { _id: string }; Returns: Json }
       partner_attach_reels: {
         Args: { _order_no: string; _payurl: string; _phone: string; _ref: string; _now?: string }
         Returns: Json
       }
+      partner_cleanup_unapproved: { Args: { _now?: string }; Returns: number }
       partner_commission_cancel: {
         Args: { _id: string; _note?: string; _now?: string }
         Returns: Json
