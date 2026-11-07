@@ -5,6 +5,8 @@
 //   POST { action: 'skip',  ids } → ready → skipped
 //   POST { action: 'retry', ids } → failed → ready
 //   POST { action: 'set_auto', on: boolean } → 자동 발송 스위치(outreach_settings.auto_send). 크론: src/server/outreach-tasks/auto-send-task.ts
+//   POST { action: 'set_auto_pick', on: boolean } → 자동 고르기 스위치(outreach_settings.auto_pick). 크론: src/server/outreach-tasks/pick-task.ts
+//   GET 은 후보 풀(이메일 있는 미확인 수)·오늘 유튜브 쿼터도 준다(표가 없으면 null).
 // 판단은 src/lib/outreach/service.ts, 본문은 src/lib/outreach/mail.ts.
 // 🚨 GMAIL_* 비밀값·access token 은 응답·로그에 절대 넣지 않는다(connected 여부만).
 import { createFileRoute } from "@tanstack/react-router";
@@ -25,9 +27,12 @@ import {
   type DraftRow,
 } from "@/lib/outreach/service";
 import { DRAFT_COLS, readAutoSend, supabaseOutreachStore, writeAutoSend } from "@/lib/outreach/store";
+import { QUOTA_DAILY } from "@/lib/outreach/pick";
+import { readAutoPick, readPickStats, writeAutoPick } from "@/lib/outreach/pick-store";
 
 const MIGRATION_HINT = "마이그레이션 20261107120000_outreach.sql 적용 여부를 확인하세요.";
 const SETTINGS_HINT = "마이그레이션 20261107130000_outreach_settings.sql 적용 여부를 확인하세요.";
+const PICK_HINT = "마이그레이션 20261107140000_outreach_candidates.sql 적용 여부를 확인하세요.";
 
 function preview(r: DraftRow) {
   try {
@@ -67,12 +72,24 @@ export const Route = createFileRoute("/api/admin/outreach")({
         } catch (e) {
           console.error(`[outreach] ${e instanceof Error ? e.message : "자동 발송 설정 읽기 실패"}`);
         }
+        // 자동 고르기 스위치·후보 풀·쿼터 — 표가 아직 없으면 null
+        let autoPick: boolean | null = null;
+        let pick: { poolNew: number; quotaToday: number; quotaLimit: number } | null = null;
+        try {
+          const [on, stats] = await Promise.all([readAutoPick(db), readPickStats(db)]);
+          autoPick = on;
+          pick = { ...stats, quotaLimit: QUOTA_DAILY };
+        } catch (e) {
+          console.error(`[outreach] ${e instanceof Error ? e.message : "자동 고르기 정보 읽기 실패"}`);
+        }
 
         return json({
           today,
           date,
           gmailConnected: gmailConnected(env),
           autoSend,
+          autoPick,
+          pick,
           rows: ((rows.data ?? []) as DraftRow[]).map((r) => ({ ...r, preview: preview(r) })),
           days: countByDay(recent.data ?? [], today, 14),
           totalSent: total.count ?? 0,
@@ -100,6 +117,16 @@ export const Route = createFileRoute("/api/admin/outreach")({
             const m = e instanceof Error ? e.message : "저장 실패";
             console.error(`[outreach] ${m}`);
             return json({ error: `${m} — ${SETTINGS_HINT}` }, 500);
+          }
+        }
+        if (body?.action === "set_auto_pick") {
+          if (typeof body.on !== "boolean") return json({ error: "켜기/끄기 값이 틀렸습니다." }, 400);
+          try {
+            return json({ ok: true, autoPick: await writeAutoPick(db, body.on) });
+          } catch (e) {
+            const m = e instanceof Error ? e.message : "저장 실패";
+            console.error(`[outreach] ${m}`);
+            return json({ error: `${m} — ${PICK_HINT}` }, 500);
           }
         }
         const ids = cleanIds(body?.ids);

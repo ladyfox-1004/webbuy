@@ -28,13 +28,19 @@ const nitro = {
     "outreach:auto-send": {
       handler: fileURLToPath(new URL("./src/server/outreach-tasks/auto-send-task.ts", import.meta.url)),
     },
+    "outreach:pick": {
+      handler: fileURLToPath(new URL("./src/server/outreach-tasks/pick-task.ts", import.meta.url)),
+    },
   },
   scheduledTasks: {
     "0 21 * * *": ["blog:collect"], // 매일 06:00 KST
     "0 0 * * TUE,FRI": ["blog:publish"], // 화·금 09:00 KST
     // 영업 메일 자동 발송 — 30분마다 깨어나고, 한국 시간 매일 07:00~20:00 인지는 코드(src/lib/outreach/auto.ts)가 본다.
-    // 🚨 무료 요금제 크론 트리거 개수 한도가 있다(지금 3개). 더 늘리기 전에 확인하라.
+    // 🚨 무료 요금제 크론 트리거 개수 한도가 있다(계정 전체 5개, 이 워커 지금 4개). 더 늘리기 전에 확인하라.
     "*/30 * * * *": ["outreach:auto-send"],
+    // 영업 메일 후보 고르기 — 매시 15·45분. 한국 시간 05:00~19:30·하루 10곳·쿼터는 코드(src/lib/outreach/pick.ts)가 본다.
+    // 발송(*/30)과 다른 시각이라 실행이 따로 잡혀 「실행당 외부 호출 50개」 한도를 따로 쓴다.
+    "15,45 * * * *": ["outreach:pick"],
   },
 } satisfies NitroConfig;
 

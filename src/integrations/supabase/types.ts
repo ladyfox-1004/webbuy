@@ -319,6 +319,60 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_candidates: {
+        Row: {
+          business_score: number
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          checked_at: string | null
+          country: string | null
+          created_at: string
+          description_summary: string | null
+          email: string | null
+          niche: string | null
+          reject_reason: string | null
+          status: string
+          subscribers: number | null
+          top_title: string | null
+          top_url: string | null
+        }
+        Insert: {
+          business_score?: number
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          checked_at?: string | null
+          country?: string | null
+          created_at?: string
+          description_summary?: string | null
+          email?: string | null
+          niche?: string | null
+          reject_reason?: string | null
+          status?: string
+          subscribers?: number | null
+          top_title?: string | null
+          top_url?: string | null
+        }
+        Update: {
+          business_score?: number
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string
+          checked_at?: string | null
+          country?: string | null
+          created_at?: string
+          description_summary?: string | null
+          email?: string | null
+          niche?: string | null
+          reject_reason?: string | null
+          status?: string
+          subscribers?: number | null
+          top_title?: string | null
+          top_url?: string | null
+        }
+        Relationships: []
+      }
       outreach_drafts: {
         Row: {
           approved_at: string | null
@@ -394,20 +448,44 @@ export type Database = {
         }
         Relationships: []
       }
-      outreach_settings: {
+      outreach_quota: {
         Row: {
-          auto_send: boolean
-          id: number
+          day: string
+          units: number
           updated_at: string | null
         }
         Insert: {
-          auto_send?: boolean
-          id?: number
+          day: string
+          units?: number
           updated_at?: string | null
         }
         Update: {
+          day?: string
+          units?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      outreach_settings: {
+        Row: {
+          auto_pick: boolean
+          auto_send: boolean
+          id: number
+          pick_cursor: number
+          updated_at: string | null
+        }
+        Insert: {
+          auto_pick?: boolean
           auto_send?: boolean
           id?: number
+          pick_cursor?: number
+          updated_at?: string | null
+        }
+        Update: {
+          auto_pick?: boolean
+          auto_send?: boolean
+          id?: number
+          pick_cursor?: number
           updated_at?: string | null
         }
         Relationships: []
@@ -727,6 +805,16 @@ export type Database = {
           payload: Json
           source_queue: string
         }
+        Returns: number
+      }
+      outreach_add_drafts: {
+        Args: { p_rows: Json }
+        Returns: {
+          channel_id: string
+        }[]
+      }
+      outreach_quota_add: {
+        Args: { p_day: string; p_units: number }
         Returns: number
       }
       read_email_batch: {

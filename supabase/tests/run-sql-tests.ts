@@ -72,6 +72,9 @@ const outreachTestFile = new URL("./outreach.test.sql", here);
 // 영업 메일 자동 발송 스위치(20261107130000_outreach_settings.sql) — 영업 메일 다음에.
 const outreachSettingsMigration = new URL("../migrations/20261107130000_outreach_settings.sql", here);
 const outreachSettingsTestFile = new URL("./outreach_settings.test.sql", here);
+// 영업 메일 후보 풀·쿼터·자동 고르기(20261107140000_outreach_candidates.sql) — 스위치 표에 열을 더하므로 그 다음에.
+const outreachCandidatesMigration = new URL("../migrations/20261107140000_outreach_candidates.sql", here);
+const outreachCandidatesTestFile = new URL("./outreach_candidates.test.sql", here);
 
 const db = new PGlite();
 let passed = 0;
@@ -107,6 +110,8 @@ await step("마이그레이션 20261107120000_outreach.sql", await Deno.readText
 await step("시험 outreach.test.sql", await Deno.readTextFile(outreachTestFile));
 await step("마이그레이션 20261107130000_outreach_settings.sql", await Deno.readTextFile(outreachSettingsMigration));
 await step("시험 outreach_settings.test.sql", await Deno.readTextFile(outreachSettingsTestFile));
+await step("마이그레이션 20261107140000_outreach_candidates.sql", await Deno.readTextFile(outreachCandidatesMigration));
+await step("시험 outreach_candidates.test.sql", await Deno.readTextFile(outreachCandidatesTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

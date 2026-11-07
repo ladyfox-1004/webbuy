@@ -5,6 +5,8 @@
 // 자료: /api/admin/outreach (src/routes/api/admin/outreach.ts). 메일 본문은 src/lib/outreach/mail.ts 한 곳.
 // 맨 위 「자동 발송」 스위치 = outreach_settings.auto_send. 켜져 있으면 워커 예약 실행(30분마다,
 // src/server/outreach-tasks/auto-send-task.ts)이 한국 시간 매일 07:00~20:00 에 오늘 묶음 ready 를 보낸다.
+// 그 아래 「자동 고르기」 스위치 = outreach_settings.auto_pick. 켜져 있으면 워커 예약 실행(매시 15·45분,
+// src/server/outreach-tasks/pick-task.ts)이 한국 시간 05:00~19:30 에 후보 풀에서 오늘 10곳을 조금씩 골라 넣는다.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -41,6 +43,10 @@ type Resp = {
   gmailConnected: boolean;
   /** 자동 발송 켜짐 여부. 설정 표가 없으면 null */
   autoSend: boolean | null;
+  /** 자동 고르기 켜짐 여부. 표·열이 없으면 null */
+  autoPick: boolean | null;
+  /** 후보 풀(이메일 있는 미확인 수)·오늘 유튜브 쿼터. 표가 없으면 null */
+  pick: { poolNew: number; quotaToday: number; quotaLimit: number } | null;
   rows: Row[];
   days: Day[];
   totalSent: number;
@@ -128,6 +134,28 @@ function AdminOutreach() {
   // 자동 발송 스위치 — 누르면 화면 안 확인 상자, 확인하면 저장
   const [autoConfirm, setAutoConfirm] = useState<null | boolean>(null);
   const [autoBusy, setAutoBusy] = useState(false);
+  // 자동 고르기 스위치 — 같은 방식(화면 안 확인 상자)
+  const [pickConfirm, setPickConfirm] = useState<null | boolean>(null);
+
+  async function doSetAutoPick(on: boolean) {
+    setPickConfirm(null);
+    setAutoBusy(true);
+    setResult(null);
+    try {
+      const res = await adminFetch("/api/admin/outreach", {
+        method: "POST",
+        body: JSON.stringify({ action: "set_auto_pick", on }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { autoPick?: boolean; error?: string };
+      if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+      setResult({ kind: "ok", text: body.autoPick ? "자동 고르기를 켰습니다." : "자동 고르기를 껐습니다. 이제 새 후보가 들어오지 않습니다." });
+    } catch (e) {
+      setResult({ kind: "error", text: (e as Error).message });
+    } finally {
+      setAutoBusy(false);
+      void q.refetch();
+    }
+  }
 
   async function doSetAuto(on: boolean) {
     setAutoConfirm(null);
@@ -260,10 +288,46 @@ function AdminOutreach() {
             </button>
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
-            매일 아침 7시~저녁 8시, 노트북이 골라 넣으면 30분 안에 자동으로 보냅니다. 항의·신고가 오면 꺼 주세요.
+            매일 아침 7시~저녁 8시, 서버가 골라 넣으면 30분 안에 자동으로 보냅니다. 항의·신고가 오면 꺼 주세요.
           </p>
           {data.autoSend === null && (
             <p className="mt-2 text-sm text-amber-800">설정 표가 아직 없습니다 — 마이그레이션 20261107130000_outreach_settings.sql 을 적용해 주세요.</p>
+          )}
+
+          <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
+            <div className="font-semibold">
+              자동 고르기{" "}
+              {data.autoPick === null ? (
+                <span className="text-muted-foreground">확인 안 됨</span>
+              ) : data.autoPick ? (
+                <span className="text-emerald-700">켜짐</span>
+              ) : (
+                <span className="text-muted-foreground">꺼짐</span>
+              )}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={data.autoPick === true}
+              aria-label="자동 고르기 켜고 끄기"
+              disabled={data.autoPick === null || autoBusy || busy !== null}
+              onClick={() => setPickConfirm(!data.autoPick)}
+              className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full transition disabled:opacity-50 ${
+                data.autoPick ? "bg-emerald-600" : "bg-zinc-300"
+              }`}
+            >
+              <span className={`inline-block h-6 w-6 rounded-full bg-white shadow transition ${data.autoPick ? "translate-x-7" : "translate-x-1"}`} />
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            노트북을 켜지 않아도 서버가 새벽 5시~저녁 7시 반 사이 조금씩 하루 10곳을 골라 넣습니다.
+          </p>
+          {data.pick ? (
+            <p className="mt-1 text-sm">
+              후보 풀: 이메일 있는 미확인 {n(data.pick.poolNew)}곳 · 오늘 유튜브 쿼터 {n(data.pick.quotaToday)}/{n(data.pick.quotaLimit)}
+            </p>
+          ) : (
+            <p className="mt-2 text-sm text-amber-800">후보 풀 표가 아직 없습니다 — 마이그레이션 20261107140000_outreach_candidates.sql 을 적용해 주세요.</p>
           )}
         </section>
       )}
@@ -461,6 +525,37 @@ function AdminOutreach() {
                     <Send className="h-5 w-5" /> 선택한 {n(selected.length)}곳 보내기
                   </button>
                 )}
+              </div>
+            </div>
+          )}
+
+          {pickConfirm !== null && (
+            <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="outreach-pick-title">
+              <div className="w-full max-w-md rounded-3xl bg-card p-6 shadow-xl">
+                <h2 id="outreach-pick-title" className="text-lg font-bold">
+                  {pickConfirm ? "자동 고르기를 켤까요?" : "자동 고르기를 끌까요?"}
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {pickConfirm
+                    ? "서버가 매일 새벽 5시~저녁 7시 반 사이 유튜브에서 후보를 확인해 하루 10곳까지 오늘 목록에 넣습니다."
+                    : "끄면 새 후보가 오늘 목록에 들어오지 않습니다. 이미 들어간 곳은 그대로 남습니다."}
+                </p>
+                <div className="mt-6 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPickConfirm(null)}
+                    className="flex-1 rounded-2xl border border-border px-4 py-3 text-base"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => doSetAutoPick(pickConfirm)}
+                    className="flex-1 rounded-2xl bg-gradient-to-br from-primary to-primary-glow px-4 py-3 text-base font-semibold text-primary-foreground"
+                  >
+                    {pickConfirm ? "켜기" : "끄기"}
+                  </button>
+                </div>
               </div>
             </div>
           )}
