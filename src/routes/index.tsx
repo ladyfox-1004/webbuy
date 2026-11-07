@@ -1617,11 +1617,6 @@ function Nav() {
                 앱 개발
               </Link>
             )}
-            {isAdmin && (
-              <Link to="/sell" className="transition hover:text-foreground">
-                판매하기
-              </Link>
-            )}
             <a
               href="#quick-contact"
               className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-primary to-primary-glow px-4 py-2 text-sm font-medium text-primary-foreground shadow-[var(--shadow-glow)] transition hover:scale-[1.02]"
@@ -1740,15 +1735,6 @@ function Nav() {
                   className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground"
                 >
                   앱 개발
-                </Link>
-              )}
-              {isAdmin && (
-                <Link
-                  to="/sell"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-xl px-3 py-2.5 text-muted-foreground transition hover:bg-surface-elevated hover:text-foreground"
-                >
-                  판매하기
                 </Link>
               )}
               <a

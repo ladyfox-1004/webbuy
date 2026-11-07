@@ -107,7 +107,6 @@ function AppDevPage() {
             <div className="hidden gap-7 text-sm text-muted-foreground md:flex">
               <Link to="/" className="transition hover:text-foreground">홈</Link>
               <Link to="/app-dev" className="text-foreground">앱 개발</Link>
-              <Link to="/sell" className="transition hover:text-foreground">판매하기</Link>
             </div>
             <Link to="/" className="rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90">
               문의하기
