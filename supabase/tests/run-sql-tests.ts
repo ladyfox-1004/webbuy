@@ -84,6 +84,16 @@ const partnersTestFile = new URL("./partners.test.sql", here);
 // 추천인 후속(20261107170000_partners_followup.sql) — 지급 뒤 환불 차감·승인 메일 기록·미승인 정리. 파트너 다음에.
 const partnersFollowupMigration = new URL("../migrations/20261107170000_partners_followup.sql", here);
 const partnersFollowupTestFile = new URL("./partners_followup.test.sql", here);
+// 파트너 지급 편의·로그인 대시보드(20261107180000_partners_dashboard.sql) — 정산 계좌 스냅샷·자동 정산·계정 연결. 후속 다음에.
+//   마이그레이션 직전에 「옛 정산 한 줄」을 넣어 스냅샷 채우기(기존 행 백필)를 확인한다(시험 파일이 지우지 않고 그대로 둔다).
+const partnersDashboardMigration = new URL("../migrations/20261107180000_partners_dashboard.sql", here);
+const partnersDashboardTestFile = new URL("./partners_dashboard.test.sql", here);
+const PARTNERS_DASHBOARD_SEED_SQL = `
+INSERT INTO public.partners (code, status, name, phone, email, bank_name, bank_account, bank_holder, approved_at)
+VALUES ('seedold', 'approved', '옛정산', '01069990001', 'seedold@example.com', '하나은행', '333-444444-55555', '옛정산', now());
+INSERT INTO public.partner_payouts (partner_id, month, gross, income_tax, local_tax, withholding, net, status)
+SELECT id, '2026-09', 10000, 300, 30, 330, 9670, 'pending' FROM public.partners WHERE code = 'seedold';
+`;
 
 const db = new PGlite();
 let passed = 0;
@@ -127,6 +137,9 @@ await step("마이그레이션 20261107160000_partners.sql", await Deno.readText
 await step("시험 partners.test.sql", await Deno.readTextFile(partnersTestFile));
 await step("마이그레이션 20261107170000_partners_followup.sql", await Deno.readTextFile(partnersFollowupMigration));
 await step("시험 partners_followup.test.sql", await Deno.readTextFile(partnersFollowupTestFile));
+await step("시드: 옛 정산 한 줄(스냅샷 채우기 확인용)", PARTNERS_DASHBOARD_SEED_SQL);
+await step("마이그레이션 20261107180000_partners_dashboard.sql", await Deno.readTextFile(partnersDashboardMigration));
+await step("시험 partners_dashboard.test.sql", await Deno.readTextFile(partnersDashboardTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

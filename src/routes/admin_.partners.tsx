@@ -5,6 +5,8 @@
 // 🚨 확인은 window.confirm 대신 화면 안 확인 상자.
 // 승인하면 서버가 바로 안내 메일을 보낸다(실패해도 승인은 그대로 — 「메일 다시 보내기」·링크 복사로 보완).
 // 지급 뒤 환불·계약 취소는 음수 「차감」 줄로 남고 다음 정산에서 빠진다(합계 0 이하면 정산 없이 이월).
+// 정산의 계좌는 만들 때 스냅샷이다(파트너가 대시보드에서 계좌를 바꿔도 이미 만든 정산은 그대로). 매월 1일 09시에 지난달 정산이 자동으로 생긴다.
+// 「정산」 탭에서 은행 대량이체(.xlsx·CSV)·원천징수 지급 내역(.xlsx)을 내려받는다(/api/admin/partner-export).
 // 자료: /api/admin/partners (src/routes/api/admin/partners.ts → public.partner_admin_overview 등)
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +14,7 @@ import { useState } from "react";
 import { ArrowLeft, Loader2, RefreshCw } from "lucide-react";
 import { adminFetch, useAdminGate } from "@/hooks/useAdminGate";
 import { CopyRow } from "@/components/partner/CopyRow";
+import { PayoutDownloads } from "@/components/partner/PayoutDownloads";
 import { kstMonth, parseWon } from "@/lib/partner/admin";
 import { commissionOf } from "@/lib/partner/ref";
 
@@ -92,6 +95,8 @@ type Payout = {
   bank_name: string;
   bank_account: string;
   bank_holder: string;
+  /** 정산을 만든 뒤 파트너 계좌가 바뀜(이 정산은 만들 때 계좌 = 위 bank_* 로 보낸다) */
+  account_changed?: boolean;
   items: number;
 };
 type Overview = { partners: Partner[]; inquiries: RefInquiry[]; commissions: Commission[]; payouts: Payout[] };
@@ -583,6 +588,11 @@ function AdminPartnersView({
           >
             이번 달 정산 만들기
           </button>
+          <p className="text-xs text-muted-foreground">매월 1일 오전 9시에 지난달 정산이 자동으로 만들어지고 카톡이 갑니다.</p>
+          <PayoutDownloads
+            month={month}
+            pendingMonths={[...new Set(data.payouts.filter((y) => y.status === "pending").map((y) => y.month))].sort().reverse()}
+          />
           {data.payouts.length === 0 && <Empty text="정산 내역이 없습니다." />}
           {data.payouts.map((y) => (
             <article key={y.id} className="rounded-2xl border border-border bg-card p-4 text-sm shadow-sm">
@@ -594,6 +604,9 @@ function AdminPartnersView({
                   <div className="text-xs text-muted-foreground">
                     {y.bank_name} {y.bank_account} ({y.bank_holder}) · {y.items}건
                   </div>
+                  {y.account_changed && (
+                    <div className="mt-1 text-xs text-amber-800">정산을 만든 뒤 파트너가 계좌를 바꿨습니다. 이 정산은 위(만들 때) 계좌로 보냅니다.</div>
+                  )}
                 </div>
                 <Badge text={y.status === "paid" ? "지급 완료" : "지급 전"} />
               </div>

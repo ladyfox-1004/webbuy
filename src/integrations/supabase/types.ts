@@ -941,6 +941,11 @@ export type Database = {
         Args: { _order_no: string; _payurl: string; _phone: string; _ref: string; _now?: string }
         Returns: Json
       }
+      partner_auto_payouts: { Args: { _now?: string }; Returns: Json }
+      partner_auto_payouts_notified: {
+        Args: { _run_month: string; _status: string; _now?: string }
+        Returns: Json
+      }
       partner_cleanup_unapproved: { Args: { _now?: string }; Returns: number }
       partner_commission_cancel: {
         Args: { _id: string; _note?: string; _now?: string }
@@ -952,12 +957,14 @@ export type Database = {
       }
       partner_make_payouts: { Args: { _month: string; _now?: string }; Returns: Json }
       partner_me: { Args: { _view_key: string; _now?: string }; Returns: Json }
+      partner_paid_list: { Args: { _from: string; _to: string }; Returns: Json }
       partner_payout_mark_paid: { Args: { _id: string; _now?: string }; Returns: Json }
       partner_refresh_payable: { Args: { _now?: string }; Returns: number }
       partner_set_status: {
         Args: { _id: string; _status: string; _now?: string }
         Returns: Json
       }
+      partner_transfer_list: { Args: { _month: string }; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
