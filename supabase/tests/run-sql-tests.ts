@@ -75,6 +75,9 @@ const outreachSettingsTestFile = new URL("./outreach_settings.test.sql", here);
 // 영업 메일 후보 풀·쿼터·자동 고르기(20261107140000_outreach_candidates.sql) — 스위치 표에 열을 더하므로 그 다음에.
 const outreachCandidatesMigration = new URL("../migrations/20261107140000_outreach_candidates.sql", here);
 const outreachCandidatesTestFile = new URL("./outreach_candidates.test.sql", here);
+// 카카오 채널 챗봇(20261107150000_kakao_chat.sql) — 대화 상태·챗봇 질문·추가 FAQ. 다른 표에 기대지 않는다.
+const kakaoChatMigration = new URL("../migrations/20261107150000_kakao_chat.sql", here);
+const kakaoChatTestFile = new URL("./kakao_chat.test.sql", here);
 
 const db = new PGlite();
 let passed = 0;
@@ -112,6 +115,8 @@ await step("마이그레이션 20261107130000_outreach_settings.sql", await Deno
 await step("시험 outreach_settings.test.sql", await Deno.readTextFile(outreachSettingsTestFile));
 await step("마이그레이션 20261107140000_outreach_candidates.sql", await Deno.readTextFile(outreachCandidatesMigration));
 await step("시험 outreach_candidates.test.sql", await Deno.readTextFile(outreachCandidatesTestFile));
+await step("마이그레이션 20261107150000_kakao_chat.sql", await Deno.readTextFile(kakaoChatMigration));
+await step("시험 kakao_chat.test.sql", await Deno.readTextFile(kakaoChatTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

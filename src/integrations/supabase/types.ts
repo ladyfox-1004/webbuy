@@ -289,6 +289,105 @@ export type Database = {
         }
         Relationships: []
       }
+      kakao_chat_sessions: {
+        Row: {
+          data: Json
+          menu: string | null
+          photos: string[]
+          question_alert_at: string | null
+          step: string
+          updated_at: string
+          user_key: string
+        }
+        Insert: {
+          data?: Json
+          menu?: string | null
+          photos?: string[]
+          question_alert_at?: string | null
+          step?: string
+          updated_at?: string
+          user_key: string
+        }
+        Update: {
+          data?: Json
+          menu?: string | null
+          photos?: string[]
+          question_alert_at?: string | null
+          step?: string
+          updated_at?: string
+          user_key?: string
+        }
+        Relationships: []
+      }
+      kakao_faq_extra: {
+        Row: {
+          active: boolean
+          answer: string
+          created_at: string
+          id: string
+          keywords: string[]
+          menu: string | null
+        }
+        Insert: {
+          active?: boolean
+          answer: string
+          created_at?: string
+          id?: string
+          keywords: string[]
+          menu?: string | null
+        }
+        Update: {
+          active?: boolean
+          answer?: string
+          created_at?: string
+          id?: string
+          keywords?: string[]
+          menu?: string | null
+        }
+        Relationships: []
+      }
+      kakao_questions: {
+        Row: {
+          added_to_faq: boolean
+          admin_answer: string | null
+          answered_by_ai: boolean
+          bot_answer: string
+          contact: string | null
+          created_at: string
+          id: string
+          menu: string | null
+          question: string
+          status: string
+          user_key: string
+        }
+        Insert: {
+          added_to_faq?: boolean
+          admin_answer?: string | null
+          answered_by_ai?: boolean
+          bot_answer?: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          menu?: string | null
+          question: string
+          status?: string
+          user_key: string
+        }
+        Update: {
+          added_to_faq?: boolean
+          admin_answer?: string | null
+          answered_by_ai?: boolean
+          bot_answer?: string
+          contact?: string | null
+          created_at?: string
+          id?: string
+          menu?: string | null
+          question?: string
+          status?: string
+          user_key?: string
+        }
+        Relationships: []
+      }
       kakao_oauth_tokens: {
         Row: {
           connected_at: string | null
@@ -812,6 +911,14 @@ export type Database = {
         Returns: {
           channel_id: string
         }[]
+      }
+      kakao_chat_add_photos: {
+        Args: { _max?: number; _urls: string[]; _user_key: string }
+        Returns: number
+      }
+      kakao_question_alert_due: {
+        Args: { _now?: string; _user_key: string }
+        Returns: boolean
       }
       outreach_quota_add: {
         Args: { p_day: string; p_units: number }

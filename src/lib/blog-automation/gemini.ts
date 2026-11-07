@@ -194,23 +194,24 @@ export function isFetcher(v: unknown): v is FetcherLike {
   );
 }
 
-/** 실제 호출. 429 는 GeminiQuotaError, 그 밖의 실패는 Error.
- *  우선순위: proxy(GEMINI_PROXY 서비스 바인딩) → ai 바인딩+gatewayId(AI Gateway) → 구글 직접(로컬 개발·시험용). */
-export async function generateDraft(opts: {
+/** generateContent 한 번 보내기(경로 고르기만). 블로그 초안(generateDraft)과 카카오 챗봇(src/lib/kakao/ai.ts)이 같이 쓴다.
+ *  우선순위: proxy(GEMINI_PROXY 서비스 바인딩) → ai 바인딩+gatewayId(AI Gateway) → 구글 직접(로컬 개발·시험용).
+ *  where: 중계 워커 경유일 때만 붙는 진단 꼬리표. 예: " (colo=IAD)"
+ *  signal: proxy·직접 호출에만 걸린다(AI Gateway 바인딩 run 은 signal 을 받지 않는다 — 호출하는 쪽이 시간 제한을 따로 건다). */
+export async function postGenerateContent(opts: {
   apiKey: string;
   model: string;
-  videoUrl: string;
-  meta: { title: string | null; channel: string | null };
+  body: unknown;
   proxy?: FetcherLike | null;
   ai?: AiBindingLike | null;
   gatewayId?: string | null;
-}): Promise<BlogDraft> {
-  const body = buildGeminiRequest(opts.videoUrl, opts.meta);
+  signal?: AbortSignal;
+}): Promise<{ res: Response; where: string }> {
+  const { body } = opts;
   const path = `v1beta/models/${encodeURIComponent(opts.model)}:generateContent`;
   const gatewayId = opts.gatewayId?.trim();
 
   let res: Response;
-  // 중계 워커 경유일 때만 붙는 진단 꼬리표. 예: " (colo=IAD)"
   let where = "";
   if (opts.proxy && isFetcher(opts.proxy)) {
     try {
@@ -218,6 +219,7 @@ export async function generateDraft(opts: {
         method: "POST",
         headers: { "content-type": "application/json", "x-goog-api-key": opts.apiKey },
         body: JSON.stringify({ model: opts.model, body }),
+        signal: opts.signal,
       });
     } catch (e) {
       // 바인딩 자체가 던진 오류(중계 워커 미배포 등). 키는 메시지에 들어가지 않는다.
@@ -243,8 +245,31 @@ export async function generateDraft(opts: {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": opts.apiKey },
       body: JSON.stringify(body),
+      signal: opts.signal,
     });
   }
+  return { res, where };
+}
+
+/** 실제 호출. 429 는 GeminiQuotaError, 그 밖의 실패는 Error.
+ *  우선순위: proxy(GEMINI_PROXY 서비스 바인딩) → ai 바인딩+gatewayId(AI Gateway) → 구글 직접(로컬 개발·시험용). */
+export async function generateDraft(opts: {
+  apiKey: string;
+  model: string;
+  videoUrl: string;
+  meta: { title: string | null; channel: string | null };
+  proxy?: FetcherLike | null;
+  ai?: AiBindingLike | null;
+  gatewayId?: string | null;
+}): Promise<BlogDraft> {
+  const { res, where } = await postGenerateContent({
+    apiKey: opts.apiKey,
+    model: opts.model,
+    body: buildGeminiRequest(opts.videoUrl, opts.meta),
+    proxy: opts.proxy,
+    ai: opts.ai,
+    gatewayId: opts.gatewayId,
+  });
 
   if (res.status === 429) {
     throw new GeminiQuotaError(
