@@ -160,7 +160,7 @@ describe("입력 정리·안내(화면 쪽)", () => {
     expect(bad.phone).toContain("휴대폰");
     expect(bad.email).toContain("이메일");
   });
-  test("참고 릴스 주소: http(s)만, 최대 10개, 중복 제거", () => {
+  test("참고 영상 주소: http(s)만, 최대 10개, 중복 제거", () => {
     expect(parseReferenceUrls("https://a.com/1\n\nhttps://a.com/1\nhttp://b.com").urls).toEqual([
       "https://a.com/1",
       "http://b.com",

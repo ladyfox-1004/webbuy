@@ -19,7 +19,7 @@ export function ReelsNav() {
           <span className="text-base">AISOLUTION</span>
         </Link>
         <Link to="/reels" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-          릴스 제작
+          쇼츠 제작
         </Link>
       </div>
     </header>

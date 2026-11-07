@@ -87,7 +87,7 @@ export function sellerLines(): string[] {
 }
 
 export function buildReelsMail(d: ReelsMailData, orderUrl: string): BuiltMail {
-  const product = isPlan(d.plan) ? goodname(d.plan as Plan) : `문의 댓글 릴스 ${d.plan}편`;
+  const product = isPlan(d.plan) ? goodname(d.plan as Plan) : `문의 댓글 쇼츠 ${d.plan}편(30초 기준)`;
   const discountLabel =
     d.discount > 0 ? `${won(d.discount)} (${d.is_trial ? "첫 주문 할인" : "체험 차감"})` : null;
   const greeting = d.shop_name?.trim()
@@ -105,11 +105,11 @@ export function buildReelsMail(d: ReelsMailData, orderUrl: string): BuiltMail {
   ];
 
   const howTo = [
-    "아래 주문 화면 링크에서 사진·영상, 홈페이지 주소, 참고 릴스 주소, 요청사항을 올려 주세요.",
+    "아래 주문 화면 링크에서 사진·영상, 홈페이지 주소, 참고 영상 주소, 요청사항을 올려 주세요.",
     "카카오톡 채널은 준비 중입니다.",
   ];
 
-  const subject = `[에이아이솔루션] 문의 댓글 릴스 결제 완료 (주문번호 ${d.order_no})`;
+  const subject = `[에이아이솔루션] 문의 댓글 쇼츠 결제 완료 (주문번호 ${d.order_no})`;
 
   const text = [
     greeting,

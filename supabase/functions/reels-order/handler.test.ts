@@ -265,7 +265,7 @@ Deno.test("save_upload: DB 가 not_paid·too_many 를 주면 409", async () => {
 });
 
 // ───────── save_links ─────────
-Deno.test("save_links: 홈페이지·참고 릴스·요청사항을 kind 별로 저장", async () => {
+Deno.test("save_links: 홈페이지·참고 영상·요청사항을 kind 별로 저장", async () => {
   const s = setup();
   const res = await s.handler(
     post({

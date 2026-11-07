@@ -32,10 +32,10 @@ export const Route = createFileRoute("/admin_/reels")({
   component: AdminReelsPage,
   head: () => ({
     meta: [
-      { title: "릴스 주문 — 에이아이솔루션 관리자" },
-      { name: "description", content: "릴스 제작 주문 관리 화면" },
+      { title: "쇼츠 주문 — 에이아이솔루션 관리자" },
+      { name: "description", content: "쇼츠 제작 주문 관리 화면" },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "릴스 주문 — 에이아이솔루션 관리자" },
+      { property: "og:title", content: "쇼츠 주문 — 에이아이솔루션 관리자" },
     ],
   }),
 });
@@ -77,7 +77,7 @@ function AdminReels() {
         >
           <ArrowLeft aria-hidden className="h-4 w-4" /> 관리자
         </Link>
-        <h1 className="font-display text-2xl font-bold">릴스 주문</h1>
+        <h1 className="font-display text-2xl font-bold">쇼츠 주문</h1>
       </div>
 
       {q.isLoading && <Loader2 aria-hidden className="mt-10 h-6 w-6 animate-spin text-primary" />}

@@ -118,7 +118,7 @@ function Index() {
 const navItems = [
   { href: "#portfolio", label: "작업 사례" },
   { href: "#services", label: "서비스" },
-  { href: "/reels", label: "릴스 제작" },
+  { href: "/reels", label: "쇼츠 제작" },
   { href: "#case", label: "자동화 사례" },
   { href: "#about", label: "회사 소개" },
 ];

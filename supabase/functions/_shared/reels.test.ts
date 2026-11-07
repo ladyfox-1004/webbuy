@@ -52,8 +52,8 @@ const trialPaidAgo = (ms: number, over: Partial<HistoryRow> = {}) =>
 Deno.test("상수: 정가표·동의 버전·상품명", () => {
   assertEquals(LIST_PRICES, { 1: 200000, 5: 750000, 10: 1400000 });
   assertEquals(CONSENT_VERSION, "reels-2026-11-06");
-  assertEquals(goodname(1), "문의 댓글 릴스 1편");
-  assertEquals(goodname(10), "문의 댓글 릴스 10편");
+  assertEquals(goodname(1), "문의 댓글 쇼츠 1편(30초 기준)");
+  assertEquals(goodname(10), "문의 댓글 쇼츠 10편(30초 기준)");
 });
 
 // ───────── 정리 ─────────

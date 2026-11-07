@@ -153,7 +153,7 @@ Deno.test(
     const raw = s.calls.fetched[0].body;
     const f = parseForm(raw);
     assertEquals(f.cmd, "payrequest");
-    assertEquals(f.goodname, "문의 댓글 릴스 1편");
+    assertEquals(f.goodname, "문의 댓글 쇼츠 1편(30초 기준)");
     assertEquals(f.price, "99000");
     assertEquals(f.recvphone, "01012345678");
     assertEquals(f.var1, ORDER);
@@ -190,7 +190,7 @@ Deno.test("체험 뒤 5편: 차감 금액·credit id 로 주문, goodname 5편",
     [750000, 99000, 651000, false, TRIAL_ID],
   );
   const f = parseForm(s.calls.fetched[0].body);
-  assertEquals(f.goodname, "문의 댓글 릴스 5편");
+  assertEquals(f.goodname, "문의 댓글 쇼츠 5편(30초 기준)");
   assertEquals(f.price, "651000");
 });
 

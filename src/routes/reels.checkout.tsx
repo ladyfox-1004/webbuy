@@ -28,9 +28,9 @@ import {
 } from "@/lib/reels/format";
 
 const CANONICAL = "https://ai-solution.co.kr/reels/checkout";
-const TITLE = "릴스 제작 주문하기 | 에이아이솔루션";
+const TITLE = "쇼츠 제작 주문하기 | 에이아이솔루션";
 const DESCRIPTION =
-  "문의 댓글이 달리는 릴스 제작 주문 화면입니다. 상품을 고르고 가게 정보를 적은 뒤 금액을 확인하고 결제합니다.";
+  "문의 댓글이 달리는 쇼츠 제작 주문 화면입니다. 상품을 고르고 가게 정보를 적은 뒤 금액을 확인하고 결제합니다.";
 
 export const Route = createFileRoute("/reels/checkout")({
   validateSearch: (s: Record<string, unknown>): { plan: ReelsPlan } => ({ plan: parsePlan(s.plan) }),
@@ -163,10 +163,10 @@ function CheckoutPage() {
           to="/reels"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft aria-hidden className="h-4 w-4" /> 릴스 제작 소개
+          <ArrowLeft aria-hidden className="h-4 w-4" /> 쇼츠 제작 소개
         </Link>
         <h1 className="mt-4 font-display text-2xl font-bold tracking-tight md:text-3xl">
-          릴스 제작 주문하기
+          쇼츠 제작 주문하기
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           가격은 부가세 포함입니다. 첫 주문 할인·체험 차감은 [금액 확인]에서 바로 보여 드립니다.
@@ -182,6 +182,7 @@ function CheckoutPage() {
         >
           <fieldset>
             <legend className="font-display text-base font-semibold">1. 상품 고르기</legend>
+            <p className="mt-1 text-sm text-muted-foreground">1편 = 30초 기준 쇼츠 한 편입니다.</p>
             <div className="mt-3 grid gap-2.5" role="radiogroup">
               {REELS_PLANS.map((p) => {
                 const c = PLAN_CARDS.find((x) => x.plan === p)!;
@@ -453,7 +454,7 @@ function QuoteView({ q }: { q: Quote }) {
     <dl className="mt-3 space-y-2 text-sm" data-testid="quote-view">
       <div className="flex items-baseline justify-between gap-3">
         <dt className="text-muted-foreground">상품</dt>
-        <dd className="font-medium">문의 댓글 릴스 {q.plan}편</dd>
+        <dd className="font-medium">문의 댓글 쇼츠 {q.plan}편(30초 기준)</dd>
       </div>
       <div className="flex items-baseline justify-between gap-3">
         <dt className="text-muted-foreground">정가</dt>

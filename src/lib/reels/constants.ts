@@ -90,15 +90,15 @@ export const METHOD_DESC: Record<ReelsMethod, string> = {
 };
 
 export const REELS_PRINCIPLE =
-  "참고 릴스의 흐름·훅·대본 구성을 분석해서 사장님 가게 자료로 새로 만들어 드립니다";
+  "참고 영상의 흐름·훅·대본 구성을 분석해서 사장님 가게 자료로 새로 만들어 드립니다";
 
 export const REELS_STEPS: readonly { title: string; desc: string }[] = [
   { title: "결제", desc: "1편·5편·10편 중 고르고 결제합니다." },
   {
     title: "자료 올리기",
-    desc: "주문 화면에서 사진·영상, 홈페이지 주소, 참고 릴스 주소, 요청사항을 올립니다.",
+    desc: "주문 화면에서 사진·영상, 홈페이지 주소, 참고 영상 주소, 요청사항을 올립니다.",
   },
-  { title: "제작", desc: "참고 릴스의 흐름·훅·대본 구성을 분석해 사장님 가게 자료로 만듭니다." },
+  { title: "제작", desc: "참고 영상의 흐름·훅·대본 구성을 분석해 사장님 가게 자료로 만듭니다." },
   { title: "완성본 전달", desc: "완성본을 보내 드리고, 편당 2회까지 무료로 고쳐 드립니다." },
 ];
 
@@ -132,7 +132,7 @@ export const CONSENTS: readonly { key: ConsentKey; label: string; body: readonly
     key: "terms",
     label: "(필수) 서비스 이용·환불 규정에 동의합니다",
     body: [
-      `${SELLER.name}는 손님이 고른 편수만큼 릴스를 만들어 드립니다. ${REELS_PRINCIPLE}. 참고 릴스의 장면·음악을 그대로 가져다 쓰지 않습니다.`,
+      `${SELLER.name}는 손님이 고른 편수만큼 쇼츠를 만들어 드립니다. ${REELS_PRINCIPLE}. 참고 영상의 장면·음악을 그대로 가져다 쓰지 않습니다.`,
       "제작 방식은 자료 보내 주시는 방식과 촬영 없이 맡기는 방식 중에서 고릅니다. 자료는 결제 뒤 주문 화면에서 올립니다.",
       ...REFUND_RULES,
       `환불 요청은 ${SELLER.email} 로 주문번호와 함께 보내 주세요.`,

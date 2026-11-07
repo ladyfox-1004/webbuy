@@ -189,12 +189,12 @@ export function createHandler(deps: OrderDeps) {
           !Array.isArray(body.reference_urls) ||
           body.reference_urls.length > MAX_REFERENCE_URLS
         ) {
-          return bad(`참고 릴스 주소는 ${MAX_REFERENCE_URLS}개까지 넣을 수 있습니다.`);
+          return bad(`참고 영상 주소는 ${MAX_REFERENCE_URLS}개까지 넣을 수 있습니다.`);
         }
         for (const v of body.reference_urls) {
           if (typeof v === "string" && !v.trim()) continue;
           const u = httpUrl(v);
-          if (!u) return bad("참고 릴스 주소는 http:// 또는 https:// 로 시작해야 합니다.");
+          if (!u) return bad("참고 영상 주소는 http:// 또는 https:// 로 시작해야 합니다.");
           items.push({ kind: "reference", url: u, note: null });
         }
       }

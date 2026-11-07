@@ -113,7 +113,7 @@ async function form(over: Record<string, string> = {}): Promise<string> {
     var1: ORDER,
     var2: "reels",
     price: "99000",
-    goodname: "문의 댓글 릴스 1편",
+    goodname: "문의 댓글 쇼츠 1편(30초 기준)",
     recvphone: "01012345678",
     ...over,
   };
@@ -340,7 +340,7 @@ Deno.test(
     for (const part of [m.text, m.html]) {
       for (const want of [
         "R261106-0001",
-        "문의 댓글 릴스 1편",
+        "문의 댓글 쇼츠 1편(30초 기준)",
         "99,000원",
         "200,000원",
         "101,000원",

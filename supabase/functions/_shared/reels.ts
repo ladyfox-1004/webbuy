@@ -39,7 +39,7 @@ export function isMethod(v: unknown): v is Method {
   return typeof v === "string" && (METHODS as readonly string[]).includes(v);
 }
 export function goodname(plan: Plan): string {
-  return `문의 댓글 릴스 ${plan}편`;
+  return `문의 댓글 쇼츠 ${plan}편(30초 기준)`;
 }
 
 // ───────── 같은 가게 ─────────

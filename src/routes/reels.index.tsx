@@ -19,10 +19,10 @@ import {
 import { num } from "@/lib/reels/format";
 
 const CANONICAL = "https://ai-solution.co.kr/reels";
-const TITLE = "문의 댓글이 달리는 릴스 제작 | 에이아이솔루션";
+const TITLE = "문의 댓글이 달리는 쇼츠 제작 | 에이아이솔루션";
 const DESCRIPTION =
-  "조회 수 말고, 문의 댓글이 달리는 릴스를 만들어 드립니다. 참고 릴스의 흐름·훅·대본 구성을 분석해서 사장님 가게 자료로 새로 만듭니다. 1편 200,000원(첫 주문 99,000원), 5편 750,000원, 10편 1,400,000원, 부가세 포함.";
-const SHARE_TITLE = "조회 수 말고, 문의 댓글이 달리는 릴스 — 에이아이솔루션";
+  "조회 수 말고, 문의 댓글이 달리는 쇼츠를 만들어 드립니다. 참고 영상의 흐름·훅·대본 구성을 분석해서 사장님 가게 자료로 새로 만듭니다. 1편 200,000원(첫 주문 99,000원), 5편 750,000원, 10편 1,400,000원, 부가세 포함.";
+const SHARE_TITLE = "조회 수 말고, 문의 댓글이 달리는 쇼츠 — 에이아이솔루션";
 
 export const Route = createFileRoute("/reels/")({
   component: ReelsPage,
@@ -65,14 +65,14 @@ function Hero() {
     <section className="px-4 pt-12 pb-12 md:pt-20 md:pb-16">
       <div className="mx-auto max-w-5xl">
         <p className="font-display text-sm font-semibold text-primary-glow md:text-base">
-          문의 댓글이 달리는 릴스 제작
+          문의 댓글이 달리는 쇼츠 제작
         </p>
         <h1 className="mt-4 max-w-3xl font-display text-[2rem] leading-[1.22] font-bold tracking-tight md:text-5xl md:leading-[1.15]">
-          조회 수 말고, <span className="text-gradient">문의 댓글이 달리는 릴스</span>를 만들어
+          조회 수 말고, <span className="text-gradient">문의 댓글이 달리는 쇼츠</span>를 만들어
           드립니다
         </h1>
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-          {REELS_PRINCIPLE}. 참고하고 싶은 릴스 주소와 가게 자료를 주시면, 손님이 댓글로 묻고 싶어지는
+          {REELS_PRINCIPLE}. 참고하고 싶은 영상(유튜브 쇼츠·인스타 릴스 등) 주소와 가게 자료를 주시면, 손님이 댓글로 묻고 싶어지는
           흐름으로 대본을 짜고 편집해 드립니다.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -129,7 +129,7 @@ function Methods() {
         <SectionTitle
           eyebrow="How"
           title="제작 방식은 두 가지 중에서 고르세요"
-          desc="어느 쪽이든 참고 릴스의 흐름·훅·대본 구성을 먼저 분석하고, 사장님 가게에 맞게 새로 만듭니다."
+          desc="어느 쪽이든 참고 영상의 흐름·훅·대본 구성을 먼저 분석하고, 사장님 가게에 맞게 새로 만듭니다."
         />
         <div className="mt-8 grid gap-4 md:grid-cols-2">
           {items.map(({ no, icon: Icon, key, points }) => (
@@ -199,7 +199,7 @@ function Pricing() {
   return (
     <section id="pricing" className="scroll-mt-4 bg-surface/60 px-4 py-14 md:py-20">
       <div className="mx-auto max-w-5xl">
-        <SectionTitle eyebrow="Price" title="가격" desc="모든 가격은 부가세 포함입니다." />
+        <SectionTitle eyebrow="Price" title="가격" desc="1편은 30초 기준 쇼츠 한 편입니다. 모든 가격은 부가세 포함입니다." />
         <div className="mt-8 grid gap-4 md:grid-cols-3">
           {PLAN_CARDS.map((c) => (
             <article

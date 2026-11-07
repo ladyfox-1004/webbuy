@@ -38,11 +38,11 @@ export const Route = createFileRoute("/reels/order/$orderNo")({
   component: OrderPage,
   head: () => ({
     meta: [
-      { title: "주문 확인 | 에이아이솔루션 릴스 제작" },
-      { name: "description", content: "문의 댓글 릴스 제작 주문 확인과 자료 올리기 화면입니다." },
+      { title: "주문 확인 | 에이아이솔루션 쇼츠 제작" },
+      { name: "description", content: "문의 댓글 쇼츠 제작 주문 확인과 자료 올리기 화면입니다." },
       { name: "robots", content: "noindex, nofollow" },
-      { property: "og:title", content: "주문 확인 | 에이아이솔루션 릴스 제작" },
-      { property: "og:description", content: "문의 댓글 릴스 제작 주문 확인 화면입니다." },
+      { property: "og:title", content: "주문 확인 | 에이아이솔루션 쇼츠 제작" },
+      { property: "og:description", content: "문의 댓글 쇼츠 제작 주문 확인 화면입니다." },
     ],
   }),
 });
@@ -122,7 +122,7 @@ function OrderBody({ orderNo, k }: { orderNo: string; k: string }) {
         <Notice>
           결제가 끝나지 않아 이 주문은 만료되었습니다. 다시 주문하시려면{" "}
           <Link to="/reels" className="font-medium text-primary-glow underline underline-offset-2">
-            릴스 제작 소개
+            쇼츠 제작 소개
           </Link>
           에서 상품을 새로 골라 주세요.
         </Notice>
@@ -179,7 +179,7 @@ function Summary({ o }: { o: OrderView }) {
         <dt className="text-muted-foreground">상호</dt>
         <dd className="min-w-0 break-words">{o.shop_name}</dd>
         <dt className="text-muted-foreground">상품</dt>
-        <dd>문의 댓글 릴스 {o.plan}편</dd>
+        <dd>문의 댓글 쇼츠 {o.plan}편(30초 기준)</dd>
         <dt className="text-muted-foreground">제작 방식</dt>
         <dd>{METHOD_LABEL[o.method] ?? o.method}</dd>
         <dt className="text-muted-foreground">금액</dt>
@@ -376,7 +376,7 @@ function LinksForm({ orderNo, k, onDone }: { orderNo: string; k: string; onDone:
           />
         </label>
         <label className="block">
-          <span className="text-sm font-medium">참고 릴스 주소</span>
+          <span className="text-sm font-medium">참고 영상 주소</span>
           <span className="block text-xs text-muted-foreground">한 줄에 하나씩, {MAX_REFERENCE_URLS}개까지</span>
           <textarea
             className={`${fieldCls} min-h-28`}

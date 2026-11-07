@@ -104,7 +104,7 @@ export function parseReferenceUrls(text: string): { urls: string[]; error: strin
   if (bad.length) return { urls: [], error: `주소는 http:// 또는 https:// 로 시작해야 합니다: ${bad[0]}` };
   const urls = [...new Set(lines)];
   if (urls.length > MAX_REFERENCE_URLS)
-    return { urls: [], error: `참고 릴스 주소는 ${MAX_REFERENCE_URLS}개까지 적어 주세요.` };
+    return { urls: [], error: `참고 영상 주소는 ${MAX_REFERENCE_URLS}개까지 적어 주세요.` };
   return { urls, error: null };
 }
 
@@ -155,7 +155,7 @@ export function isViewKey(s: string | undefined | null): boolean {
 export const UPLOAD_KIND_LABEL: Record<string, string> = {
   file: "파일",
   homepage: "홈페이지",
-  reference: "참고 릴스",
+  reference: "참고 영상",
   note: "요청사항",
 };
 
