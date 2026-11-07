@@ -174,6 +174,16 @@ const EXAMPLES = [
   { src: "/reels-examples/ex3.mp4", poster: "/reels-examples/ex3.jpg", label: "개인회생" },
 ];
 
+// 문의 댓글이 많이 달린 다른 계정 영상 캡처(작업메모 11·12번, 2026-11-05 대표님 확정 3개).
+// 조건: 영상 파일 말고 캡처만, 아이디·프로필·워터마크 가림, 댓글 수와 「댓글에 ○○ 남기면」 문구는 보이게,
+// 표기는 「예시 영상」 + 「이런 구조로 기획해 드립니다」(「저희 제작물 아님」 문구는 쓰지 않음 — 대표님 결정).
+// 결과 보장 문구 금지. 가린 원본 캡처는 저장소에 넣지 마라.
+const REFERENCES = [
+  { img: "/reels-examples/ref1.jpg", comments: "댓글 1.7만 개", hook: "댓글에 '나도' 남기면 정보 보내 드려요" },
+  { img: "/reels-examples/ref2.jpg", comments: "댓글 2.7만 개", hook: "댓글에 '솔' 남기면 링크 보내 드려요" },
+  { img: "/reels-examples/ref3.jpg", comments: "댓글 1.1만 개", hook: "댓글에 '링크' 남기면 DM으로 보내 드려요" },
+];
+
 function Examples() {
   return (
     <section className="px-4 py-14 md:py-20">
@@ -183,7 +193,31 @@ function Examples() {
           title="이런 구조로 기획해 드립니다"
           desc="첫 장면에서 궁금증을 만들고, 손님이 댓글로 묻고 싶어지게 흐름을 짭니다."
         />
-        <ul className="mt-8 grid max-w-3xl grid-cols-3 gap-3 md:gap-6">
+        <ul className="mt-8 grid gap-4 md:grid-cols-3 md:gap-6">
+          {REFERENCES.map((r) => (
+            <li key={r.img} className="overflow-hidden rounded-2xl border border-border bg-card">
+              <img
+                src={r.img}
+                alt={`예시 영상: ${r.hook}`}
+                loading="lazy"
+                width={1011}
+                height={903}
+                className="block h-auto w-full"
+              />
+              <div className="p-4">
+                <p className="text-xs font-semibold text-primary-glow">예시 영상 · {r.comments}</p>
+                <p className="mt-1 text-sm font-medium text-foreground">「{r.hook}」</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  상품 이름을 영상에서 다 말하지 않고, 궁금한 사람이 댓글로 묻게 만든 구조입니다.
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        <h3 className="mt-14 text-lg font-bold text-foreground md:text-xl">저희가 만든 예시</h3>
+        <p className="mt-1 text-sm text-muted-foreground">30초 안팎으로 만든 시험 영상입니다. 눌러서 보실 수 있어요.</p>
+        <ul className="mt-5 grid max-w-3xl grid-cols-3 gap-3 md:gap-6">
           {EXAMPLES.map((ex) => (
             <li key={ex.src} data-testid="example-slot">
               <video
