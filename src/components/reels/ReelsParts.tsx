@@ -2,7 +2,8 @@
 // 주의: 판매자 정보·환불 규정 문구는 src/lib/reels/constants.ts 한 곳에서만 고친다.
 import { Link } from "@tanstack/react-router";
 import { MessageCircle } from "lucide-react";
-import { KAKAO_PENDING_LABEL, REFUND_RULES, SELLER } from "@/lib/reels/constants";
+import { KAKAO_LINK_LABEL, REFUND_RULES, SELLER } from "@/lib/reels/constants";
+import { KAKAO_OPENCHAT_URL } from "@/lib/portfolio";
 import { statusLabel } from "@/lib/reels/format";
 
 export function ReelsNav() {
@@ -27,20 +28,21 @@ export function ReelsNav() {
 }
 
 /**
- * 카카오톡 채널 단추 자리. 채널 주소가 아직 없다(설계서 9절).
- * 주의: href 를 넣지 마라. 주소가 정해지면 그때 진짜 링크로 바꾼다. 지금은 눌러도 아무 곳에도 가지 않는다.
+ * 카카오톡 상담 단추. 2026-11-07 대표님: 채널 대신 오픈프로필 주소(KAKAO_OPENCHAT_URL, 홈 「카카오톡 상담」과 같은 주소)를 쓴다.
+ * 주의: 카카오 주소는 src/lib/portfolio.ts 한 곳에서만 고친다. 화면들은 이 컴포넌트만 쓴다.
  */
-export function KakaoChannelPlaceholder({ className = "" }: { className?: string }) {
+export function KakaoChannelLink({ className = "" }: { className?: string }) {
   return (
-    <span
-      role="link"
-      aria-disabled="true"
-      data-testid="kakao-channel-placeholder"
-      className={`inline-flex min-h-11 cursor-not-allowed items-center justify-center gap-2 rounded-full border border-border bg-muted px-5 py-2.5 text-sm font-medium text-muted-foreground select-none ${className}`}
+    <a
+      href={KAKAO_OPENCHAT_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      data-testid="kakao-channel-link"
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#FEE500] px-5 py-2.5 text-sm font-semibold text-[#191919] transition hover:brightness-95 ${className}`}
     >
       <MessageCircle aria-hidden className="h-4 w-4" />
-      {KAKAO_PENDING_LABEL}
-    </span>
+      {KAKAO_LINK_LABEL}
+    </a>
   );
 }
 

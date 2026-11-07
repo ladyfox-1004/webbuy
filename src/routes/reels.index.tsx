@@ -6,7 +6,7 @@
 // 주의: 예시 영상 칸은 대표님이 예시를 고르기 전까지 자리만 둔다(실제 이미지·영상 넣지 마라).
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Camera, Check, MessageSquareText, Sparkles } from "lucide-react";
-import { KakaoChannelPlaceholder, ReelsFooter, ReelsNav } from "@/components/reels/ReelsParts";
+import { KakaoChannelLink, ReelsFooter, ReelsNav } from "@/components/reels/ReelsParts";
 import {
   METHOD_DESC,
   METHOD_LABEL,
@@ -325,12 +325,12 @@ function Contact() {
           <div>
             <h2 className="font-display text-lg font-bold">궁금한 점이 있으세요?</h2>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              이메일 {SELLER.email} 로 물어봐 주세요. 카카오톡 채널은 준비 중입니다.
+              카카오톡이나 이메일 {SELLER.email} 로 편하게 물어봐 주세요.
             </p>
           </div>
         </div>
         <div className="mt-4 md:mt-0">
-          <KakaoChannelPlaceholder className="w-full md:w-auto" />
+          <KakaoChannelLink className="w-full md:w-auto" />
         </div>
       </div>
     </section>

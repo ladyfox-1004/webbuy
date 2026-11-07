@@ -7,7 +7,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Copy, FileUp, Link2, Loader2, RefreshCw, StickyNote } from "lucide-react";
 import {
-  KakaoChannelPlaceholder,
+  KakaoChannelLink,
   ReelsFooter,
   ReelsNav,
   ReelsStatusBadge,
@@ -140,7 +140,7 @@ function OrderBody({ orderNo, k }: { orderNo: string; k: string }) {
           카카오톡으로 보내실 땐 주문번호를 함께 적어 주세요.
         </p>
         <div className="mt-3">
-          <KakaoChannelPlaceholder className="w-full sm:w-auto" />
+          <KakaoChannelLink className="w-full sm:w-auto" />
         </div>
       </section>
     </div>

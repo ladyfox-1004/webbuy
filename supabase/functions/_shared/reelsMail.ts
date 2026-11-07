@@ -106,7 +106,7 @@ export function buildReelsMail(d: ReelsMailData, orderUrl: string): BuiltMail {
 
   const howTo = [
     "아래 주문 화면 링크에서 사진·영상, 홈페이지 주소, 참고 영상 주소, 요청사항을 올려 주세요.",
-    "카카오톡 채널은 준비 중입니다.",
+    "카카오톡으로 보내셔도 됩니다(주문번호를 함께 적어 주세요): https://open.kakao.com/o/sd29wW8h",
   ];
 
   const subject = `[에이아이솔루션] 문의 댓글 쇼츠 결제 완료 (주문번호 ${d.order_no})`;

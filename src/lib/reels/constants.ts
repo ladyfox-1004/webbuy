@@ -162,4 +162,4 @@ export const CONSENTS: readonly { key: ConsentKey; label: string; body: readonly
 export const NOT_READY_MESSAGE =
   "결제는 준비 중입니다. 잠시 뒤 다시 시도하시거나 contact@ai-solution.co.kr 로 문의해 주세요.";
 
-export const KAKAO_PENDING_LABEL = "카카오톡 채널 (준비 중)";
+export const KAKAO_LINK_LABEL = "카카오톡으로 문의하기";

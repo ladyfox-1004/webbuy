@@ -354,7 +354,7 @@ Deno.test(
         "서초중앙로29길 16-6",
         "제작 시작 전: 전액 환불",
         "편당 2회까지 무료",
-        "카카오톡 채널은 준비 중",
+        "https://open.kakao.com/o/sd29wW8h",
       ]) {
         assert(part.includes(want), want);
       }
