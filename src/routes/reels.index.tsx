@@ -166,11 +166,12 @@ function Methods() {
 
 // 예시 영상. 2026-11-07 대표님 결정: 남의 영상 캡처 대신 우리가 만든 시험 영상(상호 없는 것만)을 쓴다.
 // 파일: public/reels-examples/ex1~3.mp4(720p 압축)·jpg(첫 화면). 원본은 shorts_maker/ad_maker/runs 의
-// rent_sample_nobrand(final_v2) · dui_generic_01 · sample_02. 상호·실전화번호가 나오는 영상은 넣지 마라.
+// rent_sample_nobrand(final_v2) · dui_generic_01 · 바탕 화면\법무법인글로리\숏폼견본\개인회생_숏폼_견본_v3_댓글형.mp4.
+// 상호·실전화번호가 나오는 영상, 상품 제휴 영상(로봇청소기 등 — 대표님이 뺌)은 넣지 마라.
 const EXAMPLES = [
   { src: "/reels-examples/ex1.mp4", poster: "/reels-examples/ex1.jpg", label: "장기렌트" },
-  { src: "/reels-examples/ex2.mp4", poster: "/reels-examples/ex2.jpg", label: "법률 상담" },
-  { src: "/reels-examples/ex3.mp4", poster: "/reels-examples/ex3.jpg", label: "생활가전" },
+  { src: "/reels-examples/ex2.mp4", poster: "/reels-examples/ex2.jpg", label: "음주운전 상담" },
+  { src: "/reels-examples/ex3.mp4", poster: "/reels-examples/ex3.jpg", label: "개인회생" },
 ];
 
 function Examples() {
