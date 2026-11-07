@@ -5,7 +5,7 @@
 //    남의 릴스를 그대로 베낀다는 표현, 결과(조회·문의·매출 숫자)를 약속하는 표현, 제작 기간 약속은 쓰지 않는다.
 // 주의: 예시 영상 칸은 대표님이 예시를 고르기 전까지 자리만 둔다(실제 이미지·영상 넣지 마라).
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Camera, Check, Clapperboard, MessageSquareText, Sparkles } from "lucide-react";
+import { ArrowRight, Camera, Check, MessageSquareText, Sparkles } from "lucide-react";
 import { KakaoChannelPlaceholder, ReelsFooter, ReelsNav } from "@/components/reels/ReelsParts";
 import {
   METHOD_DESC,
@@ -164,7 +164,15 @@ function Methods() {
   );
 }
 
-// 예시 영상 자리. 주의: 대표님이 예시를 고르면 캡처(얼굴·상호·아이디 가림, 「다른 계정 사례(저희 제작물 아님)」 표시)로 바꾼다.
+// 예시 영상. 2026-11-07 대표님 결정: 남의 영상 캡처 대신 우리가 만든 시험 영상(상호 없는 것만)을 쓴다.
+// 파일: public/reels-examples/ex1~3.mp4(720p 압축)·jpg(첫 화면). 원본은 shorts_maker/ad_maker/runs 의
+// rent_sample_nobrand(final_v2) · dui_generic_01 · sample_02. 상호·실전화번호가 나오는 영상은 넣지 마라.
+const EXAMPLES = [
+  { src: "/reels-examples/ex1.mp4", poster: "/reels-examples/ex1.jpg", label: "장기렌트" },
+  { src: "/reels-examples/ex2.mp4", poster: "/reels-examples/ex2.jpg", label: "법률 상담" },
+  { src: "/reels-examples/ex3.mp4", poster: "/reels-examples/ex3.jpg", label: "생활가전" },
+];
+
 function Examples() {
   return (
     <section className="px-4 py-14 md:py-20">
@@ -175,18 +183,20 @@ function Examples() {
           desc="첫 장면에서 궁금증을 만들고, 손님이 댓글로 묻고 싶어지게 흐름을 짭니다."
         />
         <ul className="mt-8 grid max-w-3xl grid-cols-3 gap-3 md:gap-6">
-          {[1, 2, 3].map((i) => (
-            <li key={i} data-testid="example-slot">
-              <div className="flex aspect-[9/16] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-input bg-muted p-2 text-center">
-                <Clapperboard aria-hidden className="h-6 w-6 text-muted-foreground md:h-8 md:w-8" />
-                <span className="text-xs font-semibold text-foreground md:text-sm">예시 영상</span>
-                <span className="text-[11px] leading-snug text-muted-foreground md:text-xs">
-                  이런 구조로 기획해 드립니다
-                </span>
-                <span className="mt-1 rounded-full border border-border bg-card px-2 py-0.5 text-[10px] text-muted-foreground md:text-[11px]">
-                  준비 중
-                </span>
-              </div>
+          {EXAMPLES.map((ex) => (
+            <li key={ex.src} data-testid="example-slot">
+              <video
+                src={ex.src}
+                poster={ex.poster}
+                controls
+                playsInline
+                preload="none"
+                className="aspect-[9/16] w-full rounded-2xl border border-border bg-black object-cover"
+                aria-label={`예시 영상: ${ex.label}`}
+              />
+              <p className="mt-2 text-center text-xs font-medium text-foreground md:text-sm">
+                예시 영상 · {ex.label}
+              </p>
             </li>
           ))}
         </ul>
