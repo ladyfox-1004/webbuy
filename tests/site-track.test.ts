@@ -2,6 +2,7 @@
 import { describe, expect, test } from "bun:test";
 import {
   MAX_TRACK_BODY_BYTES,
+  VISIT_SOURCES,
   classifySource,
   deviceOf,
   isBot,
@@ -118,6 +119,18 @@ describe("유입 경로 판별", () => {
     expect(classifySource({ referrerHost: "www.ai-solution.co.kr", userAgent: WIN_CHROME })).toBe(
       "direct",
     );
+  });
+  test("영업 메일: utm_source=email 은 email(지메일 referrer·앱 안 브라우저보다 앞선다)", () => {
+    expect(classifySource({ utmSource: "email", userAgent: WIN_CHROME })).toBe("email");
+    expect(classifySource({ utmSource: "Email", userAgent: WIN_CHROME })).toBe("email");
+    expect(classifySource({ utmSource: "e-mail", userAgent: WIN_CHROME })).toBe("email");
+    expect(
+      classifySource({ utmSource: "email", referrerHost: "mail.google.com", userAgent: WIN_CHROME }),
+    ).toBe("email");
+    expect(classifySource({ utmSource: "email", userAgent: NAVER_INAPP })).toBe("email");
+    expect(VISIT_SOURCES).toContain("email");
+    // 「email」 이 들어간 다른 이름(newsletter_email 등)은 그대로 other
+    expect(classifySource({ utmSource: "newsletter_email", userAgent: WIN_CHROME })).toBe("other");
   });
   test("가짜 당근 호스트(daangn.com.evil.kr)는 당근이 아니다", () => {
     expect(classifySource({ referrerHost: "daangn.com.evil.kr", userAgent: WIN_CHROME })).toBe("other");

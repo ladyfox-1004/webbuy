@@ -52,6 +52,7 @@ const SOURCE_LABEL: Record<string, string> = {
   google: "구글",
   instagram: "인스타그램",
   kakao: "카카오톡",
+  email: "영업 메일",
   direct: "바로 들어옴(주소 입력·즐겨찾기 등)",
   other: "그 밖의 사이트",
 };

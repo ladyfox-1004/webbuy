@@ -1,4 +1,4 @@
-// 릴스 판매·방문 기록 SQL 시험 실행기 — 메모리 Postgres(PGlite)에서 돌린다. 운영 DB 에 연결하지 않는다.
+// 릴스 판매·방문 기록·영업 메일 SQL 시험 실행기 — 메모리 Postgres(PGlite)에서 돌린다. 운영 DB 에 연결하지 않는다.
 //
 // 실행(저장소 루트에서): deno run -A supabase/tests/run-sql-tests.ts
 //   같은 폴더 deno.json 의 "nodeModulesDir": "none" 덕분에 저장소 package.json/node_modules 와 섞이지 않고
@@ -66,6 +66,9 @@ const testFile = new URL("./reels_orders.test.sql", here);
 const inquiriesMigration = new URL("../migrations/20260907100000_inquiries.sql", here);
 const visitsMigration = new URL("../migrations/20261107100000_site_visits.sql", here);
 const visitsTestFile = new URL("./site_visits.test.sql", here);
+// 영업 메일(20261107120000_outreach.sql)은 site_visits.source 제약을 고친다 → 방문 기록 마이그레이션 다음에.
+const outreachMigration = new URL("../migrations/20261107120000_outreach.sql", here);
+const outreachTestFile = new URL("./outreach.test.sql", here);
 
 const db = new PGlite();
 let passed = 0;
@@ -97,6 +100,8 @@ await step("시험 reels_orders.test.sql", await Deno.readTextFile(testFile));
 await step("마이그레이션 20260907100000_inquiries.sql", await Deno.readTextFile(inquiriesMigration));
 await step("마이그레이션 20261107100000_site_visits.sql", await Deno.readTextFile(visitsMigration));
 await step("시험 site_visits.test.sql", await Deno.readTextFile(visitsTestFile));
+await step("마이그레이션 20261107120000_outreach.sql", await Deno.readTextFile(outreachMigration));
+await step("시험 outreach.test.sql", await Deno.readTextFile(outreachTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

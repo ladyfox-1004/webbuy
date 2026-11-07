@@ -319,6 +319,81 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_drafts: {
+        Row: {
+          approved_at: string | null
+          batch_date: string
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          created_at: string
+          email: string
+          error: string | null
+          gmail_message_id: string | null
+          id: string
+          niche: string | null
+          sent_at: string | null
+          status: string
+          subscribers: number | null
+          top_title: string | null
+          top_url: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          batch_date: string
+          channel_id: string
+          channel_name: string
+          channel_url: string
+          created_at?: string
+          email: string
+          error?: string | null
+          gmail_message_id?: string | null
+          id?: string
+          niche?: string | null
+          sent_at?: string | null
+          status?: string
+          subscribers?: number | null
+          top_title?: string | null
+          top_url?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          batch_date?: string
+          channel_id?: string
+          channel_name?: string
+          channel_url?: string
+          created_at?: string
+          email?: string
+          error?: string | null
+          gmail_message_id?: string | null
+          id?: string
+          niche?: string | null
+          sent_at?: string | null
+          status?: string
+          subscribers?: number | null
+          top_title?: string | null
+          top_url?: string | null
+        }
+        Relationships: []
+      }
+      outreach_suppression: {
+        Row: {
+          created_at: string
+          email: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number

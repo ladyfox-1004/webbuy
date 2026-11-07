@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowLeft, Plus, Trash2, Pencil, ShieldCheck, Webhook, NotebookPen, Clapperboard, Inbox, MessageCircle, BarChart3 } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, Trash2, Pencil, ShieldCheck, Webhook, NotebookPen, Clapperboard, Inbox, MessageCircle, BarChart3, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { adminListPayments, adminListUsers, adminStats } from "@/lib/admin.functions";
 import { listProducts, upsertProduct, deleteProduct } from "@/lib/products.functions";
@@ -36,6 +36,7 @@ function AdminPage() {
 // 옛 패널 함수(StatsPanel 등)는 아래에 남아 있지만 화면에서 쓰지 않는다.
 const ADMIN_LINKS = [
   { to: "/admin/visits", label: "방문 기록", desc: "홈페이지 방문자·당근 유입·상담 접수", Icon: BarChart3 },
+  { to: "/admin/outreach", label: "영업 메일", desc: "오늘 보낼 채널 확인하고 보내기", Icon: Mail },
   { to: "/admin/reels", label: "쇼츠 주문", desc: "판매 페이지 주문·결제 스위치·자료", Icon: Clapperboard },
   { to: "/admin/inquiries", label: "상담 문의", desc: "홈페이지 상담 신청 목록", Icon: Inbox },
   { to: "/admin/blog", label: "블로그", desc: "글 초안·예약 발행", Icon: NotebookPen },

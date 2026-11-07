@@ -8,6 +8,7 @@ export const VISIT_SOURCES = [
   "google",
   "instagram",
   "kakao",
+  "email",
   "direct",
   "other",
 ] as const;
@@ -45,6 +46,7 @@ function hostIs(host: string, domain: string): boolean {
 /**
  * 유입 경로 판별.
  * 당근: utm_source 가 daangn/karrot/당근 → referrer 가 daangn.com·karrotmarket → 사용자 에이전트(당근 앱 안 브라우저).
+ * 영업 메일: utm_source=email.
  * 나머지(네이버·구글·인스타그램·카카오)는 utm_source → referrer 호스트 → 앱 안 브라우저 순.
  * 아무 단서도 없으면 direct(주소 입력·즐겨찾기·앱이 referrer 를 안 넘긴 경우).
  */
@@ -63,8 +65,9 @@ export function classifySource(input: {
   if (host && (hostIs(host, "daangn.com") || /karrotmarket/.test(host))) return "daangn";
   if (/daangn|karrot/i.test(ua)) return "daangn";
 
-  // 2) utm_source 이름
+  // 2) utm_source 이름. 영업 메일(src/lib/outreach/mail.ts)의 링크는 utm_source=email.
   if (utm) {
+    if (/^e-?mail$/.test(utm)) return "email";
     if (/naver/.test(utm)) return "naver";
     if (/google/.test(utm)) return "google";
     if (/instagram|^ig$|insta/.test(utm)) return "instagram";
