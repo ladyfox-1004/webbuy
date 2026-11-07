@@ -1,5 +1,6 @@
 // 사이트 공용 하단. 홈·업종별 솔루션·블로그가 같이 쓴다.
 // 🚨 페이지마다 복사하지 마라. 연락처 한 줄 바꾸려고 여러 곳을 고치게 된다.
+import { Link } from "@tanstack/react-router";
 
 export function SiteFooter() {
   return (
@@ -13,6 +14,9 @@ export function SiteFooter() {
             {/* 블로그 링크는 글이 쌓일 때까지 숨긴다(/blog 라우트·사이트맵은 그대로 둔다). */}
             <span>사업자등록번호 · 215-28-82229</span>
             <span>contact@ai-solution.co.kr</span>
+            <Link to="/partner" className="underline-offset-2 hover:text-foreground hover:underline">
+              파트너 모집
+            </Link>
           </div>
         </div>
       </div>

@@ -67,6 +67,8 @@ export const Route = createFileRoute("/api/track")({
               userAgent: ua,
             }),
             device: deviceOf(ua),
+            // 추천 코드가 있을 때만 열을 보낸다(마이그레이션 20261107160000_partners.sql 전이어도 기록이 끊기지 않게)
+            ...(input.refCode ? { ref_code: input.refCode } : {}),
           });
           if (error) console.error(`[track] insert 실패 [${error.code ?? "?"}]`);
         } catch {

@@ -23,6 +23,7 @@ import { Route as AppDevRouteImport } from './routes/app-dev'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ReelsIndexRouteImport } from './routes/reels.index'
+import { Route as PartnerIndexRouteImport } from './routes/partner.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as USlugRouteImport } from './routes/u.$slug'
 import { Route as SolutionsTelecomRouteImport } from './routes/solutions/telecom'
@@ -34,6 +35,7 @@ import { Route as SolutionsHospitalRouteImport } from './routes/solutions/hospit
 import { Route as SolutionsAutomationRouteImport } from './routes/solutions/automation'
 import { Route as ReelsCheckoutRouteImport } from './routes/reels.checkout'
 import { Route as PaymentResultRouteImport } from './routes/payment.result'
+import { Route as PartnerMeRouteImport } from './routes/partner.me'
 import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
@@ -41,6 +43,7 @@ import { Route as ApiUnsubscribeRouteImport } from './routes/api/unsubscribe'
 import { Route as ApiTrackRouteImport } from './routes/api/track'
 import { Route as AdminVisitsRouteImport } from './routes/admin_.visits'
 import { Route as AdminReelsRouteImport } from './routes/admin_.reels'
+import { Route as AdminPartnersRouteImport } from './routes/admin_.partners'
 import { Route as AdminOutreachRouteImport } from './routes/admin_.outreach'
 import { Route as AdminKakaoQuestionsRouteImport } from './routes/admin_.kakao-questions'
 import { Route as AdminKakaoConnectRouteImport } from './routes/admin_.kakao-connect'
@@ -50,9 +53,13 @@ import { Route as AdminWebhooksRouteImport } from './routes/admin.webhooks'
 import { Route as AdminReviewRouteImport } from './routes/admin.review'
 import { Route as ReelsOrderOrderNoRouteImport } from './routes/reels.order.$orderNo'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPartnerMeRouteImport } from './routes/api/partner/me'
+import { Route as ApiPartnerAttachRouteImport } from './routes/api/partner/attach'
+import { Route as ApiPartnerApplyRouteImport } from './routes/api/partner/apply'
 import { Route as ApiKakaoSkillRouteImport } from './routes/api/kakao/skill'
 import { Route as ApiKakaoCallbackRouteImport } from './routes/api/kakao/callback'
 import { Route as ApiAdminVisitsRouteImport } from './routes/api/admin/visits'
+import { Route as ApiAdminPartnersRouteImport } from './routes/api/admin/partners'
 import { Route as ApiAdminOutreachRouteImport } from './routes/api/admin/outreach'
 import { Route as ApiAdminKakaoQuestionsRouteImport } from './routes/api/admin/kakao-questions'
 import { Route as ApiAdminKakaoRouteImport } from './routes/api/admin/kakao'
@@ -133,6 +140,11 @@ const ReelsIndexRoute = ReelsIndexRouteImport.update({
   path: '/reels/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerIndexRoute = PartnerIndexRouteImport.update({
+  id: '/partner/',
+  path: '/partner/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
@@ -188,6 +200,11 @@ const PaymentResultRoute = PaymentResultRouteImport.update({
   path: '/payment/result',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PartnerMeRoute = PartnerMeRouteImport.update({
+  id: '/partner/me',
+  path: '/partner/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PSlugRoute = PSlugRouteImport.update({
   id: '/p/$slug',
   path: '/p/$slug',
@@ -221,6 +238,11 @@ const AdminVisitsRoute = AdminVisitsRouteImport.update({
 const AdminReelsRoute = AdminReelsRouteImport.update({
   id: '/admin_/reels',
   path: '/admin/reels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminPartnersRoute = AdminPartnersRouteImport.update({
+  id: '/admin_/partners',
+  path: '/admin/partners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminOutreachRoute = AdminOutreachRouteImport.update({
@@ -268,6 +290,21 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPartnerMeRoute = ApiPartnerMeRouteImport.update({
+  id: '/api/partner/me',
+  path: '/api/partner/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPartnerAttachRoute = ApiPartnerAttachRouteImport.update({
+  id: '/api/partner/attach',
+  path: '/api/partner/attach',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPartnerApplyRoute = ApiPartnerApplyRouteImport.update({
+  id: '/api/partner/apply',
+  path: '/api/partner/apply',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiKakaoSkillRoute = ApiKakaoSkillRouteImport.update({
   id: '/api/kakao/skill',
   path: '/api/kakao/skill',
@@ -281,6 +318,11 @@ const ApiKakaoCallbackRoute = ApiKakaoCallbackRouteImport.update({
 const ApiAdminVisitsRoute = ApiAdminVisitsRouteImport.update({
   id: '/api/admin/visits',
   path: '/api/admin/visits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminPartnersRoute = ApiAdminPartnersRouteImport.update({
+  id: '/api/admin/partners',
+  path: '/api/admin/partners',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAdminOutreachRoute = ApiAdminOutreachRouteImport.update({
@@ -354,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/admin/kakao-connect': typeof AdminKakaoConnectRoute
   '/admin/kakao-questions': typeof AdminKakaoQuestionsRoute
   '/admin/outreach': typeof AdminOutreachRoute
+  '/admin/partners': typeof AdminPartnersRoute
   '/admin/reels': typeof AdminReelsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/api/track': typeof ApiTrackRoute
@@ -361,6 +404,7 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/me': typeof PartnerMeRoute
   '/payment/result': typeof PaymentResultRoute
   '/reels/checkout': typeof ReelsCheckoutRoute
   '/solutions/automation': typeof SolutionsAutomationRoute
@@ -372,14 +416,19 @@ export interface FileRoutesByFullPath {
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/reels/': typeof ReelsIndexRoute
   '/api/admin/inquiries': typeof ApiAdminInquiriesRoute
   '/api/admin/kakao': typeof ApiAdminKakaoRoute
   '/api/admin/kakao-questions': typeof ApiAdminKakaoQuestionsRoute
   '/api/admin/outreach': typeof ApiAdminOutreachRoute
+  '/api/admin/partners': typeof ApiAdminPartnersRoute
   '/api/admin/visits': typeof ApiAdminVisitsRoute
   '/api/kakao/callback': typeof ApiKakaoCallbackRoute
   '/api/kakao/skill': typeof ApiKakaoSkillRoute
+  '/api/partner/apply': typeof ApiPartnerApplyRoute
+  '/api/partner/attach': typeof ApiPartnerAttachRoute
+  '/api/partner/me': typeof ApiPartnerMeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reels/order/$orderNo': typeof ReelsOrderOrderNoRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
@@ -409,6 +458,7 @@ export interface FileRoutesByTo {
   '/admin/kakao-connect': typeof AdminKakaoConnectRoute
   '/admin/kakao-questions': typeof AdminKakaoQuestionsRoute
   '/admin/outreach': typeof AdminOutreachRoute
+  '/admin/partners': typeof AdminPartnersRoute
   '/admin/reels': typeof AdminReelsRoute
   '/admin/visits': typeof AdminVisitsRoute
   '/api/track': typeof ApiTrackRoute
@@ -416,6 +466,7 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/me': typeof PartnerMeRoute
   '/payment/result': typeof PaymentResultRoute
   '/reels/checkout': typeof ReelsCheckoutRoute
   '/solutions/automation': typeof SolutionsAutomationRoute
@@ -427,14 +478,19 @@ export interface FileRoutesByTo {
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/blog': typeof BlogIndexRoute
+  '/partner': typeof PartnerIndexRoute
   '/reels': typeof ReelsIndexRoute
   '/api/admin/inquiries': typeof ApiAdminInquiriesRoute
   '/api/admin/kakao': typeof ApiAdminKakaoRoute
   '/api/admin/kakao-questions': typeof ApiAdminKakaoQuestionsRoute
   '/api/admin/outreach': typeof ApiAdminOutreachRoute
+  '/api/admin/partners': typeof ApiAdminPartnersRoute
   '/api/admin/visits': typeof ApiAdminVisitsRoute
   '/api/kakao/callback': typeof ApiKakaoCallbackRoute
   '/api/kakao/skill': typeof ApiKakaoSkillRoute
+  '/api/partner/apply': typeof ApiPartnerApplyRoute
+  '/api/partner/attach': typeof ApiPartnerAttachRoute
+  '/api/partner/me': typeof ApiPartnerMeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reels/order/$orderNo': typeof ReelsOrderOrderNoRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
@@ -465,6 +521,7 @@ export interface FileRoutesById {
   '/admin_/kakao-connect': typeof AdminKakaoConnectRoute
   '/admin_/kakao-questions': typeof AdminKakaoQuestionsRoute
   '/admin_/outreach': typeof AdminOutreachRoute
+  '/admin_/partners': typeof AdminPartnersRoute
   '/admin_/reels': typeof AdminReelsRoute
   '/admin_/visits': typeof AdminVisitsRoute
   '/api/track': typeof ApiTrackRoute
@@ -472,6 +529,7 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/p/$slug': typeof PSlugRoute
+  '/partner/me': typeof PartnerMeRoute
   '/payment/result': typeof PaymentResultRoute
   '/reels/checkout': typeof ReelsCheckoutRoute
   '/solutions/automation': typeof SolutionsAutomationRoute
@@ -483,14 +541,19 @@ export interface FileRoutesById {
   '/solutions/telecom': typeof SolutionsTelecomRoute
   '/u/$slug': typeof USlugRoute
   '/blog/': typeof BlogIndexRoute
+  '/partner/': typeof PartnerIndexRoute
   '/reels/': typeof ReelsIndexRoute
   '/api/admin/inquiries': typeof ApiAdminInquiriesRoute
   '/api/admin/kakao': typeof ApiAdminKakaoRoute
   '/api/admin/kakao-questions': typeof ApiAdminKakaoQuestionsRoute
   '/api/admin/outreach': typeof ApiAdminOutreachRoute
+  '/api/admin/partners': typeof ApiAdminPartnersRoute
   '/api/admin/visits': typeof ApiAdminVisitsRoute
   '/api/kakao/callback': typeof ApiKakaoCallbackRoute
   '/api/kakao/skill': typeof ApiKakaoSkillRoute
+  '/api/partner/apply': typeof ApiPartnerApplyRoute
+  '/api/partner/attach': typeof ApiPartnerAttachRoute
+  '/api/partner/me': typeof ApiPartnerMeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reels/order/$orderNo': typeof ReelsOrderOrderNoRoute
   '/api/admin/blog/run': typeof ApiAdminBlogRunRoute
@@ -522,6 +585,7 @@ export interface FileRouteTypes {
     | '/admin/kakao-connect'
     | '/admin/kakao-questions'
     | '/admin/outreach'
+    | '/admin/partners'
     | '/admin/reels'
     | '/admin/visits'
     | '/api/track'
@@ -529,6 +593,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
+    | '/partner/me'
     | '/payment/result'
     | '/reels/checkout'
     | '/solutions/automation'
@@ -540,14 +605,19 @@ export interface FileRouteTypes {
     | '/solutions/telecom'
     | '/u/$slug'
     | '/blog/'
+    | '/partner/'
     | '/reels/'
     | '/api/admin/inquiries'
     | '/api/admin/kakao'
     | '/api/admin/kakao-questions'
     | '/api/admin/outreach'
+    | '/api/admin/partners'
     | '/api/admin/visits'
     | '/api/kakao/callback'
     | '/api/kakao/skill'
+    | '/api/partner/apply'
+    | '/api/partner/attach'
+    | '/api/partner/me'
     | '/lovable/email/suppression'
     | '/reels/order/$orderNo'
     | '/api/admin/blog/run'
@@ -577,6 +647,7 @@ export interface FileRouteTypes {
     | '/admin/kakao-connect'
     | '/admin/kakao-questions'
     | '/admin/outreach'
+    | '/admin/partners'
     | '/admin/reels'
     | '/admin/visits'
     | '/api/track'
@@ -584,6 +655,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
+    | '/partner/me'
     | '/payment/result'
     | '/reels/checkout'
     | '/solutions/automation'
@@ -595,14 +667,19 @@ export interface FileRouteTypes {
     | '/solutions/telecom'
     | '/u/$slug'
     | '/blog'
+    | '/partner'
     | '/reels'
     | '/api/admin/inquiries'
     | '/api/admin/kakao'
     | '/api/admin/kakao-questions'
     | '/api/admin/outreach'
+    | '/api/admin/partners'
     | '/api/admin/visits'
     | '/api/kakao/callback'
     | '/api/kakao/skill'
+    | '/api/partner/apply'
+    | '/api/partner/attach'
+    | '/api/partner/me'
     | '/lovable/email/suppression'
     | '/reels/order/$orderNo'
     | '/api/admin/blog/run'
@@ -632,6 +709,7 @@ export interface FileRouteTypes {
     | '/admin_/kakao-connect'
     | '/admin_/kakao-questions'
     | '/admin_/outreach'
+    | '/admin_/partners'
     | '/admin_/reels'
     | '/admin_/visits'
     | '/api/track'
@@ -639,6 +717,7 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/email/unsubscribe'
     | '/p/$slug'
+    | '/partner/me'
     | '/payment/result'
     | '/reels/checkout'
     | '/solutions/automation'
@@ -650,14 +729,19 @@ export interface FileRouteTypes {
     | '/solutions/telecom'
     | '/u/$slug'
     | '/blog/'
+    | '/partner/'
     | '/reels/'
     | '/api/admin/inquiries'
     | '/api/admin/kakao'
     | '/api/admin/kakao-questions'
     | '/api/admin/outreach'
+    | '/api/admin/partners'
     | '/api/admin/visits'
     | '/api/kakao/callback'
     | '/api/kakao/skill'
+    | '/api/partner/apply'
+    | '/api/partner/attach'
+    | '/api/partner/me'
     | '/lovable/email/suppression'
     | '/reels/order/$orderNo'
     | '/api/admin/blog/run'
@@ -686,6 +770,7 @@ export interface RootRouteChildren {
   AdminKakaoConnectRoute: typeof AdminKakaoConnectRoute
   AdminKakaoQuestionsRoute: typeof AdminKakaoQuestionsRoute
   AdminOutreachRoute: typeof AdminOutreachRoute
+  AdminPartnersRoute: typeof AdminPartnersRoute
   AdminReelsRoute: typeof AdminReelsRoute
   AdminVisitsRoute: typeof AdminVisitsRoute
   ApiTrackRoute: typeof ApiTrackRoute
@@ -693,6 +778,7 @@ export interface RootRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   PSlugRoute: typeof PSlugRoute
+  PartnerMeRoute: typeof PartnerMeRoute
   PaymentResultRoute: typeof PaymentResultRoute
   ReelsCheckoutRoute: typeof ReelsCheckoutRoute
   SolutionsAutomationRoute: typeof SolutionsAutomationRoute
@@ -704,14 +790,19 @@ export interface RootRouteChildren {
   SolutionsTelecomRoute: typeof SolutionsTelecomRoute
   USlugRoute: typeof USlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
+  PartnerIndexRoute: typeof PartnerIndexRoute
   ReelsIndexRoute: typeof ReelsIndexRoute
   ApiAdminInquiriesRoute: typeof ApiAdminInquiriesRoute
   ApiAdminKakaoRoute: typeof ApiAdminKakaoRoute
   ApiAdminKakaoQuestionsRoute: typeof ApiAdminKakaoQuestionsRoute
   ApiAdminOutreachRoute: typeof ApiAdminOutreachRoute
+  ApiAdminPartnersRoute: typeof ApiAdminPartnersRoute
   ApiAdminVisitsRoute: typeof ApiAdminVisitsRoute
   ApiKakaoCallbackRoute: typeof ApiKakaoCallbackRoute
   ApiKakaoSkillRoute: typeof ApiKakaoSkillRoute
+  ApiPartnerApplyRoute: typeof ApiPartnerApplyRoute
+  ApiPartnerAttachRoute: typeof ApiPartnerAttachRoute
+  ApiPartnerMeRoute: typeof ApiPartnerMeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ReelsOrderOrderNoRoute: typeof ReelsOrderOrderNoRoute
   ApiAdminBlogRunRoute: typeof ApiAdminBlogRunRoute
@@ -821,6 +912,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReelsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/': {
+      id: '/partner/'
+      path: '/partner'
+      fullPath: '/partner/'
+      preLoaderRoute: typeof PartnerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -898,6 +996,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentResultRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/partner/me': {
+      id: '/partner/me'
+      path: '/partner/me'
+      fullPath: '/partner/me'
+      preLoaderRoute: typeof PartnerMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/p/$slug': {
       id: '/p/$slug'
       path: '/p/$slug'
@@ -945,6 +1050,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/reels'
       fullPath: '/admin/reels'
       preLoaderRoute: typeof AdminReelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin_/partners': {
+      id: '/admin_/partners'
+      path: '/admin/partners'
+      fullPath: '/admin/partners'
+      preLoaderRoute: typeof AdminPartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin_/outreach': {
@@ -1010,6 +1122,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/partner/me': {
+      id: '/api/partner/me'
+      path: '/api/partner/me'
+      fullPath: '/api/partner/me'
+      preLoaderRoute: typeof ApiPartnerMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/partner/attach': {
+      id: '/api/partner/attach'
+      path: '/api/partner/attach'
+      fullPath: '/api/partner/attach'
+      preLoaderRoute: typeof ApiPartnerAttachRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/partner/apply': {
+      id: '/api/partner/apply'
+      path: '/api/partner/apply'
+      fullPath: '/api/partner/apply'
+      preLoaderRoute: typeof ApiPartnerApplyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/kakao/skill': {
       id: '/api/kakao/skill'
       path: '/api/kakao/skill'
@@ -1029,6 +1162,13 @@ declare module '@tanstack/react-router' {
       path: '/api/admin/visits'
       fullPath: '/api/admin/visits'
       preLoaderRoute: typeof ApiAdminVisitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/partners': {
+      id: '/api/admin/partners'
+      path: '/api/admin/partners'
+      fullPath: '/api/admin/partners'
+      preLoaderRoute: typeof ApiAdminPartnersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/outreach': {
@@ -1128,6 +1268,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminKakaoConnectRoute: AdminKakaoConnectRoute,
   AdminKakaoQuestionsRoute: AdminKakaoQuestionsRoute,
   AdminOutreachRoute: AdminOutreachRoute,
+  AdminPartnersRoute: AdminPartnersRoute,
   AdminReelsRoute: AdminReelsRoute,
   AdminVisitsRoute: AdminVisitsRoute,
   ApiTrackRoute: ApiTrackRoute,
@@ -1135,6 +1276,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   PSlugRoute: PSlugRoute,
+  PartnerMeRoute: PartnerMeRoute,
   PaymentResultRoute: PaymentResultRoute,
   ReelsCheckoutRoute: ReelsCheckoutRoute,
   SolutionsAutomationRoute: SolutionsAutomationRoute,
@@ -1146,14 +1288,19 @@ const rootRouteChildren: RootRouteChildren = {
   SolutionsTelecomRoute: SolutionsTelecomRoute,
   USlugRoute: USlugRoute,
   BlogIndexRoute: BlogIndexRoute,
+  PartnerIndexRoute: PartnerIndexRoute,
   ReelsIndexRoute: ReelsIndexRoute,
   ApiAdminInquiriesRoute: ApiAdminInquiriesRoute,
   ApiAdminKakaoRoute: ApiAdminKakaoRoute,
   ApiAdminKakaoQuestionsRoute: ApiAdminKakaoQuestionsRoute,
   ApiAdminOutreachRoute: ApiAdminOutreachRoute,
+  ApiAdminPartnersRoute: ApiAdminPartnersRoute,
   ApiAdminVisitsRoute: ApiAdminVisitsRoute,
   ApiKakaoCallbackRoute: ApiKakaoCallbackRoute,
   ApiKakaoSkillRoute: ApiKakaoSkillRoute,
+  ApiPartnerApplyRoute: ApiPartnerApplyRoute,
+  ApiPartnerAttachRoute: ApiPartnerAttachRoute,
+  ApiPartnerMeRoute: ApiPartnerMeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ReelsOrderOrderNoRoute: ReelsOrderOrderNoRoute,
   ApiAdminBlogRunRoute: ApiAdminBlogRunRoute,

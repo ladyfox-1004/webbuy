@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { submitInquiry } from "@/lib/inquiry.functions";
+import { readStoredRef } from "@/lib/partner/ref";
 import { supabase } from "@/integrations/supabase/client";
 
 // 필요한 것 선택지. 다른 곳(홈 섹션 등)에서 같은 라벨을 쓰려면 이걸 import 한다.
@@ -168,6 +169,8 @@ export function InquiryForm({
           topic: topicBadge,
           honeypot,
           attachmentFailed,
+          // 추천인(파트너) 링크로 들어온 브라우저면 그 코드(30일 기억). 없으면 빈 값.
+          refCode: readStoredRef()?.code ?? "",
         },
       });
       setDone({

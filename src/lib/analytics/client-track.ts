@@ -5,6 +5,9 @@
 // - session_id: sessionStorage(탭 세션마다 하나).
 // - 세션 첫 방문 때 URL 의 utm_* 와 document.referrer 호스트를 세션에 저장해 그 세션 모든 기록에 붙인다.
 // - 기록 안 함: /admin…, /login, 그리고 관리자 본인(관리자 화면에 들어오면 useAdminGate 가 aisol_no_track=1 을 저장).
+// - 추천인 코드: 주소에 ?ref=코드 가 있으면 localStorage aisol_ref 에 30일 기억(src/lib/partner/ref.ts)하고
+//   그 방문 기록에 rf 로 붙인다. 기록 안 하는 브라우저(관리자)는 기억도 하지 않는다.
+import { captureRef } from "@/lib/partner/ref";
 
 export const NO_TRACK_KEY = "aisol_no_track";
 const VISITOR_KEY = "aisol_vid";
@@ -111,6 +114,13 @@ export function trackPageView(path: string) {
     if (lastSent.path === path && now - lastSent.at < 1000) return;
     lastSent = { path, at: now };
 
+    let rf: string | null = null;
+    try {
+      rf = captureRef(window.location.search);
+    } catch {
+      rf = null;
+    }
+
     const s = sessionInfo();
     const body = JSON.stringify({
       v: visitorId(s.id),
@@ -120,6 +130,7 @@ export function trackPageView(path: string) {
       us: s.us,
       um: s.um,
       uc: s.uc,
+      rf: rf ?? undefined,
     });
     const url = "/api/track";
     if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {

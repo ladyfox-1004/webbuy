@@ -5,6 +5,7 @@
 // 가짜로 끼워 볼 수 있게 했다.
 import { z } from "zod";
 import type { InquiryNotice } from "./notify/types";
+import { normalizeRef } from "./partner/ref";
 
 export const InquirySchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -24,6 +25,8 @@ export const InquirySchema = z.object({
   // 스팸 봇용 숨김 필드. 사람은 볼 수 없으므로 값이 있으면 봇이다.
   honeypot: z.string().max(200).optional().default(""),
   attachmentFailed: z.boolean().optional().default(false),
+  // 추천인(파트너) 코드 — 브라우저가 30일 기억한 ?ref= 값(src/lib/partner/ref.ts). 형식이 틀리면 버린다.
+  refCode: z.string().trim().max(40).optional().default(""),
 });
 
 export type InquiryInput = z.infer<typeof InquirySchema>;
@@ -68,6 +71,8 @@ export type InquiryRow = {
   file_name: string | null;
   consent: true;
   source: "homepage";
+  /** 추천 코드가 있을 때만 넣는다(마이그레이션 20261107160000_partners.sql 전이어도 접수가 끊기지 않게) */
+  ref_code?: string;
 };
 
 export type InquiryDeps = {
@@ -92,6 +97,7 @@ export async function processInquiry(data: InquiryInput, deps: InquiryDeps): Pro
   // 알림 결과를 나중에 이 행에 적으려고 id 를 미리 만든다(anon 은 .select() 로 되읽을 수 없다).
   const id = (deps.newId ?? (() => crypto.randomUUID()))();
   const receivedAt = (deps.now ?? (() => new Date()))().toISOString();
+  const refCode = normalizeRef(data.refCode);
 
   // 첨부파일은 경로/파일명만 문자열로 남긴다.
   // 서명 URL 은 service_role 이 필요하므로 여기서 만들지 않는다. 다운로드 URL 은 생성기가 만든다.
@@ -108,6 +114,7 @@ export async function processInquiry(data: InquiryInput, deps: InquiryDeps): Pro
       file_name: data.fileName ?? null,
       consent: true,
       source: "homepage",
+      ...(refCode ? { ref_code: refCode } : {}),
     }));
   } catch (err) {
     insertError = { message: err instanceof Error ? err.name : "unknown" };

@@ -18,6 +18,7 @@ import {
   type ReelsPlan,
 } from "@/lib/reels/constants";
 import { checkout, quote, type Quote } from "@/lib/reels/api";
+import { attachReelsRef } from "@/lib/partner/client";
 import {
   checkoutFieldErrors,
   normalizeInstaPreview,
@@ -130,6 +131,8 @@ function CheckoutPage() {
       quoted_amount: quoted.quote.amount,
     });
     if (r.ok) {
+      // 추천인(파트너) 링크로 들어온 손님이면 이 주문에 코드를 붙인다(실패해도 결제는 그대로, 최대 1.5초).
+      await attachReelsRef({ order_no: r.order_no, payurl: r.payurl, phone: form.phone.trim() });
       // 결제창으로 넘어간다. 이동하는 동안 단추는 계속 막아 둔다.
       window.location.href = r.payurl;
       return;

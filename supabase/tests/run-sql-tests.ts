@@ -78,6 +78,9 @@ const outreachCandidatesTestFile = new URL("./outreach_candidates.test.sql", her
 // 카카오 채널 챗봇(20261107150000_kakao_chat.sql) — 대화 상태·챗봇 질문·추가 FAQ. 다른 표에 기대지 않는다.
 const kakaoChatMigration = new URL("../migrations/20261107150000_kakao_chat.sql", here);
 const kakaoChatTestFile = new URL("./kakao_chat.test.sql", here);
+// 추천인(파트너)(20261107160000_partners.sql) — reels_orders·inquiries·site_visits 에 ref_code 열·트리거를 더하므로 맨 뒤에.
+const partnersMigration = new URL("../migrations/20261107160000_partners.sql", here);
+const partnersTestFile = new URL("./partners.test.sql", here);
 
 const db = new PGlite();
 let passed = 0;
@@ -117,6 +120,8 @@ await step("마이그레이션 20261107140000_outreach_candidates.sql", await De
 await step("시험 outreach_candidates.test.sql", await Deno.readTextFile(outreachCandidatesTestFile));
 await step("마이그레이션 20261107150000_kakao_chat.sql", await Deno.readTextFile(kakaoChatMigration));
 await step("시험 kakao_chat.test.sql", await Deno.readTextFile(kakaoChatTestFile));
+await step("마이그레이션 20261107160000_partners.sql", await Deno.readTextFile(partnersMigration));
+await step("시험 partners.test.sql", await Deno.readTextFile(partnersTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

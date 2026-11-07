@@ -250,6 +250,7 @@ export type Database = {
           name: string
           notes: string
           notified_at: string | null
+          ref_code: string | null
           reference_links: string
           services: string[]
           sheet_notify_status: string | null
@@ -266,6 +267,7 @@ export type Database = {
           name: string
           notes?: string
           notified_at?: string | null
+          ref_code?: string | null
           reference_links?: string
           services?: string[]
           sheet_notify_status?: string | null
@@ -282,6 +284,7 @@ export type Database = {
           name?: string
           notes?: string
           notified_at?: string | null
+          ref_code?: string | null
           reference_links?: string
           services?: string[]
           sheet_notify_status?: string | null
@@ -795,6 +798,7 @@ export type Database = {
           device: string
           id: number
           path: string
+          ref_code: string | null
           referrer_host: string | null
           session_id: string
           source: string
@@ -808,6 +812,7 @@ export type Database = {
           device?: string
           id?: number
           path: string
+          ref_code?: string | null
           referrer_host?: string | null
           session_id: string
           source?: string
@@ -821,6 +826,7 @@ export type Database = {
           device?: string
           id?: number
           path?: string
+          ref_code?: string | null
           referrer_host?: string | null
           session_id?: string
           source?: string
@@ -923,6 +929,28 @@ export type Database = {
       outreach_quota_add: {
         Args: { p_day: string; p_units: number }
         Returns: number
+      }
+      partner_admin_overview: { Args: { _now?: string }; Returns: Json }
+      partner_apply: { Args: { _p: Json }; Returns: Json }
+      partner_attach_reels: {
+        Args: { _order_no: string; _payurl: string; _phone: string; _ref: string; _now?: string }
+        Returns: Json
+      }
+      partner_commission_cancel: {
+        Args: { _id: string; _note?: string; _now?: string }
+        Returns: Json
+      }
+      partner_inquiry_paid: {
+        Args: { _inquiry_id: string; _amount: number; _now?: string }
+        Returns: Json
+      }
+      partner_make_payouts: { Args: { _month: string; _now?: string }; Returns: Json }
+      partner_me: { Args: { _view_key: string; _now?: string }; Returns: Json }
+      partner_payout_mark_paid: { Args: { _id: string; _now?: string }; Returns: Json }
+      partner_refresh_payable: { Args: { _now?: string }; Returns: number }
+      partner_set_status: {
+        Args: { _id: string; _status: string; _now?: string }
+        Returns: Json
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }

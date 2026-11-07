@@ -101,6 +101,8 @@ export type TrackInput = {
   utmSource: string | null;
   utmMedium: string | null;
   utmCampaign: string | null;
+  /** 추천인(파트너) 코드 — ?ref= 로 들어온 그 방문에만 붙는다. 형식이 틀리면 null(요청은 그대로 받는다) */
+  refCode: string | null;
 };
 
 const ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
@@ -120,7 +122,7 @@ function shortText(v: unknown, max = 100): string | null | undefined {
 
 /**
  * 브라우저가 보낸 본문(JSON 문자열) 검사. 틀리면 null(서버는 204 로 조용히 답한다).
- * 본문 모양: { v: visitor_id, s: session_id, p: path, r?: referrer_host, us?, um?, uc? }
+ * 본문 모양: { v: visitor_id, s: session_id, p: path, r?: referrer_host, us?, um?, uc?, rf?: 추천 코드 }
  */
 export function parseTrackBody(raw: string): TrackInput | null {
   if (!raw || raw.length > MAX_TRACK_BODY_BYTES) return null;
@@ -153,5 +155,8 @@ export function parseTrackBody(raw: string): TrackInput | null {
   const utmCampaign = shortText(b.uc);
   if (utmSource === undefined || utmMedium === undefined || utmCampaign === undefined) return null;
 
-  return { visitorId: b.v, sessionId: b.s, path, referrerHost, utmSource, utmMedium, utmCampaign };
+  // 추천 코드는 형식만 본다(승인 여부는 저장 때 안 본다). 틀리면 이 칸만 버린다.
+  const refCode = typeof b.rf === "string" && /^[a-z0-9]{4,16}$/.test(b.rf) ? b.rf : null;
+
+  return { visitorId: b.v, sessionId: b.s, path, referrerHost, utmSource, utmMedium, utmCampaign, refCode };
 }

@@ -163,6 +163,7 @@ describe("입력 검사", () => {
       utmSource: "daangn",
       utmMedium: "profile",
       utmCampaign: "nov",
+      refCode: null,
     });
   });
   test("선택 칸이 없거나 빈 값이면 null", () => {
