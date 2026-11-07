@@ -10,18 +10,28 @@ export function useAdminGate(): boolean {
   const [ok, setOk] = useState(false);
   useEffect(() => {
     let alive = true;
-    (async () => {
+    // 🚨 2026-11-07: 로그인 확인이 멈추거나(만료된 세션·여러 탭 잠금) 오류가 나면 빙글이 화면에 영원히 머물렀다.
+    //    12초 안에 끝나지 않거나 오류면 로그인 화면으로 보낸다.
+    const check = (async () => {
       const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return void navigate({ to: "/login", replace: true });
-      const { data: role } = await supabase
+      if (!u.user) return "login" as const;
+      const { data: role, error } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", u.user.id)
         .eq("role", "admin")
         .maybeSingle();
-      if (!role) return void navigate({ to: "/", replace: true });
-      if (alive) setOk(true);
+      if (error) return "login" as const;
+      return role ? ("ok" as const) : ("home" as const);
     })();
+    const timeout = new Promise<"login">((res) => setTimeout(() => res("login"), 12000));
+    Promise.race([check, timeout])
+      .catch(() => "login" as const)
+      .then((r) => {
+        if (!alive) return;
+        if (r === "ok") setOk(true);
+        else navigate({ to: r === "home" ? "/" : "/login", replace: true });
+      });
     return () => {
       alive = false;
     };
