@@ -8,7 +8,7 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { fileURLToPath } from "node:url";
 import type { NitroConfig } from "nitro/types";
 
-// 블로그 예약 실행(Cloudflare Cron Triggers, 시각은 UTC).
+// 블로그·영업 메일 예약 실행(Cloudflare Cron Triggers, 시각은 UTC).
 // 빌드 때 nitro 가 이 크론들을 .output/server/wrangler.json 의 triggers.crons 로 넣고,
 // 워커의 scheduled 핸들러가 controller.cron 문자열로 아래 작업을 골라 ctx.waitUntil 로 실행한다.
 // 🚨 Cloudflare 크론의 요일 숫자는 1=일요일 ~ 7=토요일이다(유닉스 cron 과 다름).
@@ -25,10 +25,16 @@ const nitro = {
     "blog:publish": {
       handler: fileURLToPath(new URL("./src/server/blog-tasks/publish-task.ts", import.meta.url)),
     },
+    "outreach:auto-send": {
+      handler: fileURLToPath(new URL("./src/server/outreach-tasks/auto-send-task.ts", import.meta.url)),
+    },
   },
   scheduledTasks: {
     "0 21 * * *": ["blog:collect"], // 매일 06:00 KST
     "0 0 * * TUE,FRI": ["blog:publish"], // 화·금 09:00 KST
+    // 영업 메일 자동 발송 — 30분마다 깨어나고, 한국 시간 매일 07:00~20:00 인지는 코드(src/lib/outreach/auto.ts)가 본다.
+    // 🚨 무료 요금제 크론 트리거 개수 한도가 있다(지금 3개). 더 늘리기 전에 확인하라.
+    "*/30 * * * *": ["outreach:auto-send"],
   },
 } satisfies NitroConfig;
 

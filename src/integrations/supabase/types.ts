@@ -394,6 +394,24 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_settings: {
+        Row: {
+          auto_send: boolean
+          id: number
+          updated_at: string | null
+        }
+        Insert: {
+          auto_send?: boolean
+          id?: number
+          updated_at?: string | null
+        }
+        Update: {
+          auto_send?: boolean
+          id?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number

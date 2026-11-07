@@ -36,8 +36,9 @@ function pick(src: Bag | undefined): OutreachEnv {
   return out;
 }
 
-export function readOutreachEnv(): OutreachEnv {
+/** cfEnv: 예약 실행(nitro task)의 context.cloudflare.env. 있으면 가장 우선한다(blog-automation/env.ts 와 같은 방식). */
+export function readOutreachEnv(cfEnv?: unknown): OutreachEnv {
   const proc = typeof process !== "undefined" ? (process.env as Bag) : undefined;
   const nitroEnv = (globalThis as { __env__?: Bag }).__env__;
-  return { ...pick(proc), ...pick(nitroEnv) };
+  return { ...pick(proc), ...pick(nitroEnv), ...pick(cfEnv as Bag | undefined) };
 }

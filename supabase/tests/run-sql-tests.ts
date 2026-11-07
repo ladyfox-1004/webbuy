@@ -69,6 +69,9 @@ const visitsTestFile = new URL("./site_visits.test.sql", here);
 // 영업 메일(20261107120000_outreach.sql)은 site_visits.source 제약을 고친다 → 방문 기록 마이그레이션 다음에.
 const outreachMigration = new URL("../migrations/20261107120000_outreach.sql", here);
 const outreachTestFile = new URL("./outreach.test.sql", here);
+// 영업 메일 자동 발송 스위치(20261107130000_outreach_settings.sql) — 영업 메일 다음에.
+const outreachSettingsMigration = new URL("../migrations/20261107130000_outreach_settings.sql", here);
+const outreachSettingsTestFile = new URL("./outreach_settings.test.sql", here);
 
 const db = new PGlite();
 let passed = 0;
@@ -102,6 +105,8 @@ await step("마이그레이션 20261107100000_site_visits.sql", await Deno.readT
 await step("시험 site_visits.test.sql", await Deno.readTextFile(visitsTestFile));
 await step("마이그레이션 20261107120000_outreach.sql", await Deno.readTextFile(outreachMigration));
 await step("시험 outreach.test.sql", await Deno.readTextFile(outreachTestFile));
+await step("마이그레이션 20261107130000_outreach_settings.sql", await Deno.readTextFile(outreachSettingsMigration));
+await step("시험 outreach_settings.test.sql", await Deno.readTextFile(outreachSettingsTestFile));
 
 console.log(`\n통과 ${passed}개, 실패 0개`);
 await db.close();

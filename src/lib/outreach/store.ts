@@ -4,6 +4,7 @@
 // 🚨 Cloudflare Worker 는 요청 하나에 외부 호출(subrequest) 수 상한이 있다(무료 50). 20통 보내기 =
 //    인증 2 + 준비 6 + (보내기 1 + 기록 1) × 20 = 48. 호출을 늘리지 마라.
 import type { ServiceDb } from "../notify/token-store";
+import type { AutoSendStore } from "./auto";
 import type { DraftRow, OutreachStatus, OutreachStore } from "./service";
 
 export const DRAFT_COLS =
@@ -80,6 +81,42 @@ export function supabaseOutreachStore(db: ServiceDb): OutreachStore {
         .eq("id", id)
         .eq("status", "sending");
       if (error) fail("실패 기록", error);
+    },
+  };
+}
+
+// ───────── 자동 발송 스위치·오늘 ready (표 outreach_settings — 마이그레이션 20261107130000_outreach_settings.sql) ─────────
+
+/** 자동 발송 켜짐 여부. 행이 없으면 기본값 true(마이그레이션이 행을 넣는다). 읽기 실패는 던진다. */
+export async function readAutoSend(db: ServiceDb): Promise<boolean> {
+  const { data, error } = await db.from("outreach_settings").select("auto_send").eq("id", 1).maybeSingle();
+  if (error) fail("자동 발송 설정 읽기", error);
+  return data ? data.auto_send === true : true;
+}
+
+export async function writeAutoSend(db: ServiceDb, on: boolean, now: Date = new Date()): Promise<boolean> {
+  const { data, error } = await db
+    .from("outreach_settings")
+    .upsert({ id: 1, auto_send: on, updated_at: now.toISOString() })
+    .select("auto_send")
+    .single();
+  if (error) fail("자동 발송 설정 저장", error);
+  return data.auto_send === true;
+}
+
+export function supabaseAutoSendStore(db: ServiceDb): AutoSendStore {
+  return {
+    getAutoSend: () => readAutoSend(db),
+    async readyIdsForDate(date) {
+      const { data, error } = await db
+        .from("outreach_drafts")
+        .select("id")
+        .eq("batch_date", date)
+        .eq("status", "ready")
+        .order("created_at", { ascending: true })
+        .limit(200);
+      if (error) fail("오늘 보낼 후보 읽기", error);
+      return (data ?? []).map((r) => r.id);
     },
   };
 }

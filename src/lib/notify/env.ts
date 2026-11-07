@@ -46,10 +46,11 @@ function pick(src: Bag | undefined): NotifyEnv {
   return out;
 }
 
-export function readNotifyEnv(): NotifyEnv {
+/** cfEnv: 예약 실행(nitro task)의 context.cloudflare.env. 있으면 가장 우선한다. */
+export function readNotifyEnv(cfEnv?: unknown): NotifyEnv {
   const proc = typeof process !== "undefined" ? (process.env as Bag) : undefined;
   const nitroEnv = (globalThis as { __env__?: Bag }).__env__;
-  return { ...pick(proc), ...pick(nitroEnv) };
+  return { ...pick(proc), ...pick(nitroEnv), ...pick(cfEnv as Bag | undefined) };
 }
 
 /** 카톡 알림의 "문의 보기" 단추가 여는 관리자 화면. 카카오 앱의 Web 플랫폼 도메인에 이 도메인을 등록해야 링크가 열린다. */

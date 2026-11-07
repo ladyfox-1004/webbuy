@@ -62,6 +62,8 @@ export type SendDeps = {
   sleep?: (ms: number) => Promise<void>;
   now?: () => Date;
   log?: (msg: string) => void;
+  /** 이번에 보낼 최대 통수(기본 MAX_SEND_PER_REQUEST). 넘는 줄은 ready 그대로 남는다(deferred). */
+  maxPerRun?: number;
 };
 
 export type SendItem = { id: string; status: OutreachStatus | "not_ready"; error?: string };
@@ -162,7 +164,7 @@ export async function sendSelected(rawIds: string[], deps: SendDeps): Promise<Se
 
   const candidates = ids.filter((id) => !blocked.has(byId.get(id)!.email) && byId.get(id)!.status === "ready");
   const notReadyIds = ids.filter((id) => !blocked.has(byId.get(id)!.email) && byId.get(id)!.status !== "ready");
-  const thisRound = candidates.slice(0, MAX_SEND_PER_REQUEST);
+  const thisRound = candidates.slice(0, Math.max(0, Math.min(deps.maxPerRun ?? MAX_SEND_PER_REQUEST, MAX_SEND_PER_REQUEST)));
   result.deferred = candidates.length - thisRound.length;
 
   // 3) 지메일 로그인 — 실패하면 아무 줄도 sending 으로 만들지 않는다

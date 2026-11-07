@@ -3,6 +3,8 @@
 // 🚨 head 에는 title·robots 만. canonical 넣지 마라(루트 head 와 합쳐진다).
 // 🚨 확인은 window.confirm 대신 화면 안 확인 상자(브라우저 확인창은 자동화를 멈춘다).
 // 자료: /api/admin/outreach (src/routes/api/admin/outreach.ts). 메일 본문은 src/lib/outreach/mail.ts 한 곳.
+// 맨 위 「자동 발송」 스위치 = outreach_settings.auto_send. 켜져 있으면 워커 예약 실행(30분마다,
+// src/server/outreach-tasks/auto-send-task.ts)이 한국 시간 매일 07:00~20:00 에 오늘 묶음 ready 를 보낸다.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -37,6 +39,8 @@ type Resp = {
   today: string;
   date: string;
   gmailConnected: boolean;
+  /** 자동 발송 켜짐 여부. 설정 표가 없으면 null */
+  autoSend: boolean | null;
   rows: Row[];
   days: Day[];
   totalSent: number;
@@ -121,6 +125,29 @@ function AdminOutreach() {
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState<null | "send" | "action">(null);
   const [result, setResult] = useState<{ kind: "ok" | "error"; text: string } | null>(null);
+  // 자동 발송 스위치 — 누르면 화면 안 확인 상자, 확인하면 저장
+  const [autoConfirm, setAutoConfirm] = useState<null | boolean>(null);
+  const [autoBusy, setAutoBusy] = useState(false);
+
+  async function doSetAuto(on: boolean) {
+    setAutoConfirm(null);
+    setAutoBusy(true);
+    setResult(null);
+    try {
+      const res = await adminFetch("/api/admin/outreach", {
+        method: "POST",
+        body: JSON.stringify({ action: "set_auto", on }),
+      });
+      const body = (await res.json().catch(() => ({}))) as { autoSend?: boolean; error?: string };
+      if (!res.ok) throw new Error(body.error ?? `HTTP ${res.status}`);
+      setResult({ kind: "ok", text: body.autoSend ? "자동 발송을 켰습니다." : "자동 발송을 껐습니다. 이제 직접 「보내기」를 눌러야 나갑니다." });
+    } catch (e) {
+      setResult({ kind: "error", text: (e as Error).message });
+    } finally {
+      setAutoBusy(false);
+      void q.refetch();
+    }
+  }
 
   const readyRows = rows.filter((r) => r.status === "ready");
   const selected = readyRows.filter((r) => checked.has(r.id));
@@ -204,6 +231,42 @@ function AdminOutreach() {
           <RefreshCw className={`h-4 w-4 ${q.isFetching ? "animate-spin" : ""}`} /> 새로고침
         </button>
       </div>
+
+      {data && (
+        <section className="mt-4 rounded-2xl border border-border bg-card p-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div className="font-semibold">
+              자동 발송{" "}
+              {data.autoSend === null ? (
+                <span className="text-muted-foreground">확인 안 됨</span>
+              ) : data.autoSend ? (
+                <span className="text-emerald-700">켜짐</span>
+              ) : (
+                <span className="text-muted-foreground">꺼짐</span>
+              )}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={data.autoSend === true}
+              aria-label="자동 발송 켜고 끄기"
+              disabled={data.autoSend === null || autoBusy || busy !== null}
+              onClick={() => setAutoConfirm(!data.autoSend)}
+              className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full transition disabled:opacity-50 ${
+                data.autoSend ? "bg-emerald-600" : "bg-zinc-300"
+              }`}
+            >
+              <span className={`inline-block h-6 w-6 rounded-full bg-white shadow transition ${data.autoSend ? "translate-x-7" : "translate-x-1"}`} />
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            매일 아침 7시~저녁 8시, 노트북이 골라 넣으면 30분 안에 자동으로 보냅니다. 항의·신고가 오면 꺼 주세요.
+          </p>
+          {data.autoSend === null && (
+            <p className="mt-2 text-sm text-amber-800">설정 표가 아직 없습니다 — 마이그레이션 20261107130000_outreach_settings.sql 을 적용해 주세요.</p>
+          )}
+        </section>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <label className="flex items-center gap-2 text-sm">
@@ -378,6 +441,11 @@ function AdminOutreach() {
           {readyRows.length > 0 && (
             <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 px-4 py-3 backdrop-blur">
               <div className="mx-auto max-w-2xl">
+                {data.autoSend === true && busy !== "send" && (
+                  <p className="mb-2 text-center text-sm text-muted-foreground">
+                    자동 발송이 켜져 있어 곧 자동으로 나갑니다. 빼고 싶은 곳은 '건너뛰기'
+                  </p>
+                )}
                 {busy === "send" ? (
                   <div className="flex items-center justify-center gap-2 py-3 text-base">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -393,6 +461,37 @@ function AdminOutreach() {
                     <Send className="h-5 w-5" /> 선택한 {n(selected.length)}곳 보내기
                   </button>
                 )}
+              </div>
+            </div>
+          )}
+
+          {autoConfirm !== null && (
+            <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="outreach-auto-title">
+              <div className="w-full max-w-md rounded-3xl bg-card p-6 shadow-xl">
+                <h2 id="outreach-auto-title" className="text-lg font-bold">
+                  {autoConfirm ? "자동 발송을 켤까요?" : "자동 발송을 끌까요?"}
+                </h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {autoConfirm
+                    ? "매일 아침 7시~저녁 8시 사이, 그날 준비된 곳에 30분 안에 자동으로 메일이 나갑니다. 보내면 대표님 카톡으로 알려 드려요."
+                    : "끄면 자동으로 나가지 않습니다. 보내려면 직접 골라서 「보내기」를 눌러 주세요."}
+                </p>
+                <div className="mt-6 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAutoConfirm(null)}
+                    className="flex-1 rounded-2xl border border-border px-4 py-3 text-base"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => doSetAuto(autoConfirm)}
+                    className="flex-1 rounded-2xl bg-gradient-to-br from-primary to-primary-glow px-4 py-3 text-base font-semibold text-primary-foreground"
+                  >
+                    {autoConfirm ? "켜기" : "끄기"}
+                  </button>
+                </div>
               </div>
             </div>
           )}

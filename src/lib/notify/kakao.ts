@@ -182,16 +182,36 @@ export async function sendMemo(
   }
 }
 
-/**
- * 접수 한 건을 카톡으로 보낸다. 예외를 던지지 않고 상태를 돌려준다.
- * 새 리프레시 토큰을 받았는데 저장이 실패하면 메시지는 보내되 상태에 그 사실을 남긴다
- * ("ok" 대신 "failed:store_save" — 다음 갱신 때까지는 옛 토큰도 쓸 수 있지만 꼭 봐야 한다).
- */
+/** 접수 한 건을 카톡으로 보낸다. 예외를 던지지 않고 상태를 돌려준다(sendKakaoTemplate 참고). */
 export async function sendKakaoNotice(
   n: InquiryNotice,
   cfg: KakaoConfig,
   store: KakaoTokenStore | null,
   adminUrl: string,
+  fetchFn: FetchLike = fetch,
+): Promise<NotifyStatus> {
+  return sendKakaoTemplate(buildKakaoTemplate(n, adminUrl), cfg, store, fetchFn);
+}
+
+/** 접수 알림이 아닌 글(예: 영업 메일 자동 발송 결과)을 같은 「나에게 보내기」로 보낼 때의 템플릿 */
+export function buildKakaoTextTemplate(text: string, url: string, buttonTitle: string) {
+  return {
+    object_type: "text" as const,
+    text: clip(text, KAKAO_TEXT_MAX),
+    link: { web_url: url, mobile_web_url: url },
+    button_title: buttonTitle,
+  };
+}
+
+/**
+ * 템플릿 하나를 대표님 카톡으로 보낸다(/admin/kakao-connect 로 연결된 토큰). 예외를 던지지 않고 상태를 돌려준다.
+ * 새 리프레시 토큰을 받았는데 저장이 실패하면 메시지는 보내되 상태에 그 사실을 남긴다
+ * ("ok" 대신 "failed:store_save" — 다음 갱신 때까지는 옛 토큰도 쓸 수 있지만 꼭 봐야 한다).
+ */
+export async function sendKakaoTemplate(
+  template: ReturnType<typeof buildKakaoTemplate>,
+  cfg: KakaoConfig,
+  store: KakaoTokenStore | null,
   fetchFn: FetchLike = fetch,
 ): Promise<NotifyStatus> {
   if (!cfg.restApiKey) return "skipped:no_rest_api_key";
@@ -229,7 +249,7 @@ export async function sendKakaoNotice(
   }
 
   try {
-    await sendMemo(accessToken, buildKakaoTemplate(n, adminUrl), fetchFn);
+    await sendMemo(accessToken, template, fetchFn);
   } catch (err) {
     return `failed:${errorReason(err)}`;
   }
